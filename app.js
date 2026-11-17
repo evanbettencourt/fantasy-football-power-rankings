@@ -188,7 +188,7 @@ function renderStandings(week) {
     }
   }
   standings.sort((a,b)=>b.wins-a.wins || b.pf-a.pf);
-  $("standings-body").innerHTML=standings.map((t,i)=>`<tr><td>${i+1}</td><td class="standings-team">${teamName(t)}</td><td>${t.wins}-${t.losses}${t.ties?`-${t.ties}`:""}</td><td>${fmt(t.pf)}</td><td>${fmt(t.pa)}</td></tr>`).join("");
+  $("standings-body").innerHTML=standings.map((t,i)=>`<tr><td>${i+1}</td><td class="standings-team">${teamName(t)}<small class="manager-name">${escapeHtml(t.owner)}</small></td><td>${t.wins}-${t.losses}${t.ties?`-${t.ties}`:""}</td><td>${fmt(t.pf)}</td><td>${fmt(t.pa)}</td></tr>`).join("");
 }
 function renderStats(week, rankings) {
   const weekData=calculateWeek(week);
