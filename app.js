@@ -158,37 +158,26 @@ function renderScoreboard(week) {
     </div>`).join("");
 }
 function renderStandings(week) {
-  const standings = [...state.teams.values()].map(t=>({...t,wins:0,losses:0,ties:0,pf:0,pa:0}));
-  const map = new Map(standings.map(t=>[t.id,t]));
-  for (let w=1;w<=week;w++) {
-    const groups = new Map();
-    for (const m of state.weeks[w] || []) {
-      if (!groups.has(m.matchup_id)) groups.set(m.matchup_id,[]);
-      groups.get(m.matchup_id).push(m);
-    }
-    for (const group of groups.values()) {
-      if (group.length!==2 || group.some(m=>num(m.points)<=0)) continue;
-      const [a,b]=group,ta=map.get(Number(a.roster_id)),tb=map.get(Number(b.roster_id));
-      if (!ta||!tb) continue;
-      ta.pf+=num(a.points);tb.pf+=num(b.points);ta.pa+=num(b.points);tb.pa+=num(a.points);
-      if(num(a.points)>num(b.points)){ta.wins++;tb.losses++}else if(num(a.points)<num(b.points)){tb.wins++;ta.losses++}else{ta.ties++;tb.ties++}
-    }
-    if (w <= getWeeksToLoad()) {
-      const scores = (state.weeks[w] || []).filter(m=>num(m.points)>0).map(m=>num(m.points)).sort((a,b)=>a-b);
-      if (scores.length === standings.length) {
-        const median = (scores[scores.length/2-1] + scores[scores.length/2]) / 2;
-        for (const m of state.weeks[w]) {
-          const t = map.get(Number(m.roster_id));
-          if (!t || num(m.points)<=0) continue;
-          if (num(m.points)>median) t.wins++;
-          else if (num(m.points)<median) t.losses++;
-          else t.ties++;
-        }
-      }
-    }
-  }
-  standings.sort((a,b)=>b.wins-a.wins || b.pf-a.pf);
-  $("standings-body").innerHTML=standings.map((t,i)=>`<tr><td>${i+1}</td><td class="standings-team">${teamName(t)}<small class="manager-name">${escapeHtml(t.owner)}</small></td><td>${t.wins}-${t.losses}${t.ties?`-${t.ties}`:""}</td><td>${fmt(t.pf)}</td><td>${fmt(t.pa)}</td></tr>`).join("");
+ const teams=[...state.teams.values()].map(t=>({...t,wins:0,losses:0,ties:0,pf:0,pa:0}));
+ const map=new Map(teams.map(t=>[t.id,t]));
+ for(let w=1;w<=week;w++){
+  const groups=new Map();
+  for(const m of state.weeks[w]||[]){if(!groups.has(m.matchup_id))groups.set(m.matchup_id,[]);groups.get(m.matchup_id).push(m);}
+  for(const g of groups.values()){if(g.length!==2||g.some(m=>num(m.points)<=0))continue;const [a,b]=g,ta=map.get(Number(a.roster_id)),tb=map.get(Number(b.roster_id));if(!ta||!tb)continue;ta.pf+=num(a.points);tb.pf+=num(b.points);ta.pa+=num(b.points);tb.pa+=num(a.points);if(num(a.points)>num(b.points)){ta.wins++;tb.losses++;}else if(num(a.points)<num(b.points)){tb.wins++;ta.losses++;}else{ta.ties++;tb.ties++;}}
+  const scores=(state.weeks[w]||[]).filter(m=>num(m.points)>0).map(m=>num(m.points)).sort((x,y)=>x-y);
+  if(scores.length===teams.length){const med=(scores[5]+scores[6])/2;for(const m of state.weeks[w]){const t=map.get(Number(m.roster_id));if(!t||num(m.points)<=0)continue;if(num(m.points)>med)t.wins++;else if(num(m.points)<med)t.losses++;else t.ties++;}}
+ }
+ teams.sort((x,y)=>y.wins-x.wins||y.pf-x.pf);
+ const colors=["#ff4d91","#26b9d5","#9a68ff","#e8b83d","#50c99a","#f0784f","#b5a0ff","#5dc4ee","#e47eb4","#a7d86c","#f1a34c","#8d9cf5"];
+ const row=(t,i)=>'<div class="league-team-row"><span class="team-rank">'+String(i+1).padStart(2,"0")+'</span><span class="team-color" style="--team-color:'+colors[i%colors.length]+'"></span><div class="league-team-identity"><strong>'+teamName(t)+'</strong><small>'+escapeHtml(t.owner)+'</small></div><span class="league-team-record">'+t.wins+'-'+t.losses+(t.ties?'-'+t.ties:'')+'</span></div>';
+ $("playoff-standings").innerHTML=teams.slice(0,6).map(row).join("");
+ $("bubble-standings").innerHTML=teams.slice(6).map((t,i)=>row(t,i+6)).join("");
+}
+function renderLeagueStatus(week){
+ const max=getWeeksToLoad(),label=$("current-week-label"),phase=$("league-phase"),buttons=$("league-week-buttons");
+ if(label)label.textContent="WEEK "+week;
+ if(phase)phase.textContent=week>=15?"PLAYOFFS":"REGULAR SEASON";
+ if(buttons){buttons.innerHTML=Array.from({length:max},(_,i)=>i+1).map(w=>'<button type="button" class="week-chip '+(w===week?'active':'')+'" data-week="'+w+'">'+w+'</button>').join("");buttons.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>renderWeek(Number(btn.dataset.week))));}
 }
 function renderStats(week, rankings) {
   const weekData=calculateWeek(week);
@@ -218,6 +207,7 @@ function renderWeek(week) {
   renderStandings(week);
   renderStats(week,rankings);
   renderEditorial(week,rankings);
+  renderLeagueStatus(week);
   $("week-select").value=String(week);
   $("status").textContent=`CONNECTED · ${state.teams.size} TEAMS · DATA THROUGH WEEK ${week}`;
 }
