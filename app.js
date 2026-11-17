@@ -202,11 +202,7 @@ function renderStats(week, rankings) {
 }
 function renderWeek(week) {
   state.selectedWeek=week;
-  const rankings=renderRankings(week);
-  renderScoreboard(week);
   renderStandings(week);
-  renderStats(week,rankings);
-  renderEditorial(week,rankings);
   renderLeagueStatus(week);
   $("week-select").value=String(week);
   $("status").textContent=`CONNECTED · ${state.teams.size} TEAMS · DATA THROUGH WEEK ${week}`;
@@ -298,7 +294,6 @@ function setupNavigation() {
       const visible = panel.dataset.panel === target;
       panel.hidden = !visible;
     });
-    if (target === "schedule") renderSchedule();
     if (target === "rules") renderRules();
     window.scrollTo({top:0,behavior:"smooth"});
   }));
