@@ -5,6 +5,7 @@ const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1
 
 const num = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
 const fmt = (v) => num(v).toFixed(2);
+const MANAGERS = { khogan99:"Kevin", marcd9:"Marc", cjmyers210:"Colby", tajibhall:"Ben", itsdonk:"Brandon", turtmonk:"Evan", pgdoyle5:"Pat", joeysolomon:"Joey", abutta31:"Butta", lee2222:"Lee", dersnation:"Ders", tanzi14:"Tanz" };
 const initials = (name) => (name || "?").trim().split(/\s+/).slice(0,2).map(x => x[0]).join("").toUpperCase();
 const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function teamFor(rosterId) { return state.teams.get(Number(rosterId)); }
@@ -28,9 +29,10 @@ function buildTeams() {
   for (const roster of state.rosters) {
     const owner = userById.get(roster.owner_id);
     const metadata = owner?.metadata || {};
-    const name = metadata.team_name || owner?.display_name || owner?.username || `Team ${roster.roster_id}`;
+    const username = owner?.username || "";
+    const name = metadata.team_name || owner?.display_name || username || `Team ${roster.roster_id}`;
     state.teams.set(Number(roster.roster_id), {
-      id: Number(roster.roster_id), name, owner: owner?.display_name || owner?.username || "",
+      id: Number(roster.roster_id), name, owner: MANAGERS[username] || owner?.display_name || username, username,
       avatar: metadata.avatar || owner?.avatar || null, wins: 0, losses: 0, ties: 0,
       pf: 0, pa: 0, allPlayWins: 0, allPlayGames: 0, scores: []
     });
@@ -99,7 +101,7 @@ function computeRankings(week) {
     }
   }
   const maxPf = Math.max(1,...teams.map(t=>t.pf));
-  const games = Math.max(1,week);
+  const games = Math.max(1,week * 2);
   const recentWeeks = [Math.max(1,week-2),Math.max(1,week-1),week];
   const recentAverages = recentWeeks.map(w => {
     const all = (state.weeks[w] || []).filter(m=>num(m.points)>0).map(m=>num(m.points));
