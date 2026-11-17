@@ -592,7 +592,7 @@ html,body{background:#17132b;color:var(--text);font-family:"DM Sans",Arial,sans-
 
 /* Faithful JFL-inspired Power Rankings recreation */
 
-@font-face{font-family:Inter;src:url("/fonts/inter-latin-var.woff2") format("woff2");font-style:normal;font-weight:100 900;font-display:swap}
+
 :root{--jfl-purple-bright:#7B33F5;--jfl-purple-deep:#3B1E78;--jfl-light-purple:#EAB4F9;--jfl-pink:#F74193;--jfl-sky:#239FC2;--jfl-gold:#D5943B;--jfl-cream:#F5F4EB;--jfl-ink:#121122;--jfl-parchment:#F4EFE2}
 .pr-page{position:relative;isolation:isolate;width:calc(100% + 56px);min-height:calc(100vh - 76px);margin:0 -28px;color:var(--jfl-cream);background:linear-gradient(165deg,var(--jfl-ink),var(--jfl-purple-deep));font-family:Inter,Arial,sans-serif}
 .pr-shell{display:flex;align-items:flex-start;gap:30px;max-width:1180px;margin:auto;padding:34px 24px 64px}
