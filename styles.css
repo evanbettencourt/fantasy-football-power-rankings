@@ -611,3 +611,24 @@ html,body{background:#17132b;color:var(--text);font-family:"DM Sans",Arial,sans-
 /* Weekly scoring chart: neutral ties and a clear top-six / bottom-six cutoff. */
 .pr-chart-bar-item i.win{background:#57F26B}.pr-chart-bar-item i.loss{background:#F2685C}.pr-chart-bar-item i.even{background:#D5943B}.pr-chart-bar-item span{display:block;color:#F5F4EB!important;opacity:1;visibility:visible;font:9px ui-monospace,monospace;line-height:1.2}.pr-chart-bar-item b{display:block;visibility:visible;opacity:1}
 .pr-chart-median-divider{flex:0 0 0;width:0;height:140px;align-self:flex-end;margin:0 3px 18px;border-left:2px dashed #F5F4EB99}
+
+
+/* Weekly rankings report workspace */
+.pr-report-panel{max-width:1180px;margin:22px auto 0;padding:19px 20px;border:1px solid #ffffff2b;border-radius:9px;background:linear-gradient(135deg,#ffffff0d,#ffffff05);color:var(--jfl-cream)}
+.pr-report-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.pr-report-kicker{color:var(--jfl-pink);font-size:9px;font-weight:800;letter-spacing:.18em}
+.pr-report-heading h2{margin:6px 0 5px;color:var(--jfl-gold);font-size:17px;font-weight:900;letter-spacing:.03em}
+.pr-report-heading p{margin:0;color:#c9bed8;font-size:11px;line-height:1.5}
+.pr-report-live{flex:none;padding:6px 8px;border:1px solid #57f26b55;border-radius:4px;color:#8be99a;font-size:8px;font-weight:800;letter-spacing:.1em}
+.pr-report-controls{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-top:15px}
+.pr-report-controls label{color:var(--jfl-light-purple);font-size:9px;font-weight:800;letter-spacing:.12em}
+.pr-report-controls select,.pr-report-controls button{height:34px;padding:0 11px;border:1px solid #ffffff38;border-radius:5px;background:#21183c;color:var(--jfl-cream);font:800 9px Inter,Arial,sans-serif;letter-spacing:.06em}
+.pr-report-controls select{min-width:105px}
+.pr-report-controls button{border-color:#D5943B99;color:var(--jfl-gold);cursor:pointer}
+.pr-report-controls button:disabled{opacity:.4;cursor:not-allowed}
+.pr-report-controls button:hover:not(:disabled){background:#D5943B20}
+.pr-report-status{min-height:16px;margin:10px 0 8px;color:#b9accb;font-size:10px}
+.pr-report-status.error{color:#ff9a91}
+.pr-report-output{display:block;width:100%;min-height:185px;max-height:420px;resize:vertical;padding:12px;border:1px solid #ffffff22;border-radius:6px;background:#0c0a18;color:#eee8f5;font:10px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}
+.pr-report-footnote{margin:9px 0 0;color:#a99fbe;font-size:9px;line-height:1.55}
+@media(max-width:600px){.pr-report-panel{margin:18px 0 0;padding:14px}.pr-report-heading{flex-direction:column}.pr-report-controls{gap:7px}.pr-report-controls button{flex:1}.pr-report-output{min-height:210px}}
