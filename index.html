@@ -4,105 +4,84 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#17132b">
-  <meta name="description" content="Fantasy football league power rankings, weekly results, and standings.">
-  <title>Monkey Boys Fantasy Football</title>
+  <meta name="description" content="Monkey Boys Fantasy Football League">
+  <title>Monkey Boys Fantasy League</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="shell">
-    <header class="topbar">
-      <a class="wordmark" href="#" aria-label="Monkey Boys home"><span class="mark">MB</span><span>MONKEY BOYS</span></a>
-      <div class="top-meta"><span class="live-dot"></span><span id="season-label">SLEEPER LEAGUE</span><span class="meta-divider">/</span><span>POWER INDEX</span></div>
-    </header>
-    <nav class="site-nav" aria-label="Main navigation">
-      <span class="nav-crest" aria-hidden="true">MB</span><button class="nav-tab active" data-tab="league">League</button>
-      <button class="nav-tab" data-tab="lottery">Draft Lottery</button>
-      <button class="nav-tab" data-tab="rankings">Power Rankings</button>
-      <button class="nav-tab" data-tab="schedule">Schedule</button>
-      <button class="nav-tab" data-tab="hall">Hall of Fame</button>
-      <button class="nav-tab" data-tab="rules">Constitution</button>
-    </nav>
-
-    <main>
-      <section class="intro tab-panel" data-panel="rankings">
-        <div class="eyebrow">MONKEY BOYS FOOTBALL CLUB <span id="season-tag">2026 SEASON</span></div>
-        <div class="intro-row">
-          <div>
-            <h1>Monkey Boys <em>League</em></h1>
-            <p class="lede">SEASON II · 2026</p>
-          </div>
-          <div class="week-control">
-            <label for="week-select">WEEK</label>
-            <select id="week-select" aria-label="Select week"></select><button id="reveal-button" class="reveal-button" type="button">REVEAL</button>
-          </div>
-        </div>
-        <div id="status" class="status">Connecting to Sleeper league data…</div>
-      </section>
-
-      <section class="stat-grid tab-panel" data-panel="league" id="headline-stats">
-        <article class="stat-card"><span class="stat-label">TOP TEAM</span><strong id="top-team">—</strong><span class="stat-foot" id="top-team-foot">POWER INDEX LEADER</span></article>
-        <article class="stat-card"><span class="stat-label">WEEKLY HIGH</span><strong id="weekly-high">—</strong><span class="stat-foot" id="weekly-high-foot">—</span></article>
-        <article class="stat-card"><span class="stat-label">BIGGEST RISER</span><strong id="biggest-riser">—</strong><span class="stat-foot" id="biggest-riser-foot">THIS WEEK</span></article>
-        <article class="stat-card"><span class="stat-label">LEAGUE AVERAGE</span><strong id="league-average">—</strong><span class="stat-foot">POINTS PER TEAM</span></article>
-      </section>
-
-      <section class="section rankings-section tab-panel" data-panel="rankings">
-        <div class="section-heading">
-          <div><div class="eyebrow">01 / THE POWER INDEX</div><h2>Where everybody stands</h2></div>
-          <span class="section-note">POWER SCORE · 0–100</span>
-        </div>
-        <div class="table-wrap">
-          <table class="rank-table">
-            <thead><tr><th class="rank-col">RANK</th><th>TEAM</th><th>RECORD</th><th>PF</th><th>ALL-PLAY</th><th>POWER</th><th class="move-col">Δ</th></tr></thead>
-            <tbody id="rankings-body"><tr><td colspan="7" class="loading-cell">Loading rankings…</td></tr></tbody>
-          </table>
-        </div>
-        <div class="method-note">THE POWER INDEX BLENDS RECORD, ALL-PLAY PERFORMANCE, POINTS FOR, AND RECENT FORM.</div><section class="weekly-chart"><div class="chart-heading"><span class="eyebrow">02 / THE SCORING PICTURE</span><span class="section-note">POINTS FOR · SELECTED WEEK</span></div><div id="weekly-chart-bars" class="weekly-chart-bars"></div></section><section class="rank-notes"><div class="eyebrow">03 / THE WEEKLY DISPATCH</div><h2>Notes from around the league</h2><div id="team-notes" class="team-notes"></div></section>
-      </section>
-
-      <div class="lower-grid tab-panel" data-panel="league">
-        <section class="section">
-          <div class="section-heading compact"><div><div class="eyebrow">02 / THIS WEEK</div><h2>Scoreboard</h2></div></div>
-          <div id="scoreboard" class="scoreboard"><div class="loading-cell">Loading matchups…</div></div>
-        </section>
-        <section class="section">
-          <div class="section-heading compact"><div><div class="eyebrow">03 / THE TABLE</div><h2>Standings</h2></div></div>
-          <div class="table-wrap">
-            <table class="standings-table">
-              <thead><tr><th>#</th><th>TEAM</th><th>W-L</th><th>PF</th><th>PA</th></tr></thead>
-              <tbody id="standings-body"><tr><td colspan="5" class="loading-cell">Loading standings…</td></tr></tbody>
-            </table>
-          </div>
-        </section>
+<div class="shell">
+  <header class="topbar"><a class="wordmark" href="#"><span class="mark">MB</span><span>MONKEY BOYS</span></a><div class="top-meta"><span class="live-dot"></span><span id="season-label">2026 SLEEPER LEAGUE</span></div></header>
+  <nav class="site-nav" aria-label="Main navigation">
+    <span class="nav-crest" aria-hidden="true">MB</span>
+    <button class="nav-tab active" data-tab="league">League</button>
+    <button class="nav-tab" data-tab="lottery">Draft Lottery</button>
+    <button class="nav-tab" data-tab="rankings">Power Rankings</button>
+    <button class="nav-tab" data-tab="schedule">Schedule</button>
+    <button class="nav-tab" data-tab="hall">Hall of Fame</button>
+    <button class="nav-tab" data-tab="rules">Constitution</button>
+  </nav>
+  <main>
+    <section class="league-hero tab-panel" data-panel="league">
+      <div class="jfl-kicker">MONKEY BOYS FANTASY LEAGUE <span>·</span> <span id="season-tag">2026 SEASON</span></div>
+      <div class="league-hero-row">
+        <div><h1>MONKEY BOYS<br><em>FANTASY LEAGUE</em></h1><p>THE HOME OF THE LEAGUE.</p></div>
+        <div class="league-crest">MB<span>2026</span></div>
       </div>
+      <div id="status" class="status">CONNECTING TO SLEEPER LEAGUE DATA…</div>
+    </section>
+    <section class="league-overview tab-panel" data-panel="league">
+      <article class="league-status-panel">
+        <div class="panel-kicker">LEAGUE STATUS</div><h2 id="league-phase">REGULAR SEASON</h2>
+        <div class="phase-track"><span class="phase-done"></span><span></span><span></span></div>
+        <div class="phase-labels"><span>PRESEASON</span><span>REGULAR SEASON</span><span>PLAYOFFS</span></div>
+        <div class="current-week"><span>CURRENT WEEK</span><strong id="current-week-label">WEEK —</strong></div>
+        <div class="week-picker-label">SELECT A WEEK</div><div id="league-week-buttons" class="league-week-buttons"></div>
+      </article>
+      <article class="league-standings-panel">
+        <div class="standings-title"><div><div class="panel-kicker">THE TABLE</div><h2>LEAGUE STANDINGS</h2></div><span>12 TEAMS</span></div>
+        <div class="standings-columns">
+          <div><div class="standings-group-title"><span class="playoff-dot"></span> PLAYOFF POSITION <small>TOP 6</small></div><div id="playoff-standings" class="league-team-list"></div></div>
+          <div><div class="standings-group-title"><span class="bubble-dot"></span> ON THE BUBBLE <small>7–12</small></div><div id="bubble-standings" class="league-team-list"></div></div>
+        </div>
+      </article>
+    </section>
+    <section class="lower-grid tab-panel" data-panel="league">
+      <section class="section"><div class="section-heading compact"><div><div class="eyebrow">WEEKLY MATCHUPS</div><h2>Scoreboard</h2></div></div><div id="scoreboard" class="scoreboard"><div class="loading-cell">Loading matchups…</div></div></section>
+      <section class="section"><div class="section-heading compact"><div><div class="eyebrow">LEAGUE SNAPSHOT</div><h2>Season leaders</h2></div></div>
+        <div class="leader-stats">
+          <div><span>TOP TEAM</span><strong id="top-team">—</strong><small id="top-team-foot">POWER INDEX LEADER</small></div>
+          <div><span>WEEKLY HIGH</span><strong id="weekly-high">—</strong><small id="weekly-high-foot">—</small></div>
+          <div><span>BIGGEST RISER</span><strong id="biggest-riser">—</strong><small id="biggest-riser-foot">THIS WEEK</small></div>
+          <div><span>LEAGUE AVG.</span><strong id="league-average">—</strong><small>POINTS PER TEAM</small></div>
+        </div>
+      </section>
+    </section>
+    <section class="takeaway-section tab-panel" data-panel="league"><div class="section-heading compact"><div><div class="eyebrow">THE CONVERSATION</div><h2>Week in review</h2></div></div><p id="takeaway">The league story is coming into focus…</p></section>
 
-      <section class="section takeaway-section tab-panel" data-panel="league">
-        <div class="section-heading compact"><div><div class="eyebrow">04 / THE CONVERSATION</div><h2>Week in review</h2></div></div>
-        <p id="takeaway">The league story is coming into focus…</p>
-      </section>
-      <section class="league-hero tab-panel" data-panel="league">
-        <div class="jfl-kicker">MONKEY BOYS FANTASY LEAGUE <span>·</span> SEASON II · 2026</div>
-        <div class="league-hero-row"><div><h1>MONKEY BOYS<br><em>FANTASY LEAGUE</em></h1><p>THE HOME OF THE LEAGUE.</p></div><div class="league-crest">MB<span>2026</span></div></div>
-        <div id="status" class="status">CONNECTING TO SLEEPER LEAGUE DATA…</div>
-      </section>
-      <section class="league-overview tab-panel" data-panel="league">
-        <article class="league-status-panel"><div class="panel-kicker">LEAGUE STATUS</div><h2 id="league-phase">REGULAR SEASON</h2><div class="phase-track"><span class="phase-done"></span><span></span><span></span></div><div class="phase-labels"><span>PRESEASON</span><span>REGULAR SEASON</span><span>PLAYOFFS</span></div><div class="current-week"><span>CURRENT WEEK</span><strong id="current-week-label">WEEK —</strong></div><div class="week-picker-label">SELECT A WEEK</div><div id="league-week-buttons" class="league-week-buttons"></div></article>
-        <article class="league-standings-panel"><div class="standings-title"><div><div class="panel-kicker">THE TABLE</div><h2>LEAGUE STANDINGS</h2></div><span>12 TEAMS</span></div><div class="standings-columns"><div><div class="standings-group-title"><span class="playoff-dot"></span> PLAYOFF POSITION <small>TOP 6</small></div><div id="playoff-standings" class="league-team-list"></div></div><div><div class="standings-group-title"><span class="bubble-dot"></span> ON THE BUBBLE <small>7–12</small></div><div id="bubble-standings" class="league-team-list"></div></div></div></article>
-      </section>
-      <div class="lower-grid tab-panel" data-panel="league"><section class="section"><div class="section-heading compact"><div><div class="eyebrow">WEEKLY MATCHUPS</div><h2>Scoreboard</h2></div></div><div id="scoreboard" class="scoreboard"><div class="loading-cell">Loading matchups…</div></div></section><section class="section"><div class="section-heading compact"><div><div class="eyebrow">LEAGUE SNAPSHOT</div><h2>Season leaders</h2></div></div><div class="leader-stats"><div><span>TOP TEAM</span><strong id="top-team">—</strong></div><div><span>WEEKLY HIGH</span><strong id="weekly-high">—</strong></div><div><span>BIGGEST RISER</span><strong id="biggest-riser">—</strong></div><div><span>LEAGUE AVG.</span><strong id="league-average">—</strong></div></div></section></div>
-      <section class="intro tab-panel" data-panel="rankings" hidden><div class="eyebrow">MONKEY BOYS FOOTBALL CLUB <span id="season-tag">2026 SEASON</span></div><div class="intro-row"><div><h1>POWER <em>RANKINGS</em></h1><p class="lede">SEASON II · 2026</p></div><div class="week-control"><label for="week-select">WEEK</label><select id="week-select" aria-label="Select week"></select><button id="reveal-button" class="reveal-button" type="button">REVEAL</button></div></div></section>
-      <section class="section rankings-section tab-panel" data-panel="rankings" hidden><div class="section-heading"><div><div class="eyebrow">POWER INDEX</div><h2>Where everybody stands</h2></div><span class="section-note">POWER SCORE · 0–100</span></div><div class="table-wrap"><table class="rank-table"><thead><tr><th>RANK</th><th>TEAM</th><th>RECORD</th><th>PF</th><th>ALL-PLAY</th><th>POWER</th><th>Δ</th></tr></thead><tbody id="rankings-body"><tr><td colspan="7" class="loading-cell">Loading rankings…</td></tr></tbody></table></div><div class="method-note">THE POWER INDEX BLENDS RECORD, ALL-PLAY PERFORMANCE, POINTS FOR, AND RECENT FORM.</div><section class="weekly-chart"><div class="chart-heading"><span class="eyebrow">THE SCORING PICTURE</span><span class="section-note">POINTS FOR · SELECTED WEEK</span></div><div id="weekly-chart-bars" class="weekly-chart-bars"></div></section><section class="rank-notes"><div class="eyebrow">THE WEEKLY DISPATCH</div><h2>Notes from around the league</h2><div id="team-notes" class="team-notes"></div></section></section>
-      <section class="section tab-panel extra-panel" data-panel="lottery" hidden><div class="eyebrow">DRAFT ORDER</div><h2>Draft Lottery</h2><p>Draft lottery results and selection order.</p><div id="lottery-content"></div></section>
-      <section class="section tab-panel extra-panel" data-panel="schedule" hidden><div class="eyebrow">THE FIXTURES</div><h2>Schedule</h2><p>Weekly matchup results across the regular season.</p><div id="schedule-content"></div></section>
-      <section class="section tab-panel extra-panel" data-panel="hall" hidden><div class="eyebrow">THE RECORD BOOK</div><h2>Hall of Fame</h2><p>League champions and all-time achievements.</p><div id="hall-content"></div></section>
-      <section class="section tab-panel extra-panel" data-panel="rules" hidden><div class="eyebrow">THE CONSTITUTION</div><h2>The Constitution</h2><p class="rules-intro">The official rules, settings, roster requirements, and scoring system of Monkey Boys Fantasy Football.</p><div id="rules-content" class="rules-content"></div></section>
-    </main>
+    <section class="intro tab-panel" data-panel="rankings" hidden>
+      <div class="eyebrow">MONKEY BOYS FOOTBALL CLUB <span id="season-tag-rankings">2026 SEASON</span></div>
+      <div class="intro-row"><div><h1>POWER <em>RANKINGS</em></h1><p class="lede">SEASON II · 2026</p></div>
+        <div class="week-control"><label for="week-select">WEEK</label><select id="week-select" aria-label="Select week"></select><button id="reveal-button" class="reveal-button" type="button">REVEAL</button></div>
+      </div>
+    </section>
+    <section class="section rankings-section tab-panel" data-panel="rankings" hidden>
+      <div class="section-heading"><div><div class="eyebrow">THE POWER INDEX</div><h2>Where everybody stands</h2></div><span class="section-note">POWER SCORE · 0–100</span></div>
+      <div class="table-wrap"><table class="rank-table"><thead><tr><th>RANK</th><th>TEAM</th><th>RECORD</th><th>PF</th><th>ALL-PLAY</th><th>POWER</th><th>Δ</th></tr></thead><tbody id="rankings-body"><tr><td colspan="7" class="loading-cell">Loading rankings…</td></tr></tbody></table></div>
+      <div class="method-note">THE POWER INDEX BLENDS RECORD, ALL-PLAY PERFORMANCE, POINTS FOR, AND RECENT FORM.</div>
+      <section class="weekly-chart"><div class="chart-heading"><span class="eyebrow">THE SCORING PICTURE</span><span class="section-note">POINTS FOR · SELECTED WEEK</span></div><div id="weekly-chart-bars" class="weekly-chart-bars"></div></section>
+      <section class="rank-notes"><div class="eyebrow">THE WEEKLY DISPATCH</div><h2>Notes from around the league</h2><div id="team-notes" class="team-notes"></div></section>
+    </section>
 
-    <footer><span>MONKEY BOYS <span class="footer-dot">●</span> EST. 2025</span><span id="updated-at">LIVE LEAGUE DATA</span></footer>
-  </div>
-  <script src="app.js"></script>
+    <section class="section tab-panel extra-panel" data-panel="lottery" hidden><div class="eyebrow">DRAFT ORDER</div><h2>Draft Lottery</h2><p>Draft lottery results and selection order.</p><div id="lottery-content"></div></section>
+    <section class="section tab-panel extra-panel" data-panel="schedule" hidden><div class="eyebrow">THE FIXTURES</div><h2>Schedule</h2><p>Weekly matchup results across the regular season.</p><div id="schedule-content"></div></section>
+    <section class="section tab-panel extra-panel" data-panel="hall" hidden><div class="eyebrow">THE RECORD BOOK</div><h2>Hall of Fame</h2><p>League champions and all-time achievements.</p><div id="hall-content"></div></section>
+    <section class="section tab-panel extra-panel" data-panel="rules" hidden><div class="eyebrow">THE CONSTITUTION</div><h2>The Constitution</h2><p class="rules-intro">The official rules, settings, roster requirements, and scoring system of Monkey Boys Fantasy Football.</p><div id="rules-content" class="rules-content"></div></section>
+  </main>
+  <footer><span>MONKEY BOYS <span class="footer-dot">●</span> EST. 2025</span><span id="updated-at">LIVE LEAGUE DATA</span></footer>
+</div>
+<script src="app.js"></script>
 </body>
 </html>
