@@ -17,9 +17,17 @@
       <a class="wordmark" href="#" aria-label="League Room home"><span class="mark">LR</span><span>LEAGUE ROOM</span></a>
       <div class="top-meta"><span class="live-dot"></span><span id="season-label">SLEEPER LEAGUE</span><span class="meta-divider">/</span><span>POWER INDEX</span></div>
     </header>
+    <nav class="site-nav" aria-label="Main navigation">
+      <button class="nav-tab active" data-tab="league">League</button>
+      <button class="nav-tab" data-tab="lottery">Draft Lottery</button>
+      <button class="nav-tab" data-tab="rankings">Power Rankings</button>
+      <button class="nav-tab" data-tab="schedule">Schedule</button>
+      <button class="nav-tab" data-tab="hall">Hall of Fame</button>
+      <button class="nav-tab" data-tab="rules">Rules</button>
+    </nav>
 
     <main>
-      <section class="intro">
+      <section class="intro tab-panel" data-panel="league">
         <div class="eyebrow">THE WEEKLY LEAGUE REPORT <span id="season-tag">2026 SEASON</span></div>
         <div class="intro-row">
           <div>
@@ -34,14 +42,14 @@
         <div id="status" class="status">Connecting to Sleeper league data…</div>
       </section>
 
-      <section class="stat-grid" id="headline-stats">
+      <section class="stat-grid tab-panel" data-panel="league" id="headline-stats">
         <article class="stat-card"><span class="stat-label">TOP TEAM</span><strong id="top-team">—</strong><span class="stat-foot" id="top-team-foot">POWER INDEX LEADER</span></article>
         <article class="stat-card"><span class="stat-label">WEEKLY HIGH</span><strong id="weekly-high">—</strong><span class="stat-foot" id="weekly-high-foot">—</span></article>
         <article class="stat-card"><span class="stat-label">BIGGEST RISER</span><strong id="biggest-riser">—</strong><span class="stat-foot" id="biggest-riser-foot">THIS WEEK</span></article>
         <article class="stat-card"><span class="stat-label">LEAGUE AVERAGE</span><strong id="league-average">—</strong><span class="stat-foot">POINTS PER TEAM</span></article>
       </section>
 
-      <section class="section rankings-section">
+      <section class="section rankings-section tab-panel" data-panel="rankings">
         <div class="section-heading">
           <div><div class="eyebrow">01 / THE INDEX</div><h2>Power rankings</h2></div>
           <span class="section-note">POWER SCORE · 0–100</span>
@@ -55,7 +63,7 @@
         <div class="method-note">POWER INDEX BLENDS WIN RATE (35%), ALL-PLAY WIN RATE (25%), TOTAL POINTS (25%) AND RECENT FORM (15%).</div>
       </section>
 
-      <div class="lower-grid">
+      <div class="lower-grid tab-panel" data-panel="league">
         <section class="section">
           <div class="section-heading compact"><div><div class="eyebrow">02 / THIS WEEK</div><h2>Scoreboard</h2></div></div>
           <div id="scoreboard" class="scoreboard"><div class="loading-cell">Loading matchups…</div></div>
@@ -71,10 +79,14 @@
         </section>
       </div>
 
-      <section class="section takeaway-section">
+      <section class="section takeaway-section tab-panel" data-panel="league">
         <div class="section-heading compact"><div><div class="eyebrow">04 / THE CONVERSATION</div><h2>Week in review</h2></div></div>
         <p id="takeaway">The league story is coming into focus…</p>
       </section>
+      <section class="section tab-panel extra-panel" data-panel="lottery" hidden><div class="eyebrow">02 / THE DRAW</div><h2>Draft Lottery</h2><p>Lottery format and odds will be added once we confirm your league's draft-lottery rules.</p></section>
+      <section class="section tab-panel extra-panel" data-panel="schedule" hidden><div class="eyebrow">04 / THE FIXTURES</div><h2>Schedule</h2><p>Weekly schedule and matchup history will appear here.</p><div id="schedule-content"></div></section>
+      <section class="section tab-panel extra-panel" data-panel="hall" hidden><div class="eyebrow">05 / THE RECORD BOOK</div><h2>Hall of Fame</h2><p>League records, champions, and all-time achievements will appear here once we connect the league's historical seasons.</p></section>
+      <section class="section tab-panel extra-panel" data-panel="rules" hidden><div class="eyebrow">06 / THE CONSTITUTION</div><h2>Rules</h2><p>Your league rules will live here. We can populate this page from your constitution or Sleeper league settings.</p></section>
     </main>
 
     <footer><span>LEAGUE ROOM <span class="footer-dot">●</span> POWERED BY SLEEPER</span><span id="updated-at">LIVE LEAGUE DATA</span></footer>
