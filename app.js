@@ -295,6 +295,7 @@ function setupNavigation() {
       panel.hidden = !visible;
     });
     if (target === "rules") renderRules();
+    if (target === "rankings") { const rankings=renderRankings(state.selectedWeek); renderEditorial(state.selectedWeek,rankings); }
     window.scrollTo({top:0,behavior:"smooth"});
   }));
 }
