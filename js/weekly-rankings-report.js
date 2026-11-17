@@ -48,7 +48,7 @@
   }
 
   async function loadPlayerDatabase() {
-    const cacheKey = "mb-sleeper-players-nfl-v1";
+    const cacheKey = "mb-sleeper-players-nfl-v2";
     try {
       const cached = sessionStorage.getItem(cacheKey);
       if (cached) {
