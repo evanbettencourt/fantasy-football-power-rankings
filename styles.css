@@ -8,3 +8,90 @@ body{background:var(--bg);color:var(--text)}.shell{max-width:1160px;padding:0 48
 @media(max-width:760px){.shell{padding:0 19px}.intro{padding:44px 0 24px}.stat-grid{border-bottom:1px solid var(--text)}.stat-card{border-bottom:1px solid var(--line);padding:14px}.stat-card:nth-child(2){border-right:0}.team-notes{grid-template-columns:1fr}.weekly-chart-bars{gap:4px}.chart-bar-label,.chart-bar-value{font-size:7px}.chart-heading{flex-direction:column}.rank-notes{padding:25px 0}.rule-group summary{font-size:10px}.takeaway-section{padding:19px}.extra-panel h2{font-size:35px}}
 
 .rankings-hidden tr{display:none!important}
+
+
+/* JFL-inspired dark visual system */
+:root{
+ color-scheme:dark;
+ --bg:#17132b;--panel:#211d45;--panel2:#29234f;--line:#40365e;
+ --muted:#a69bbd;--text:#f4f0e8;--lime:#20b6d2;--red:#ff4f91;
+ --purple:#8238f4;--pink:#ff3297;--gold:#f2bd38;--mono:"DM Mono",monospace;
+ --sans:"DM Sans",Arial,sans-serif;
+}
+html,body{min-height:100%;background:radial-gradient(ellipse at 85% 15%,#2c1850 0%,#1b1534 38%,#141126 100%);color:var(--text)}
+body{font-family:var(--sans);font-size:15px}
+.shell{max-width:none;width:100%;padding:0 28px}
+.topbar{display:none}
+.site-nav{height:76px;margin:0 -28px;padding:0 27px;display:flex;align-items:center;gap:0;border-bottom:1px solid #ffffff20;background:#100e20aa}
+.nav-crest{width:42px;height:42px;margin-right:22px;display:grid;place-items:center;color:#f7f1e8;border:1px solid #f7f1e888;border-radius:8px 8px 12px 12px;font-weight:900;font-size:13px;letter-spacing:-1px;clip-path:polygon(0 0,100% 0,100% 78%,50% 100%,0 78%)}
+.nav-tab{height:76px;padding:0 13px;border:0;border-bottom:3px solid transparent;color:#aaa1b8;font:500 16px var(--sans);letter-spacing:-.02em}
+.nav-tab:hover,.nav-tab.active{color:#fff}
+.nav-tab.active{border-bottom-color:var(--lime)}
+main{max-width:1500px;margin:0 auto}
+.intro{padding:62px 0 28px}
+.eyebrow,.week-control label,.stat-label,.stat-foot,.section-note,.rank-table th,.standings-table th,.method-note,footer{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.2em}
+.eyebrow{color:var(--pink)}
+.eyebrow span{color:var(--pink)}
+.intro-row{margin-top:22px;align-items:center}
+h1{font-family:var(--sans);font-weight:900;font-size:clamp(54px,6vw,88px);line-height:.92;letter-spacing:-.045em;text-transform:uppercase;max-width:760px}
+h1 em{font-style:normal;color:var(--text)}
+.lede{font:700 14px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--pink)}
+.week-control{min-width:240px;gap:9px}
+.week-control label{color:var(--pink)}
+select{background:#29234f;border:1px solid #ffffff18;border-radius:9px;color:var(--text);padding:12px 14px;font:600 14px var(--sans)}
+.reveal-button{background:var(--purple);border:1px solid var(--purple);border-radius:12px;color:#130e24;padding:14px 24px;font:600 18px var(--sans);letter-spacing:.04em;cursor:pointer;box-shadow:0 8px 28px #7d35f455}
+.reveal-button:hover{filter:brightness(1.12)}
+.status{color:var(--muted);font:11px var(--sans);letter-spacing:.12em}
+.stat-grid{gap:18px;margin:8px 0 48px}
+.stat-card{background:#29234f;border:1px solid #51427a;border-radius:15px;padding:22px;min-height:130px}
+.stat-label{color:var(--pink)}
+.stat-card strong{font-size:28px;font-weight:800}
+.stat-foot{color:#aaa0c0;font-size:10px}
+.section{margin-bottom:42px}
+.section-heading{border-bottom:2px solid var(--purple);padding-bottom:12px;margin-bottom:18px}
+.section-heading h2,.rank-notes h2,.extra-panel h2{font-family:var(--sans);font-size:32px;font-weight:900;letter-spacing:-.035em;text-transform:uppercase}
+.section-note{color:#a99fbe}
+.table-wrap{border:1px solid #ffffff12;border-radius:14px;background:#ffffff08;overflow-x:auto}
+.rank-table th,.standings-table th{height:44px;color:#a99fbe;border-bottom:1px solid #ffffff18}
+.rank-table td{height:68px;border-top:1px solid #ffffff0e}
+.rank-table th,.rank-table td{padding:0 16px}
+.rank-number{font:800 24px var(--sans);color:var(--text)}
+.team-cell{gap:12px;min-width:160px}
+.team-name{font-size:16px;font-weight:800}
+.sub-name,.manager-name{color:#aaa0c0}
+.record,.points,.allplay{font:700 13px var(--sans);color:#e3dced}
+.bar{height:6px;background:#453a68;border-radius:10px}
+.bar span{background:var(--lime);border-radius:10px}
+.movement.up{color:#25c4a9}.movement.down{color:#ff5b72}
+.lower-grid{gap:20px}
+.takeaway-section{background:#29234f;border:1px solid #51427a;border-radius:14px;padding:24px}
+.takeaway-section p{color:#d2c9df}
+.matchup{border-bottom:1px solid #ffffff18;padding:17px 8px}
+.winner{color:var(--lime)}
+.standings-table td{border-top:1px solid #ffffff12}
+.standings-table td:nth-child(1),.standings-table td:nth-child(3),.standings-table td:nth-child(4),.standings-table td:nth-child(5){color:#e0d8eb}
+.weekly-chart{background:#211b40;border:1px solid #583b83;border-radius:14px;padding:22px;margin:26px 0}
+.chart-bar{border-radius:5px 5px 0 0;background:var(--lime)}
+.chart-bar-item:nth-child(even) .chart-bar{background:var(--red)}
+.chart-bar-label,.chart-bar-value{color:#c4bad4}
+.rank-notes{padding:25px 0 38px;border-bottom:1px solid #ffffff20}
+.team-note{border-top:1px solid #ffffff1a;padding:18px 0}
+.team-note-head strong{font-size:16px}.team-note-head span{color:var(--pink)}
+.team-note p{font:14px/1.55 var(--sans);color:#c7bdd5}
+.extra-panel{min-height:420px;padding:36px 0}
+.extra-panel h2{font-size:48px}
+.extra-panel p{color:#c3b9d1}
+.rules-content{border-color:#ffffff20}
+.rule-group{border-color:#ffffff20}
+.rule-body{color:#d2c9df}
+.rule-body h3{font:800 19px var(--sans);color:var(--text)}
+footer{border-color:#ffffff20;color:#9d93b0}
+.footer-dot{color:var(--pink)}
+.rankings-hidden tr{display:none!important}
+@media(max-width:760px){
+ .shell{padding:0 16px}.site-nav{height:64px;margin:0 -16px;padding:0 10px;overflow-x:auto}.nav-tab{height:64px;padding:0 11px;font-size:13px}.nav-crest{width:32px;height:34px;margin-right:9px;flex:none}
+ .intro{padding:40px 0 22px}.intro-row{align-items:flex-start;flex-direction:column;gap:22px}h1{font-size:54px}.week-control{width:100%;flex-direction:row;flex-wrap:wrap;min-width:0}.week-control select{flex:1;min-width:120px}.reveal-button{margin:0;font-size:14px;padding:11px 16px}
+ .stat-grid{gap:10px}.stat-card{border-radius:12px;padding:15px;min-height:110px}.stat-card strong{font-size:21px}
+ .section-heading h2,.rank-notes h2{font-size:25px}.team-notes{grid-template-columns:1fr}.weekly-chart{padding:15px}.chart-bar-label,.chart-bar-value{font-size:7px}
+ .lower-grid{grid-template-columns:1fr;gap:8px}
+}
