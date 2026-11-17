@@ -61,7 +61,7 @@ function calculateWeek(week) {
   return { results, leagueAvg, scoreByRoster, played: played.length > 0 };
 }
 function computeRankings(week) {
-  const teams = [...state.teams.values()].map(t => ({...t, wins:0,losses:0,ties:0,pf:0,pa:0,allPlayWins:0,allPlayGames:0,scores:[]}));
+  const teams = [...state.teams.values()].map(t => ({...t, wins:0,losses:0,ties:0,pf:0,pa:0,allPlayWins:0,allPlayLosses:0,allPlayTies:0,allPlayGames:0,scores:[]}));
   const byId = new Map(teams.map(t => [t.id,t]));
   let completedWeeks = 0;
   for (let w = 1; w <= week; w++) {
@@ -108,7 +108,8 @@ function computeRankings(week) {
           const opponentScore = num(opponent.points);
           t.allPlayGames++;
           if (num(score.points) > opponentScore) t.allPlayWins++;
-          else if (num(score.points) === opponentScore) t.allPlayWins += .5;
+          else if (num(score.points) < opponentScore) t.allPlayLosses++;
+          else t.allPlayTies++;
         }
       }
     }
@@ -128,6 +129,7 @@ function computeRankings(week) {
     t.power = 100 * (.35*winRate + .25*allPlayRate + .25*(t.pf/maxPf) + .15*Math.min(1.25,recentForm)/1.25);
     t.record = `${t.wins}-${t.losses}${t.ties ? `-${t.ties}` : ""}`;
     t.allPlayRate = allPlayRate;
+    t.allPlayRecord = `${t.allPlayWins}-${t.allPlayLosses}${t.allPlayTies ? `-${t.allPlayTies}` : ""}`;
   }
   return teams.sort((a,b)=>b.power-a.power || b.pf-a.pf);
 }
