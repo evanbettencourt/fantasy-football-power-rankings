@@ -30,9 +30,9 @@ function buildTeams() {
     const owner = userById.get(roster.owner_id);
     const metadata = owner?.metadata || {};
     const username = owner?.username || "";
-    const name = metadata.team_name || owner?.display_name || username || `Team ${roster.roster_id}`;
+    const name = MANAGERS[username] || owner?.display_name || username || `Team ${roster.roster_id}`;
     state.teams.set(Number(roster.roster_id), {
-      id: Number(roster.roster_id), name, owner: MANAGERS[username] || owner?.display_name || username, username,
+      id: Number(roster.roster_id), name, owner: "", username,
       avatar: metadata.avatar || owner?.avatar || null, wins: 0, losses: 0, ties: 0,
       pf: 0, pa: 0, allPlayWins: 0, allPlayGames: 0, scores: []
     });
@@ -169,14 +169,18 @@ function renderStandings(week) {
  }
  teams.sort((x,y)=>y.wins-x.wins||y.pf-x.pf);
  const colors=["#ff4d91","#26b9d5","#9a68ff","#e8b83d","#50c99a","#f0784f","#b5a0ff","#5dc4ee","#e47eb4","#a7d86c","#f1a34c","#8d9cf5"];
- const row=(t,i)=>'<div class="league-team-row"><span class="team-rank">'+String(i+1).padStart(2,"0")+'</span><span class="team-color" style="--team-color:'+colors[i%colors.length]+'"></span><div class="league-team-identity"><strong>'+teamName(t)+'</strong><small>'+escapeHtml(t.owner)+'</small></div><span class="league-team-record">'+t.wins+'-'+t.losses+(t.ties?'-'+t.ties:'')+'</span></div>';
- $("playoff-standings").innerHTML=teams.slice(0,6).map(row).join("");
- $("bubble-standings").innerHTML=teams.slice(6).map((t,i)=>row(t,i+6)).join("");
+ const row=(t,i)=>`<div class="league-team-row ${i===6?"playoff-divider":""}"><span class="team-rank">${String(i+1).padStart(2,"0")}</span><div class="league-team-identity"><strong>${teamName(t)}</strong></div><span class="league-team-record">${t.wins}-${t.losses}${t.ties?"-"+t.ties:""}</span></div>`;
+ $("standings-list").innerHTML=teams.map(row).join("");
 }
 function renderLeagueStatus(week){
  const max=getWeeksToLoad(),label=$("current-week-label"),phase=$("league-phase"),buttons=$("league-week-buttons");
  if(label)label.textContent="WEEK "+week;
- if(phase)phase.textContent=week>=15?"PLAYOFFS":"REGULAR SEASON";
+ const leagueStatus=state.league?.status;
+ const playoffStart=num(state.league?.settings?.playoff_week_start)||15;
+ const phaseIndex=leagueStatus==="pre_draft"?0:leagueStatus==="drafting"?1:(week>=playoffStart||leagueStatus==="complete")?3:2;
+ const phaseNames=["PRE-DRAFT","DRAFT","REGULAR SEASON","PLAYOFFS"];
+ if(phase)phase.textContent=phaseNames[phaseIndex];
+ document.querySelectorAll(".phase-track span").forEach((bar,i)=>bar.classList.toggle("phase-done",i<=phaseIndex));
  if(buttons){buttons.innerHTML=Array.from({length:max},(_,i)=>i+1).map(w=>'<button type="button" class="week-chip '+(w===week?'active':'')+'" data-week="'+w+'">'+w+'</button>').join("");buttons.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>renderWeek(Number(btn.dataset.week))));}
 }
 function renderStats(week, rankings) {
