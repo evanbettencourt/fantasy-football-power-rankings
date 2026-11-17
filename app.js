@@ -4,7 +4,7 @@ const $ = (id) => document.getElementById(id);
 const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {} };
 
 const num = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
-const fmt = (v) => num(v).toFixed(1);
+const fmt = (v) => num(v).toFixed(2);
 const initials = (name) => (name || "?").trim().split(/\s+/).slice(0,2).map(x => x[0]).join("").toUpperCase();
 const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function teamFor(rosterId) { return state.teams.get(Number(rosterId)); }
