@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10130f">
+  <meta name="description" content="Fantasy football league power rankings, weekly results, and standings.">
+  <title>League Room — Power Rankings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="wordmark" href="#" aria-label="League Room home"><span class="mark">LR</span><span>LEAGUE ROOM</span></a>
+      <div class="top-meta"><span class="live-dot"></span><span id="season-label">SLEEPER LEAGUE</span><span class="meta-divider">/</span><span>POWER INDEX</span></div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div class="eyebrow">THE WEEKLY LEAGUE REPORT <span id="season-tag">2026 SEASON</span></div>
+        <div class="intro-row">
+          <div>
+            <h1>Power <em>Rankings.</em></h1>
+            <p class="lede">The numbers don't lie. The group chat might.</p>
+          </div>
+          <div class="week-control">
+            <label for="week-select">VIEW WEEK</label>
+            <select id="week-select" aria-label="Select week"></select>
+          </div>
+        </div>
+        <div id="status" class="status">Connecting to Sleeper league data…</div>
+      </section>
+
+      <section class="stat-grid" id="headline-stats">
+        <article class="stat-card"><span class="stat-label">TOP TEAM</span><strong id="top-team">—</strong><span class="stat-foot" id="top-team-foot">POWER INDEX LEADER</span></article>
+        <article class="stat-card"><span class="stat-label">WEEKLY HIGH</span><strong id="weekly-high">—</strong><span class="stat-foot" id="weekly-high-foot">—</span></article>
+        <article class="stat-card"><span class="stat-label">BIGGEST RISER</span><strong id="biggest-riser">—</strong><span class="stat-foot" id="biggest-riser-foot">THIS WEEK</span></article>
+        <article class="stat-card"><span class="stat-label">LEAGUE AVERAGE</span><strong id="league-average">—</strong><span class="stat-foot">POINTS PER TEAM</span></article>
+      </section>
+
+      <section class="section rankings-section">
+        <div class="section-heading">
+          <div><div class="eyebrow">01 / THE INDEX</div><h2>Power rankings</h2></div>
+          <span class="section-note">POWER SCORE · 0–100</span>
+        </div>
+        <div class="table-wrap">
+          <table class="rank-table">
+            <thead><tr><th class="rank-col">RANK</th><th>TEAM</th><th>RECORD</th><th>PF</th><th>ALL-PLAY</th><th>POWER</th><th class="move-col">Δ</th></tr></thead>
+            <tbody id="rankings-body"><tr><td colspan="7" class="loading-cell">Loading rankings…</td></tr></tbody>
+          </table>
+        </div>
+        <div class="method-note">POWER INDEX BLENDS WIN RATE (35%), ALL-PLAY WIN RATE (25%), TOTAL POINTS (25%) AND RECENT FORM (15%).</div>
+      </section>
+
+      <div class="lower-grid">
+        <section class="section">
+          <div class="section-heading compact"><div><div class="eyebrow">02 / THIS WEEK</div><h2>Scoreboard</h2></div></div>
+          <div id="scoreboard" class="scoreboard"><div class="loading-cell">Loading matchups…</div></div>
+        </section>
+        <section class="section">
+          <div class="section-heading compact"><div><div class="eyebrow">03 / THE TABLE</div><h2>Standings</h2></div></div>
+          <div class="table-wrap">
+            <table class="standings-table">
+              <thead><tr><th>#</th><th>TEAM</th><th>W-L</th><th>PF</th><th>PA</th></tr></thead>
+              <tbody id="standings-body"><tr><td colspan="5" class="loading-cell">Loading standings…</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <section class="section takeaway-section">
+        <div class="section-heading compact"><div><div class="eyebrow">04 / THE CONVERSATION</div><h2>Week in review</h2></div></div>
+        <p id="takeaway">The league story is coming into focus…</p>
+      </section>
+    </main>
+
+    <footer><span>LEAGUE ROOM <span class="footer-dot">●</span> POWERED BY SLEEPER</span><span id="updated-at">LIVE LEAGUE DATA</span></footer>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
