@@ -750,3 +750,24 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
  .pr-stage.armed .pr-reveal{display:none}
  .pr-stage *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+
+/* Power Rankings typography and scoring chart refinements. */
+:root{--pr-rank-size:48px;--pr-name-size:17px}
+.pr-chart-img{min-height:160px;padding:15px 8px 8px;border:1px solid #ffffff18;border-radius:7px;background:#ffffff06}
+.pr-chart-bar-item span{font:9px ui-monospace,monospace;color:#F5F4EB}
+.pr-chart-bar-item b{color:#EAB4F9;font-size:9px}
+.pr-chart-median-divider{height:140px;border-left:2px dashed #F5F4EB99}
+.pr-mast .t{font-size:10.5px;letter-spacing:.2em}
+.pr-mast .wk{font-size:clamp(28px,3.6vw,36px)}
+.pr-h2{font-size:11px;letter-spacing:.13em}
+.pr-mid .bl{font-size:14px;line-height:1.55}
+.pr-tbl{font-size:12.5px}
+.pr-tbl .c-team .nm{font-size:14px}
+.pr-chart-note,.pr-tbl-note{font-size:11px}
+@media(max-width:520px){
+  :root{--pr-rank-size:38px;--pr-name-size:15px}
+  .pr-mast .wk{font-size:28px}
+  .pr-mid .bl{font-size:12.5px;line-height:1.52}
+  .pr-tbl .c-team .nm{font-size:12px}
+}
