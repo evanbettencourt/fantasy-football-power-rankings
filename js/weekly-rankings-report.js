@@ -175,6 +175,89 @@
     );
   }
 
+  async function fetchPlayerNews(id) {
+    const cacheKey = "mb-sleeper-player-news-v1-" + id;
+    try {
+      const cached = sessionStorage.getItem(cacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed.savedAt && Date.now() - parsed.savedAt < 15 * 60 * 1000) return parsed.news || [];
+      }
+    } catch (_) {}
+
+    const response = await fetch("/api/sleeper-news?player_id=" + encodeURIComponent(id) + "&limit=5");
+    if (!response.ok) throw new Error("Player news request failed (" + response.status + ")");
+    const payload = await response.json();
+    const news = Array.isArray(payload.news) ? payload.news : [];
+    try { sessionStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), news })); } catch (_) {}
+    return news;
+  }
+
+  async function playerNewsLines() {
+    const injured = new Map();
+    [...teams.values()].forEach(team => {
+      (team.roster && team.roster.players || []).map(String).forEach(id => {
+        const player = players[id] || {};
+        const status = String(player.injury_status || "").trim();
+        const hasDetails = status && !/^active$/i.test(status) ||
+          player.injury_body_part || player.injury_notes || player.practice_participation ||
+          player.practice_description;
+        if (hasDetails && !injured.has(id)) injured.set(id, playerName(id));
+      });
+    });
+
+    const ids = [...injured.keys()];
+    if (!ids.length) return ["  No rostered players currently have injury information in Sleeper's player directory."];
+
+    const results = [];
+    const failures = [];
+    let cursor = 0;
+    async function worker() {
+      while (cursor < ids.length) {
+        const id = ids[cursor++];
+        try {
+          const news = await fetchPlayerNews(id);
+          results.push({ id, name: injured.get(id), news });
+        } catch (error) {
+          failures.push(injured.get(id) + ": " + error.message);
+        }
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(5, ids.length) }, worker));
+
+    const lines = [];
+    results.sort((a,b) => a.name.localeCompare(b.name)).forEach(result => {
+      if (!result.news.length) return;
+      const seen = new Set();
+      const items = result.news
+        .slice()
+        .sort((a,b) => Number(b.published || 0) - Number(a.published || 0))
+        .filter(item => {
+          const meta = item.metadata && typeof item.metadata === "object" ? item.metadata : {};
+          const key = [item.source, item.published, meta.title].join("|");
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .slice(0, 3);
+      if (!items.length) return;
+      lines.push("  " + result.name + ":");
+      items.forEach(item => {
+        const meta = item.metadata && typeof item.metadata === "object" ? item.metadata : {};
+        const date = Number(item.published) ? new Date(Number(item.published)).toLocaleString() : "Date unavailable";
+        const source = String(item.source || "Sleeper news").replace(/_/g, " ");
+        if (meta.title) lines.push("    [" + date + " · " + source + "] " + meta.title);
+        if (meta.description) lines.push("      " + meta.description);
+        if (meta.analysis) lines.push("      Analysis: " + meta.analysis);
+        if (meta.url) lines.push("      Article: " + meta.url);
+      });
+    });
+
+    if (!lines.length) lines.push("  Sleeper's player-news feed returned no news items for the rostered players with injury designations.");
+    if (failures.length) lines.push("  News lookup errors: " + failures.join("; "));
+    return lines;
+  }
+
   function rosterLines(team) {
     const roster = team.roster || {};
     const starters = (roster.starters || []).map(String);
@@ -236,6 +319,8 @@
         Promise.all(weekNumbers.map(w => get("/league/" + LEAGUE_ID + "/matchups/" + w))),
         get("/league/" + LEAGUE_ID + "/transactions/" + week).catch(() => [])
       ]);
+      setStatus("Loading Sleeper player news and injury outlook…");
+      const newsLines = await playerNewsLines();
       const standings = buildStandings(weekData);
       const currentGames = weekData[week - 1] || [];
       const scoreMap = new Map(currentGames.map(game => [Number(game.roster_id), Number(game.points) || 0]));
@@ -294,7 +379,10 @@
       section("05  /  INJURY & PRACTICE REPORT — CURRENT ROSTERS");
       lines.push(...injuryLines());
       lines.push("  Sleeper player-directory fields only; designations and practice information may lag breaking news.");
-      section("06  /  EDITORIAL NOTES TO ADD");
+      section("06  /  PLAYER NEWS & INJURY OUTLOOK — SLEEPER NEWS FEED");
+      lines.push(...newsLines);
+      lines.push("  News is supplied by Sleeper's linked providers; publication dates and source labels are shown where available.");
+      section("07  /  EDITORIAL NOTES TO ADD");
       lines.push("• Injuries, expected return timelines, or role changes not reflected accurately by Sleeper:");
       lines.push("• Major league context, manager tendencies, trade evaluations, or other notes:");
       $("pr-report-output").value = lines.join("\n");
