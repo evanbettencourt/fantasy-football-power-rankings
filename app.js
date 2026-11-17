@@ -158,7 +158,7 @@ const EDITORIAL_EDITIONS = {
       { manager: "Tanz", note: "Tanz's roster looks different after the recent trades, with Tony Pollard joining Omarion Hampton and Kenny Gainwell in the backfield mix. The team is still trying to recover from a difficult first half, but the new pieces give it a clearer foundation to evaluate heading into the final stretch. Week 10 was especially frustrating: Tanz finished just 1.21 points below the median." }
     ],
     headline: "Ben holds the top spot as the contender race tightens",
-    feature: "The three-team deal reshaped three rosters in different ways: Joey added Tee Higgins and George Pickens, Ben brought in Jaxon Smith-Njigba, and Tanz acquired Tony Pollard. Joey gets the clearest immediate boost at receiver, while Ben adds another high-end option to an already deep lineup. For Tanz, Pollard adds a useful piece to a backfield that also includes Omarion Hampton and Kenny Gainwell. The trade is an important late-season storyline, but its impact will ultimately depend on how each manager deploys the new pieces.,
+    feature: "The three-team deal reshaped three rosters in different ways: Joey added Tee Higgins and George Pickens, Ben brought in Jaxon Smith-Njigba, and Tanz acquired Tony Pollard. Joey gets the clearest immediate boost at receiver, while Ben adds another high-end option to an already deep lineup. For Tanz, Pollard adds a useful piece to a backfield that also includes Omarion Hampton and Kenny Gainwell. The trade is an important late-season storyline, but its impact will ultimately depend on how each manager deploys the new pieces.",
     notes: [
       "Top score: Pat — 140.08 points",
       "Biggest upset: Pat defeated Brandon",
