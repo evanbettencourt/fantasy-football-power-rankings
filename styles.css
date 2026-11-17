@@ -159,3 +159,7 @@ html,body{background:#17132b;color:var(--text);font-family:"DM Sans",Arial,sans-
 @media(max-width:650px){.phase-labels{font-size:7px;letter-spacing:0}.league-team-row{padding:10px 7px}.league-team-identity strong{font-size:12px}.league-team-record{font-size:10px}}
 
 .eliminated-label{display:inline-block;margin-left:8px;padding:3px 6px;border:1px solid #ff4f91;border-radius:4px;color:#ff79a9;font:800 8px/1 "DM Sans",Arial,sans-serif;letter-spacing:.12em;vertical-align:middle}
+
+
+/* Align each league phase label with the center of its matching progress bar */
+.phase-labels{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;text-align:center}.phase-labels span:first-child,.phase-labels span:last-child{text-align:center}
