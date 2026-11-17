@@ -632,3 +632,14 @@ html,body{background:#17132b;color:var(--text);font-family:"DM Sans",Arial,sans-
 .pr-report-output{display:block;width:100%;height:min(68vh,720px);min-height:520px;max-height:900px;resize:vertical;overflow-y:auto;padding:22px 24px;border:1px solid #D5943B55;border-radius:8px;background:linear-gradient(145deg,#211936,#171329);color:var(--jfl-cream);font:500 12px/1.8 Inter,Arial,sans-serif;letter-spacing:.01em;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:2;scrollbar-color:#80649d #171329;scrollbar-width:thin}
 .pr-report-footnote{margin:9px 0 0;color:#a99fbe;font-size:9px;line-height:1.55}
 @media(max-width:600px){.pr-report-panel{margin:18px 0 0;padding:14px}.pr-report-heading{flex-direction:column}.pr-report-controls{gap:7px}.pr-report-controls button{flex:1}.pr-report-output{height:62vh;min-height:420px;padding:16px;font-size:11px}}
+
+
+/* Editorial feature block beneath the weekly power rankings. */
+.pr-editorial-feature{margin-top:12px;padding:18px 20px;border:1px solid #d5943b66;border-left:3px solid var(--jfl-gold);border-radius:9px;background:linear-gradient(120deg,#d5943b12,#ffffff06)}
+.pr-feature-kicker{color:var(--jfl-gold);font:800 9px ui-monospace,monospace;letter-spacing:.14em}
+.pr-editorial-feature h3{margin:8px 0;color:var(--jfl-cream);font-size:17px;font-weight:850}
+.pr-editorial-feature>p{margin:0;color:#e3dce9;font-size:13px;line-height:1.65}
+.pr-feature-notes{margin-top:14px;padding-top:12px;border-top:1px solid #ffffff20}
+.pr-feature-notes strong{color:var(--jfl-light-purple);font-size:9px;letter-spacing:.13em}
+.pr-feature-notes ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 22px;margin:9px 0 0;padding-left:17px;color:#d7cfe2;font-size:11px;line-height:1.5}
+@media(max-width:600px){.pr-editorial-feature{padding:14px}.pr-editorial-feature h3{font-size:15px}.pr-editorial-feature>p{font-size:12px}.pr-feature-notes ul{grid-template-columns:1fr}}
