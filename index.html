@@ -79,17 +79,45 @@
 
     <section class="pr-page tab-panel" data-panel="rankings" hidden>
       <div class="pr-shell">
-        <aside class="pr-rail"><div class="pr-rail-title">THE ARCHIVE</div><nav id="pr-archive" class="pr-archive" aria-label="Power Rankings editions"></nav></aside>
+        <aside class="pr-rail">
+          <div class="label">EDITIONS</div>
+          <nav id="pr-archive" class="pr-archive" aria-label="Past Power Rankings editions"></nav>
+        </aside>
         <div class="pr-stage" id="pr-stage">
-          <div class="pr-mast-wrap"><header class="pr-mast">
-            <div class="pr-kicker">MONKEY BOYS · EST. 2017</div>
-            <div class="pr-mast-row"><div class="pr-word"><h1>POWER<br>RANKINGS</h1><p id="pr-edition-label">THE WEEKLY LEAGUE DISPATCH</p></div><div class="pr-crest" aria-label="Monkey Boys crest">MB</div></div>
-            <div class="pr-controls"><label for="week-select">EDITION</label><select id="week-select" aria-label="Select Power Rankings edition"></select><button id="pr-reveal" class="reveal-button" type="button">REVEAL RANKINGS</button></div>
-          </header></div>
+          <section class="pr-mast-wrap">
+            <header class="pr-mast">
+              <div class="pr-mast-text">
+                <span class="t">Monkey Boys Power Rankings</span>
+                <span class="wk" id="pr-week-title">Week 10</span>
+              </div>
+              <div class="pr-mast-actions">
+                <span class="d" id="pr-edition-label">NOVEMBER 17, 2026</span>
+                <div class="pr-crest" aria-label="Monkey Boys crest">MB</div>
+              </div>
+            </header>
+            <div class="pr-controls">
+              <label for="week-select">EDITION</label>
+              <select id="week-select" aria-label="Select Power Rankings edition"></select>
+              <button id="pr-reveal" class="pr-reveal" type="button">REVEAL RANKINGS</button>
+            </div>
+          </section>
           <main class="pr-wrap">
-            <section class="pr-section pr-chart-wrap"><div class="pr-section-head"><h2>THE SCORING PICTURE</h2><span>WEEKLY POINTS · HUNDREDTHS</span></div><div id="weekly-chart-bars" class="pr-chart-img" aria-label="Weekly scores chart"></div><p class="pr-chart-note">Green indicates a head-to-head win; red indicates a head-to-head loss. Gold indicates a tie.</p></section>
-            <section class="pr-section"><div class="pr-section-head"><h2>THE POWER RANKINGS</h2><span id="pr-rank-count">12 MANAGERS</span></div><div id="pr-board" class="pr-board"><div class="pr-empty">Loading the weekly edition…</div></div></section>
-            <section class="pr-section pr-standings-wrap"><div class="pr-section-head"><h2>THE STANDINGS</h2><span>REGULAR-SEASON CONTEXT</span></div><div class="pr-table-wrap"><table class="pr-standings"><thead><tr><th>SEED</th><th>MANAGER</th><th>REC</th><th>PF</th><th>PA</th><th>ALL-PLAY</th><th>POWER RANK</th></tr></thead><tbody id="pr-standings-body"></tbody></table></div><p class="pr-allplay-note">All-Play shows each manager’s record against every other team’s score in each completed week. The playoff cutoff is after sixth place.</p></section>
+            <section class="pr-chart-wrap">
+              <div class="pr-h2">Weekly Scoring</div>
+              <div id="weekly-chart-bars" class="pr-chart-img" aria-label="Weekly scores chart"></div>
+              <p class="pr-chart-note">Green indicates a head-to-head win; red indicates a loss. The dashed divider separates the top six scores from the bottom six.</p>
+            </section>
+            <div class="pr-board" id="pr-board"><div class="pr-empty">Loading the weekly edition…</div></div>
+            <section class="pr-standings">
+              <h2 class="pr-h2">Standings</h2>
+              <div class="pr-tbl-scroll">
+                <table class="pr-tbl">
+                  <thead><tr><th class="c-team"><span class="sd">Seed</span><span class="nm">Manager</span></th><th>Rec</th><th>PF</th><th>PA</th><th>All-Play</th><th>Power Rank</th></tr></thead>
+                  <tbody id="pr-standings-body"></tbody>
+                </table>
+              </div>
+              <p class="pr-tbl-note">All-Play shows each manager’s cumulative record against the other 11 teams each completed week. The playoff cutoff is after sixth place.</p>
+            </section>
           </main>
         </div>
       </div>
