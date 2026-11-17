@@ -239,6 +239,7 @@ async function init() {
     select.innerHTML=Array.from({length:maxWeek},(_,i)=>`<option value="${i+1}">WEEK ${i+1}</option>`).join("");
     select.addEventListener("change",()=>renderWeek(Number(select.value)));
     renderWeek(defaultWeek);
+    $("rankings-body").classList.add("rankings-hidden");
     $("updated-at").textContent="SLEEPER API · PUBLIC LEAGUE DATA";
   } catch(error) {
     console.error(error);
