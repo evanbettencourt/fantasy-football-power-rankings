@@ -140,6 +140,7 @@ function calculateMovement(week, rankings) {
 
 const EDITORIAL_EDITIONS = {};
 function renderPowerRankings(week) {
+  state.selectedWeek=week;
   const maxWeek=getWeeksToLoad(), archive=$("pr-archive"), select=$("week-select"), edition=EDITORIAL_EDITIONS[week];
   if(select) select.value=String(week);
   if(archive) {
