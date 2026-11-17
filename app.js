@@ -174,13 +174,28 @@ function renderPowerRankings(week) {
   const maxWeek=getWeeksToLoad(),archive=$("pr-archive"),select=$("week-select"),edition=EDITORIAL_EDITIONS[week];
   if(select)select.value=String(week);
   if(archive){
-    archive.innerHTML='<button type="button" class="pr-archive-item" data-week="0"><span>POST-DRAFT</span><small>WEEK 00</small></button>'+Array.from({length:maxWeek},(_,i)=>maxWeek-i).map(w=>'<button type="button" class="pr-archive-item '+(w===week?'active':'')+'" data-week="'+w+'"><span>WEEK '+w+'</span><small>'+(EDITORIAL_EDITIONS[w]?.date||'EDITION PENDING')+'</small></button>').join("");
-    archive.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>{const w=Number(btn.dataset.week);if(w===0){$("pr-edition-label").textContent="POST-DRAFT · WEEK 00";$("pr-board").innerHTML='<div class="pr-empty"><strong>POST-DRAFT RANKINGS</strong><p>The post-draft editorial edition has not been added yet.</p></div>';$("pr-rank-count").textContent="POST-DRAFT";archive.querySelectorAll("button").forEach(x=>x.classList.toggle("active",x===btn));const b=$("pr-reveal");if(b)b.hidden=true;}else renderPowerRankings(w);}));
+    archive.innerHTML='<button type="button" class="pr-archive-item" data-week="0"><span>Post-Draft</span><small>September 2026</small></button>'+Array.from({length:maxWeek},(_,i)=>maxWeek-i).map(w=>'<button type="button" class="pr-archive-item '+(w===week?'active':'')+'" data-week="'+w+'"><span>Week '+String(w).padStart(2,"0")+'</span><small>'+(EDITORIAL_EDITIONS[w]?.date||'Edition pending')+'</small></button>').join("");
+    archive.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>{const w=Number(btn.dataset.week);if(w===0){$("pr-week-title").textContent="Post-Draft";$("pr-edition-label").textContent="SEPTEMBER 2026";$("pr-board").innerHTML='<div class="pr-empty"><strong>POST-DRAFT RANKINGS</strong><p>The post-draft editorial edition has not been added yet.</p></div>';$("pr-rank-count").textContent="POST-DRAFT";archive.querySelectorAll("button").forEach(x=>x.classList.toggle("active",x===btn));const b=$("pr-reveal");if(b)b.hidden=true;}else renderPowerRankings(w);}));
   }
-  $("pr-edition-label").textContent=edition?.date?("WEEK "+week+" · "+edition.date):("WEEK "+week+" · EDITION");
+  $("pr-week-title").textContent="Week "+week;
+  $("pr-edition-label").textContent=edition?.date||"EDITION PENDING";
   const stats=computeRankings(week),byName=new Map(stats.map(t=>[t.name,t])),previous=EDITORIAL_EDITIONS[week-1]?.rankings||[],priorRanks=new Map(previous.map((r,i)=>[r.manager,i+1])),hasEdition=Boolean(edition?.rankings?.length);
+  const palette=["#5B21B6","#F4C13E","#F74193","#39A7E3","#E4002B","#EE6A5B","#17B8A6","#034694","#6FC24A","#EF8E3C","#B499D3","#909090"];
+  const teamOrder=[...state.teams.keys()];
+  const colorFor=t=>t?.color||palette[Math.max(0,teamOrder.indexOf(t?.id))%palette.length];
+  const pfRanks=new Map([...stats].sort((a,b)=>b.pf-a.pf).map((t,i)=>[t.name,i+1]));
+  const paRanks=new Map([...stats].sort((a,b)=>b.pa-a.pa).map((t,i)=>[t.name,i+1]));
   if(!hasEdition)$("pr-board").innerHTML='<div class="pr-empty"><strong>THIS EDITION HAS NOT BEEN PUBLISHED.</strong><p>Power Rankings are editorial, not an automated sort of the standings. The live scoring picture and standings are shown below; this edition’s ranked order and written analysis have not been entered yet.</p></div>';
-  else $("pr-board").innerHTML=edition.rankings.map((entry,i)=>{const t=byName.get(entry.manager);if(!t)return "";const rank=i+1,prior=priorRanks.get(entry.manager),move=prior==null?0:prior-rank,txt=prior==null?"—":move>0?"▲ "+move:move<0?"▼ "+Math.abs(move):"—",cls=move>0?"up":move<0?"down":"same";return '<article class="pr-card" data-prev="'+(prior||rank)+'" data-final="'+rank+'" data-move="'+move+'"><div class="pr-rank"><span>RANK</span><strong class="pr-roll">'+String(rank).padStart(2,"0")+'</strong><small class="pr-mv '+cls+'">'+txt+'</small></div><div class="pr-card-body"><div class="pr-card-head"><h3>'+escapeHtml(entry.manager)+'</h3><span class="pr-meta">'+escapeHtml(t.record)+' · '+fmt(t.pf)+' PF</span></div><div class="bl-wrap"><p>'+(entry.note?escapeHtml(entry.note):'<span class="pr-note-pending">Commentary pending.</span>')+'</p></div></div></article>';}).join("");
+  else $("pr-board").innerHTML=edition.rankings.map((entry,i)=>{
+    const t=byName.get(entry.manager);if(!t)return "";
+    const rank=i+1,prior=priorRanks.get(entry.manager),move=prior==null?0:prior-rank;
+    const txt=prior==null?"—":move>0?"▲"+move:move<0?"▼"+Math.abs(move):"—";
+    const cls=move>0?"up":move<0?"dn":"ev",dir=move>0?"up":move<0?"dn":"ev",color=colorFor(t);
+    return '<article class="pr-card" style="--tc:'+color+';--sp:'+color+'" data-prev="'+(prior||rank)+'" data-final="'+rank+'" data-move="'+move+'" data-dir="'+dir+'">'+
+      '<div class="pr-rank"><div class="pr-num"><span class="v prev">'+(prior||rank)+'</span><span class="v final">'+rank+'</span></div><span class="pr-mv '+cls+'">'+txt+'</span></div>'+
+      '<div class="pr-mid"><div class="pr-nmrow"><span class="nm">'+escapeHtml(entry.manager)+'</span><span class="pr-meta"><span class="rec"><span class="w">'+t.wins+'</span><span class="dash">-</span><span class="l">'+t.losses+'</span></span><span class="dot">·</span><span class="pf">PF '+fmt(t.pf)+' ('+pfRanks.get(t.name)+'th)</span><span class="dot">·</span><span class="pa">PA '+fmt(t.pa)+' ('+paRanks.get(t.name)+'th)</span></span></div>'+
+      '<div class="bl-wrap"><div class="bl">'+(entry.note?escapeHtml(entry.note):'<span class="pr-note-pending">Commentary pending.</span>')+'</div></div></div></article>';
+  }).join("");
   $("pr-rank-count").textContent=hasEdition?edition.rankings.length+" / 12 RANKED":"12 MANAGERS";
   const reveal=$("pr-reveal");if(reveal){reveal.hidden=!hasEdition;reveal.textContent="REVEAL RANKINGS";window.initPowerRankingsReveal?.();}
   const scores=(state.weeks[week]||[]).filter(m=>num(m.points)>0).sort((a,b)=>num(b.points)-num(a.points));
@@ -190,10 +205,20 @@ function renderPowerRankings(week) {
     else if(matchup.winner===2){outcomeByRoster.set(matchup.a.id,"loss");outcomeByRoster.set(matchup.b.id,"win");}
     else {outcomeByRoster.set(matchup.a.id,"even");outcomeByRoster.set(matchup.b.id,"even");}
   }
-  $("weekly-chart-bars").innerHTML=scores.length?scores.map((m,index)=>{const t=teamFor(m.roster_id),score=num(m.points),height=Math.max(10,Math.round(score/(num(scores[0]?.points)||1)*118)),result=outcomeByRoster.get(Number(m.roster_id))||"even";return '<div class="pr-chart-bar-item" title="'+escapeHtml(t?.name||"Manager")+': '+fmt(score)+' · '+(result==="win"?"WIN":result==="loss"?"LOSS":"TIE")+'"><span>'+fmt(score)+'</span><i class="'+result+'" style="height:'+height+'px"></i><b>'+escapeHtml(t?.name||"—")+'</b></div>'+(index===5?'<div class="pr-chart-median-divider" aria-label="Median cutoff"></div>':"");}).join(""):'<div class="pr-empty">No completed scoring data for this week.</div>';
+  $("weekly-chart-bars").innerHTML=scores.length?scores.map((m,index)=>{
+    const t=teamFor(m.roster_id),score=num(m.points),height=Math.max(10,Math.round(score/(num(scores[0]?.points)||1)*118)),result=outcomeByRoster.get(Number(m.roster_id))||"even";
+    return '<div class="pr-chart-bar-item" title="'+escapeHtml(t?.name||"Manager")+': '+fmt(score)+' · '+(result==="win"?"WIN":result==="loss"?"LOSS":"TIE")+'"><span>'+fmt(score)+'</span><i class="'+result+'" style="height:'+height+'px"></i><b>'+escapeHtml(t?.name||"—")+'</b></div>'+(index===5?'<div class="pr-chart-median-divider" aria-label="Median cutoff"></div>':"");
+  }).join(""):'<div class="pr-empty">No completed scoring data for this week.</div>';
   const standings=[...stats].sort((a,b)=>b.wins-a.wins||b.pf-a.pf),editorialRanks=new Map((edition?.rankings||[]).map((r,i)=>[r.manager,i+1]));
-  $("pr-standings-body").innerHTML=standings.map((t,i)=>'<tr class="'+(i===6?"playoff-divider":"")+'"><td>'+String(i+1).padStart(2,"0")+'</td><td>'+escapeHtml(t.name)+'</td><td>'+escapeHtml(t.record)+'</td><td>'+fmt(t.pf)+'</td><td>'+fmt(t.pa)+'</td><td>'+escapeHtml(t.allPlayRecord)+'</td><td>'+(editorialRanks.get(t.name)||"—")+'</td></tr>').join("");
+  $("pr-standings-body").innerHTML=standings.map((t,i)=>{
+    const color=colorFor(t),rank=editorialRanks.get(t.name),record=t.record.split("-");
+    return '<tr class="'+(i===6?"pr-cut":"")+'"><th scope="row" class="c-team"><span class="sd">'+(i+1)+'</span><span class="nm" style="color:'+color+'">'+escapeHtml(t.name)+'</span></th>'+
+      '<td class="c-rec"><span class="w">'+(record[0]||0)+'</span><span class="dash">-</span><span class="l">'+(record[1]||0)+'</span></td>'+
+      '<td class="num">'+fmt(t.pf)+'</td><td class="num">'+fmt(t.pa)+'</td><td class="num">'+escapeHtml(t.allPlayRecord)+'</td>'+
+      '<td><span class="pr-pr">'+(rank||"—")+'</span></td></tr>';
+  }).join("");
 }
+
 function renderScoreboard(week) {
   const {results} = calculateWeek(week);
   const el = $("scoreboard");
