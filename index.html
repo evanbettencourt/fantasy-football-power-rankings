@@ -77,20 +77,21 @@
       </div>
     </section>
 
-    <section class="intro tab-panel" data-panel="rankings" hidden>
-      <div class="eyebrow">MONKEY BOYS FOOTBALL CLUB <span id="season-tag-rankings">2026 SEASON</span></div>
-      <div class="intro-row"><div><h1>POWER <em>RANKINGS</em></h1><p class="lede">EST. 2017 · POWER INDEX</p></div>
-        <div class="week-control"><label for="week-select">WEEK</label><select id="week-select" aria-label="Select week"></select><button id="reveal-button" class="reveal-button" type="button">REVEAL</button></div>
+    <section class="pr-page tab-panel" data-panel="rankings" hidden>
+      <div class="pr-shell">
+        <aside class="pr-rail"><div class="pr-rail-title">THE ARCHIVE</div><nav id="pr-archive" class="pr-archive" aria-label="Power Rankings editions"></nav></aside>
+        <div class="pr-stage" id="pr-stage">
+          <header class="pr-mast"><div class="pr-kicker">MONKEY BOYS · EST. 2017</div><div class="pr-mast-row"><div><h1>POWER<br>RANKINGS</h1><p id="pr-edition-label">THE WEEKLY LEAGUE DISPATCH</p></div><div class="pr-crest" aria-label="Monkey Boys crest">MB</div></div>
+            <div class="pr-controls"><label for="week-select">EDITION</label><select id="week-select" aria-label="Select Power Rankings edition"></select><button id="reveal-button" class="reveal-button" type="button">REVEAL RANKINGS</button></div>
+          </header>
+          <main class="pr-wrap">
+            <section class="pr-section"><div class="pr-section-head"><h2>THE SCORING PICTURE</h2><span>WEEKLY POINTS · HUNDREDTHS</span></div><div id="weekly-chart-bars" class="pr-chart-img"></div><p class="pr-chart-note">Green indicates a score above the weekly league median; red indicates below.</p></section>
+            <section class="pr-section"><div class="pr-section-head"><h2>THE POWER RANKINGS</h2><span id="pr-rank-count">12 MANAGERS</span></div><div id="pr-board" class="pr-board"><div class="pr-empty">Loading the weekly edition…</div></div></section>
+            <section class="pr-section"><div class="pr-section-head"><h2>THE STANDINGS</h2><span>REGULAR-SEASON CONTEXT</span></div><div class="pr-table-wrap"><table class="pr-standings"><thead><tr><th>SEED</th><th>MANAGER</th><th>REC</th><th>PF</th><th>PA</th><th>ALL-PLAY</th><th>POWER RANK</th></tr></thead><tbody id="pr-standings-body"></tbody></table></div><p class="pr-allplay-note">All-Play shows each manager’s record against every other team’s score in each completed week. The playoff cutoff is after sixth place.</p></section>
+          </main>
+        </div>
       </div>
     </section>
-    <section class="section rankings-section tab-panel" data-panel="rankings" hidden>
-      <div class="section-heading"><div><div class="eyebrow">THE POWER INDEX</div><h2>Where everybody stands</h2></div><span class="section-note">POWER SCORE · 0–100</span></div>
-      <div class="table-wrap"><table class="rank-table"><thead><tr><th>RANK</th><th>TEAM</th><th>RECORD</th><th>PF</th><th>ALL-PLAY</th><th>POWER</th><th>Δ</th></tr></thead><tbody id="rankings-body"><tr><td colspan="7" class="loading-cell">Loading rankings…</td></tr></tbody></table></div>
-      <div class="method-note">THE POWER INDEX BLENDS RECORD, ALL-PLAY PERFORMANCE, POINTS FOR, AND RECENT FORM.</div>
-      <section class="weekly-chart"><div class="chart-heading"><span class="eyebrow">THE SCORING PICTURE</span><span class="section-note">POINTS FOR · SELECTED WEEK</span></div><div id="weekly-chart-bars" class="weekly-chart-bars"></div></section>
-      <section class="rank-notes"><div class="eyebrow">THE WEEKLY DISPATCH</div><h2>Notes from around the league</h2><div id="team-notes" class="team-notes"></div></section>
-    </section>
-
     <section class="section tab-panel extra-panel" data-panel="hall" hidden><div class="eyebrow">THE RECORD BOOK</div><h2>Hall of Fame</h2><p>League champions and all-time achievements.</p><div id="hall-content"></div></section>
     <section class="section tab-panel extra-panel" data-panel="rules" hidden><div class="eyebrow">THE CONSTITUTION</div><h2>The Constitution</h2><p class="rules-intro">The official rules, settings, roster requirements, and scoring system of Monkey Boys Fantasy Football.</p><div id="rules-content" class="rules-content"></div></section>
   </main>
