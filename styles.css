@@ -95,3 +95,36 @@ footer{border-color:#ffffff20;color:#9d93b0}
  .section-heading h2,.rank-notes h2{font-size:25px}.team-notes{grid-template-columns:1fr}.weekly-chart{padding:15px}.chart-bar-label,.chart-bar-value{font-size:7px}
  .lower-grid{grid-template-columns:1fr;gap:8px}
 }
+
+
+/* Power-ranking rows become the large reveal cards used by JFL */
+.rankings-section .section-heading{display:none}
+.rankings-section .table-wrap{overflow:visible;border:0;background:transparent}
+.rank-table{border-collapse:separate;border-spacing:0 12px}
+.rank-table thead{display:none}
+.rank-table tbody{display:block}
+.rank-table tbody tr{
+ display:grid;grid-template-columns:78px minmax(0,1fr) minmax(110px,auto);
+ grid-template-rows:auto auto;align-items:center;gap:4px 20px;
+ min-height:112px;padding:17px 22px;margin:0 0 12px;
+ background:linear-gradient(110deg,#211b3c 0%,#1d1933 100%);
+ border:1px solid #ffffff0c;border-left:6px solid var(--purple);
+ border-radius:15px;box-shadow:0 8px 24px #0b091b22;
+}
+.rank-table tbody td{height:auto;border:0;padding:0;min-width:0}
+.rank-table tbody td:nth-child(1){grid-column:1;grid-row:1 / span 2;font:900 46px var(--sans);color:var(--text);text-align:center}
+.rank-table tbody td:nth-child(2){grid-column:2;grid-row:1}
+.rank-table tbody td:nth-child(3){grid-column:2;grid-row:2;font:600 12px var(--sans);color:#b6abc9}
+.rank-table tbody td:nth-child(4){grid-column:3;grid-row:1;font:700 12px var(--sans);color:#d7cce6;text-align:right}
+.rank-table tbody td:nth-child(5){grid-column:3;grid-row:2;font:600 11px var(--sans);color:#a99fbe;text-align:right}
+.rank-table tbody td:nth-child(6){display:none}
+.rank-table tbody td:nth-child(7){grid-column:3;grid-row:1;align-self:start;justify-self:end;font:700 11px var(--sans);color:var(--pink)}
+.rank-table .team-name{font-size:21px;font-weight:900}
+.rank-table .sub-name{display:none}
+.rank-table tbody tr:hover{transform:translateY(-1px);border-color:#ffffff24}
+@media(max-width:600px){
+ .rank-table tbody tr{grid-template-columns:48px minmax(0,1fr) 85px;gap:4px 12px;padding:14px 12px;min-height:96px}
+ .rank-table tbody td:nth-child(1){font-size:34px}
+ .rank-table .team-name{font-size:17px}
+ .rank-table tbody td:nth-child(4),.rank-table tbody td:nth-child(5){font-size:10px}
+}
