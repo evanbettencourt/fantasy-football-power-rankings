@@ -1,7 +1,7 @@
 const LEAGUE_ID = "1313563024161787904";
 const API = "/api/sleeper";
 const $ = (id) => document.getElementById(id);
-const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [], draftOrder: null, draftSeason: null };
+const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [], recoveredWeeks: [], usingCachedCore: false, draftOrder: null, draftSeason: null };
 
 const num = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
 const fmt = (v) => num(v).toFixed(2);
@@ -18,11 +18,30 @@ function getWeeksToLoad() {
   const playoffStart = num(state.league?.settings?.playoff_week_start) || 15;
   return Math.max(1, Math.min(18, playoffStart + 2));
 }
-async function fetchJson(path) {
-  const response = await fetch(`${API}${path}`);
-  if (!response.ok) throw new Error(`Sleeper API returned ${response.status} for ${path}`);
-  return response.json();
+async function fetchJson(path, options = {}) {
+  const attempts = Math.max(1, Number(options.attempts) || 3);
+  const timeoutMs = Math.max(1000, Number(options.timeoutMs) || 12000);
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(API + path, { signal: controller.signal, headers: { "Accept": "application/json" } });
+      if (!response.ok) { const error = new Error("Sleeper API returned " + response.status + " for " + path); error.status = response.status; throw error; }
+      return await response.json();
+    } catch (error) {
+      lastError = error;
+      const retryable = error.name === "AbortError" || error instanceof TypeError || !error.status || error.status === 408 || error.status === 429 || error.status >= 500;
+      if (!retryable || attempt === attempts) break;
+      await new Promise(resolve => setTimeout(resolve, 700 * (2 ** (attempt - 1))));
+    } finally { clearTimeout(timeout); }
+  }
+  throw lastError || new Error("Sleeper request failed for " + path);
 }
+const STARTUP_CACHE_KEY = "monkey-boys-sleeper-cache-" + LEAGUE_ID;
+function readStartupCache() { try { const value = JSON.parse(localStorage.getItem(STARTUP_CACHE_KEY) || "null"); return value && typeof value === "object" ? value : {}; } catch { return {}; } }
+function writeStartupCache(patch) { try { const current = readStartupCache(); localStorage.setItem(STARTUP_CACHE_KEY, JSON.stringify({ ...current, ...patch, savedAt: Date.now() })); } catch (error) { console.warn("Unable to save local Sleeper fallback cache", error); } }
+function hasCachedCore(cache, key) { return key === "league" ? !!(cache.league && cache.league.league_id) : Array.isArray(cache[key]) && cache[key].length > 0; }
 function buildTeams() {
   const userById = new Map(state.users.map(u => [String(u.user_id ?? "").trim(), u]));
   state.teams = new Map();
@@ -290,48 +309,75 @@ function renderWeek(week) {
   renderStandings(week);
   renderLeagueStatus(week);
   $("week-select").value=String(week);
-  $("status").textContent=state.failedWeeks.length ? `CONNECTED · ${state.teams.size} TEAMS · SOME WEEKLY DATA UNAVAILABLE (${state.failedWeeks.join(", ")})` : `CONNECTED · ${state.teams.size} TEAMS · DATA THROUGH WEEK ${week}`;
+  const statusParts = ["CONNECTED · " + state.teams.size + " TEAMS", "DATA THROUGH WEEK " + week];
+  if (state.usingCachedCore) statusParts.push("SAVED LEAGUE DETAILS IN USE");
+  if (state.recoveredWeeks.length) statusParts.push("SAVED WEEK DATA: " + state.recoveredWeeks.join(", "));
+  if (state.failedWeeks.length) statusParts.push("WEEKS UNAVAILABLE: " + state.failedWeeks.join(", "));
+  $("status").textContent = statusParts.join(" · ");
+  $("status").classList.toggle("error", state.failedWeeks.length > 0);
 }
 async function init() {
+  const cache = readStartupCache();
+  const requests = [["league", "/league/" + LEAGUE_ID], ["users", "/league/" + LEAGUE_ID + "/users"], ["rosters", "/league/" + LEAGUE_ID + "/rosters"]];
   try {
-    const [league,users,rosters]=await Promise.all([
-      fetchJson(`/league/${LEAGUE_ID}`),fetchJson(`/league/${LEAGUE_ID}/users`),fetchJson(`/league/${LEAGUE_ID}/rosters`)
-    ]);
-    state.league=league;state.users=users;state.rosters=rosters;buildTeams();
-    renderLotteryHistory();
-    loadActualDraftOrder();
-    const season=league.season||String(new Date().getFullYear());
-    $("season-label").textContent=`${season} SLEEPER LEAGUE · EST. 2017`;
-    $("season-tag").textContent=`${season} SEASON · EST. 2017`;
-    const rankingsSeasonTag = $("season-tag-rankings");
-    if (rankingsSeasonTag) rankingsSeasonTag.textContent = `${season} SEASON · EST. 2017`;
-    const maxWeek=getWeeksToLoad();
-    // Load each week independently so one failed matchup request cannot block the page.
-    const weekResults=await Promise.all(Array.from({length:maxWeek},(_,i)=>i+1).map(async w=>{
-      try { return [w,await fetchJson(`/league/${LEAGUE_ID}/matchups/${w}`),true]; }
-      catch(error) { console.warn(`Could not load Sleeper week ${w}`,error); return [w,[],false]; }
+    // Load each required resource independently; reuse its last good copy if Sleeper is temporarily unavailable.
+    const results = await Promise.all(requests.map(async ([key, path]) => {
+      try {
+        const value = await fetchJson(path);
+        const valid = key === "league" ? value && value.league_id : Array.isArray(value) && value.length > 0;
+        if (!valid) throw new Error("Sleeper returned invalid " + key + " data.");
+        writeStartupCache({ [key]: value });
+        return { key, value, cached: false };
+      } catch (error) {
+        console.warn("Sleeper " + key + " request failed after retries", error);
+        return hasCachedCore(cache, key) ? { key, value: cache[key], cached: true } : { key, value: null, error };
+      }
     }));
-    const failedWeeks=weekResults.filter(item=>!item[2]).map(item=>item[0]);
-    state.failedWeeks=failedWeeks;
-    for(const [week,data] of weekResults) state.weeks[week]=data;
-    const completed=Array.from({length:maxWeek},(_,i)=>i+1).filter(w=>(state.weeks[w]||[]).some(m=>num(m.points)>0));
-    const defaultWeek=completed.length?Math.max(...completed):1;
-    const select=$("week-select");
-    select.innerHTML=Array.from({length:maxWeek},(_,i)=>`<option value="${i+1}">WEEK ${i+1}</option>`).join("");
-    select.addEventListener("change",()=>renderPowerRankings(Number(select.value)));
-    renderWeek(defaultWeek);
-    renderPowerRankings(defaultWeek);
-    $("updated-at").textContent="SLEEPER API · PUBLIC LEAGUE DATA";
-  } catch(error) {
-    console.error(error);
-    $("status").textContent="COULD NOT LOAD LEAGUE DATA · PLEASE REFRESH";
+    const missing = results.filter(item => !item.value);
+    if (missing.length) throw new Error("Required data unavailable (" + missing.map(item => item.key + ": " + (item.error?.message || "no saved copy")).join("; ") + ").");
+    const core = Object.fromEntries(results.map(item => [item.key, item.value]));
+    state.league = core.league; state.users = core.users; state.rosters = core.rosters;
+    state.usingCachedCore = results.some(item => item.cached);
+    buildTeams(); renderLotteryHistory(); loadActualDraftOrder();
+    const season = core.league.season || String(new Date().getFullYear());
+    $("season-label").textContent = season + " SLEEPER LEAGUE · EST. 2017";
+    $("season-tag").textContent = season + " SEASON · EST. 2017";
+    const rankingsSeasonTag = $("season-tag-rankings");
+    if (rankingsSeasonTag) rankingsSeasonTag.textContent = season + " SEASON · EST. 2017";
+    const maxWeek = getWeeksToLoad();
+    const weekResults = await Promise.all(Array.from({ length: maxWeek }, (_, index) => index + 1).map(async week => {
+      const key = String(week);
+      try {
+        const data = await fetchJson("/league/" + LEAGUE_ID + "/matchups/" + week);
+        if (!Array.isArray(data)) throw new Error("Invalid matchup data for week " + week);
+        const saved = readStartupCache().weeks || {};
+        writeStartupCache({ weeks: { ...saved, [key]: data } });
+        return { week, data, source: "live" };
+      } catch (error) {
+        console.warn("Week " + week + " failed after retries", error);
+        const saved = readStartupCache().weeks || cache.weeks || {};
+        return Array.isArray(saved[key]) ? { week, data: saved[key], source: "cache" } : { week, data: [], source: "missing" };
+      }
+    }));
+    state.failedWeeks = weekResults.filter(item => item.source === "missing").map(item => item.week);
+    state.recoveredWeeks = weekResults.filter(item => item.source === "cache").map(item => item.week);
+    weekResults.forEach(item => { state.weeks[item.week] = item.data; });
+    const completed = Array.from({ length: maxWeek }, (_, index) => index + 1).filter(week => (state.weeks[week] || []).some(match => num(match.points) > 0));
+    const defaultWeek = completed.length ? Math.max(...completed) : 1;
+    const select = $("week-select");
+    select.innerHTML = Array.from({ length: maxWeek }, (_, index) => `<option value="${index + 1}">WEEK ${index + 1}</option>`).join("");
+    select.addEventListener("change", () => renderPowerRankings(Number(select.value)));
+    renderWeek(defaultWeek); renderPowerRankings(defaultWeek);
+    $("updated-at").textContent = state.usingCachedCore || state.recoveredWeeks.length ? "SLEEPER API · SAVED DATA USED WHERE NEEDED" : "SLEEPER API · PUBLIC LEAGUE DATA";
+  } catch (error) {
+    console.error("League startup failed", error);
+    $("status").textContent = "LEAGUE DATA ERROR · " + (error?.message || "Unknown startup error");
     $("status").classList.add("error");
-    $("pr-board").innerHTML='<div class="pr-empty">Unable to connect to Sleeper. Please refresh.</div>';
+    $("pr-board").innerHTML = '<div class="pr-empty">League data could not be refreshed. No saved fallback was available; please try again shortly.</div>';
     const standings = $("standings-list");
-    if (standings) standings.innerHTML = '<div class="empty-note">Standings unavailable. Please refresh.</div>';
+    if (standings) standings.innerHTML = '<div class="empty-note">Standings unavailable. Please try again shortly.</div>';
   }
 }
-
 function renderSchedule() {
   const rows = [];
   for (let week=1; week<=getWeeksToLoad(); week++) {
