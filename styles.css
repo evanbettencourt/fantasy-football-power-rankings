@@ -643,3 +643,95 @@ html,body{background:#17132b;color:var(--text);font-family:"DM Sans",Arial,sans-
 .pr-feature-notes strong{color:var(--jfl-light-purple);font-size:9px;letter-spacing:.13em}
 .pr-feature-notes ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 22px;margin:9px 0 0;padding-left:17px;color:#d7cfe2;font-size:11px;line-height:1.5}
 @media(max-width:600px){.pr-editorial-feature{padding:14px}.pr-editorial-feature h3{font-size:15px}.pr-editorial-feature>p{font-size:12px}.pr-feature-notes ul{grid-template-columns:1fr}}
+
+
+/* Match the JFL Power Rankings page framing when the Rankings tab is active. */
+body:has(.pr-page:not([hidden])) {
+  background: var(--jfl-ink);
+  color: var(--jfl-cream);
+}
+body:has(.pr-page:not([hidden])) .shell {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+body:has(.pr-page:not([hidden])) .topbar,
+body:has(.pr-page:not([hidden])) .site-nav,
+body:has(.pr-page:not([hidden])) footer {
+  width: min(100%, 1180px);
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 24px;
+  padding-left: 24px;
+}
+body:has(.pr-page:not([hidden])) .topbar {
+  border-bottom-color: #ffffff2e;
+}
+body:has(.pr-page:not([hidden])) .wordmark {
+  color: var(--jfl-cream);
+}
+body:has(.pr-page:not([hidden])) .mark {
+  background: var(--jfl-pink);
+  color: #fff;
+}
+body:has(.pr-page:not([hidden])) .top-meta {
+  color: var(--jfl-light-purple);
+}
+body:has(.pr-page:not([hidden])) .live-dot {
+  background: #57F26B;
+  box-shadow: 0 0 10px #57F26B88;
+}
+body:has(.pr-page:not([hidden])) .site-nav {
+  border-bottom-color: #ffffff2e;
+}
+body:has(.pr-page:not([hidden])) .nav-crest {
+  width: 36px;
+  height: 42px;
+  margin-right: 18px;
+  border: 0;
+  border-radius: 0;
+  background: var(--jfl-pink);
+  color: #fff;
+}
+body:has(.pr-page:not([hidden])) .nav-tab {
+  height: 58px;
+  padding: 0 15px;
+  color: #b9accb;
+  font: 800 10px Inter, Arial, sans-serif;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+body:has(.pr-page:not([hidden])) .nav-tab:hover,
+body:has(.pr-page:not([hidden])) .nav-tab.active {
+  color: var(--jfl-cream);
+}
+body:has(.pr-page:not([hidden])) .nav-tab.active {
+  border-bottom-color: var(--jfl-pink);
+}
+body:has(.pr-page:not([hidden])) .pr-page {
+  width: 100%;
+  margin: 0;
+}
+body:has(.pr-page:not([hidden])) footer {
+  min-height: 54px;
+  border-top: 1px solid #ffffff20;
+  color: #b9accb;
+}
+@media (max-width: 760px) {
+  body:has(.pr-page:not([hidden])) .topbar,
+  body:has(.pr-page:not([hidden])) .site-nav,
+  body:has(.pr-page:not([hidden])) footer {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+  body:has(.pr-page:not([hidden])) .nav-crest {
+    width: 30px;
+    height: 36px;
+    margin-right: 10px;
+  }
+  body:has(.pr-page:not([hidden])) .nav-tab {
+    height: 54px;
+    padding: 0 11px;
+    font-size: 9px;
+  }
+}
