@@ -62,6 +62,7 @@ function calculateWeek(week) {
 function computeRankings(week) {
   const teams = [...state.teams.values()].map(t => ({...t, wins:0,losses:0,ties:0,pf:0,pa:0,allPlayWins:0,allPlayGames:0,scores:[]}));
   const byId = new Map(teams.map(t => [t.id,t]));
+  let completedWeeks = 0;
   for (let w = 1; w <= week; w++) {
     const matchups = state.weeks[w] || [];
     const valid = matchups.filter(m => num(m.points) > 0);
@@ -87,13 +88,16 @@ function computeRankings(week) {
     }
     if (weeklyScores.length) {
       const sorted = [...weeklyScores].sort((a,b)=>a-b);
-      const median = (sorted[sorted.length/2-1] + sorted[sorted.length/2]) / 2;
-      if (w <= getWeeksToLoad()) for (const m of valid) {
+      if (w <= getWeeksToLoad() && valid.length === teams.length) {
+        completedWeeks++;
+        const median = (sorted[sorted.length/2-1] + sorted[sorted.length/2]) / 2;
+        for (const m of valid) {
         const t = byId.get(Number(m.roster_id));
         if (!t) continue;
         if (num(m.points) > median) t.wins++;
         else if (num(m.points) < median) t.losses++;
         else t.ties++;
+        }
       }
       for (const t of teams) {
         const score = matchups.find(m => Number(m.roster_id) === t.id);
@@ -109,7 +113,7 @@ function computeRankings(week) {
     }
   }
   const maxPf = Math.max(1,...teams.map(t=>t.pf));
-  const games = Math.max(1,week * 2);
+  const games = Math.max(1,completedWeeks * 2);
   const recentWeeks = [Math.max(1,week-2),Math.max(1,week-1),week];
   const recentAverages = recentWeeks.map(w => {
     const all = (state.weeks[w] || []).filter(m=>num(m.points)>0).map(m=>num(m.points));
@@ -171,7 +175,7 @@ function renderStandings(week) {
     }
     if (w <= getWeeksToLoad()) {
       const scores = (state.weeks[w] || []).filter(m=>num(m.points)>0).map(m=>num(m.points)).sort((a,b)=>a-b);
-      if (scores.length) {
+      if (scores.length === standings.length) {
         const median = (scores[scores.length/2-1] + scores[scores.length/2]) / 2;
         for (const m of state.weeks[w]) {
           const t = map.get(Number(m.roster_id));
