@@ -17,11 +17,9 @@
   <nav class="site-nav" aria-label="Main navigation">
     <span class="nav-crest" aria-hidden="true">MB</span>
     <button class="nav-tab active" data-tab="league">League</button>
-    <button class="nav-tab" data-tab="lottery">Draft Lottery</button>
     <button class="nav-tab" data-tab="rankings">Power Rankings</button>
-    <button class="nav-tab" data-tab="schedule">Schedule</button>
-    <button class="nav-tab" data-tab="hall">Hall of Fame</button>
-    <button class="nav-tab" data-tab="rules">Constitution</button>
+<button class="nav-tab" data-tab="hall">Hall of Fame</button>
+    <button class="nav-tab" data-tab="rules">Rules</button>
   </nav>
   <main>
     <section class="league-hero tab-panel" data-panel="league">
@@ -48,19 +46,6 @@
         </div>
       </article>
     </section>
-    <section class="lower-grid tab-panel" data-panel="league">
-      <section class="section"><div class="section-heading compact"><div><div class="eyebrow">WEEKLY MATCHUPS</div><h2>Scoreboard</h2></div></div><div id="scoreboard" class="scoreboard"><div class="loading-cell">Loading matchups…</div></div></section>
-      <section class="section"><div class="section-heading compact"><div><div class="eyebrow">LEAGUE SNAPSHOT</div><h2>Season leaders</h2></div></div>
-        <div class="leader-stats">
-          <div><span>TOP TEAM</span><strong id="top-team">—</strong><small id="top-team-foot">POWER INDEX LEADER</small></div>
-          <div><span>WEEKLY HIGH</span><strong id="weekly-high">—</strong><small id="weekly-high-foot">—</small></div>
-          <div><span>BIGGEST RISER</span><strong id="biggest-riser">—</strong><small id="biggest-riser-foot">THIS WEEK</small></div>
-          <div><span>LEAGUE AVG.</span><strong id="league-average">—</strong><small>POINTS PER TEAM</small></div>
-        </div>
-      </section>
-    </section>
-    <section class="takeaway-section tab-panel" data-panel="league"><div class="section-heading compact"><div><div class="eyebrow">THE CONVERSATION</div><h2>Week in review</h2></div></div><p id="takeaway">The league story is coming into focus…</p></section>
-
     <section class="intro tab-panel" data-panel="rankings" hidden>
       <div class="eyebrow">MONKEY BOYS FOOTBALL CLUB <span id="season-tag-rankings">2026 SEASON</span></div>
       <div class="intro-row"><div><h1>POWER <em>RANKINGS</em></h1><p class="lede">SEASON II · 2026</p></div>
@@ -75,8 +60,6 @@
       <section class="rank-notes"><div class="eyebrow">THE WEEKLY DISPATCH</div><h2>Notes from around the league</h2><div id="team-notes" class="team-notes"></div></section>
     </section>
 
-    <section class="section tab-panel extra-panel" data-panel="lottery" hidden><div class="eyebrow">DRAFT ORDER</div><h2>Draft Lottery</h2><p>Draft lottery results and selection order.</p><div id="lottery-content"></div></section>
-    <section class="section tab-panel extra-panel" data-panel="schedule" hidden><div class="eyebrow">THE FIXTURES</div><h2>Schedule</h2><p>Weekly matchup results across the regular season.</p><div id="schedule-content"></div></section>
     <section class="section tab-panel extra-panel" data-panel="hall" hidden><div class="eyebrow">THE RECORD BOOK</div><h2>Hall of Fame</h2><p>League champions and all-time achievements.</p><div id="hall-content"></div></section>
     <section class="section tab-panel extra-panel" data-panel="rules" hidden><div class="eyebrow">THE CONSTITUTION</div><h2>The Constitution</h2><p class="rules-intro">The official rules, settings, roster requirements, and scoring system of Monkey Boys Fantasy Football.</p><div id="rules-content" class="rules-content"></div></section>
   </main>
