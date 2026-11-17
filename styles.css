@@ -203,3 +203,60 @@ html,body{background:#17132b;color:var(--text);font-family:"DM Sans",Arial,sans-
 .lottery-empty{grid-column:1/-1;padding:20px;border:1px dashed #59477b;border-radius:10px;color:var(--muted);font-size:13px}
 @media(max-width:850px){.lottery-order-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.lottery-history-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.lottery-intro{padding:38px 0 22px}.lottery-heading h2{font-size:22px}.lottery-order-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.lottery-order-card{padding:12px 10px;gap:9px}.lottery-order-card>span{font-size:19px}.lottery-order-card strong{font-size:12px}.lottery-results-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.lottery-result-row{padding:10px 9px;gap:7px}.lottery-result-row strong{font-size:11px}.lottery-first{font-size:7px}.lottery-history-grid{grid-template-columns:1fr}.lottery-table th,.lottery-table td{padding:11px 9px}.lottery-table th{font-size:8px}.lottery-table td{font-size:11px}.lottery-formula{font-size:8px}}
+
+
+/* Draft lottery — JFL lottery layout */
+.lottery-page{padding:0 0 44px}
+.lot-hero{padding:52px 0 34px}
+.lot-hero .eyebrow{margin:0;color:#ff4f91;font:700 11px var(--sans);letter-spacing:.2em;text-transform:uppercase}
+.lot-lock{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:17px}
+.lot-lock h1{margin:0;font-size:clamp(58px,7vw,92px);line-height:.88;letter-spacing:-.06em;text-transform:none;font-weight:900}
+.mb-lottery-crest{width:70px;height:82px;flex:none;display:grid;place-items:center;clip-path:polygon(0 0,100% 0,100% 77%,50% 100%,0 77%);background:linear-gradient(145deg,#ff4f91,#8c3ee9 55%,#20b9d7);font-size:25px;font-weight:900}
+.lot-final{max-width:100%;margin:0 auto}
+.lot-sec{margin:0 0 34px}
+.lot-sec-hd{font:800 17px var(--sans);letter-spacing:-.02em;color:var(--text);padding-bottom:11px;border-bottom:1px solid #ffffff24;margin-bottom:10px}
+.lot-prog{display:flex;align-items:center;gap:7px;margin:0 0 13px;color:#a99fbe;font:11px var(--sans)}
+.lot-prog b{color:var(--lime);font-weight:800}
+.lot-source{margin-left:auto;color:#8f84a3;font-size:9px;letter-spacing:.12em}
+.dob{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:7px}
+.dob-slot{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:13px 5px 12px;background:#ffffff08;border:1px solid #ffffff13;border-radius:9px}
+.dob-n{font:700 11px var(--mono);color:#a99fbe}
+.dob-dot,.ds-dot{width:8px;height:8px;border-radius:50%;flex:none}
+.dob-nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:800 10px var(--sans)}
+.ds-cols{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);gap:28px}
+.ds-thd,.ds-row{display:grid;grid-template-columns:38px minmax(0,1fr) 65px 76px;align-items:center;gap:9px}
+.ds-thd{padding:0 8px 9px;color:#9489a8;font:700 9px var(--sans);letter-spacing:.1em;text-transform:uppercase}
+.ds-thd .r,.ds-thd .c{text-align:right}
+.ds-row{min-height:39px;padding:5px 8px;border-top:1px solid #ffffff12}
+.ds-pk{font:700 12px var(--mono);color:#a99fbe}
+.ds-tm{display:flex;align-items:center;gap:8px;min-width:0;font:800 12px var(--sans)}
+.ds-mv{font:800 11px var(--mono);text-align:right}
+.ds-mv.up,.ls-lval.up{color:#2ac7aa}
+.ds-mv.dn,.ls-lval.dn{color:#ff668f}
+.ds-mv.even{color:#a99fbe}
+.ds-slot{text-align:right}
+.pill{display:inline-block;min-width:33px;padding:4px 7px;border:1px solid #ffffff20;border-radius:5px;background:#ffffff0a;color:#e7dfef;font:700 10px var(--mono);text-align:center}
+.lottery-leaderboard .lot-sec-hd{font-size:15px}
+.ls-thd,.ls-luck{display:grid;grid-template-columns:76px minmax(70px,1fr) 42px;align-items:center;gap:9px}
+.ls-thd{padding:0 4px 9px;color:#9489a8;font:700 9px var(--sans);letter-spacing:.1em;text-transform:uppercase}
+.ls-thd .c{text-align:right}
+.ls-luck{min-height:29px;padding:3px 4px;border-top:1px solid #ffffff0d}
+.ls-lnm{font:700 10px var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ls-track{position:relative;height:9px;background:#ffffff08;border-radius:3px;overflow:hidden}
+.ls-axis{position:absolute;left:50%;top:0;bottom:0;width:1px;background:#a99fbe88;z-index:1}
+.ls-fill{position:absolute;top:1px;bottom:1px;border-radius:2px}
+.ls-fill.up{background:#22b8a5}.ls-fill.dn{background:#f05b83}
+.ls-lval{text-align:right;font:700 10px var(--mono)}
+.lottery-formula{margin:12px 0 0;color:#9186a8;font:700 9px var(--sans);letter-spacing:.1em;line-height:1.7}
+.lot-history-sec{padding-top:5px}
+.lottery-history-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.lottery-year-card{padding:13px 15px;background:#ffffff06;border:1px solid #ffffff15;border-radius:9px}
+.lottery-year-heading{display:flex;justify-content:space-between;align-items:center;padding-bottom:9px;margin-bottom:2px;border-bottom:1px solid #ffffff1b}
+.lottery-year-heading strong{font:900 20px var(--sans)}
+.lottery-year-heading span{font:700 9px var(--sans);letter-spacing:.1em;color:#a99fbe}
+.lottery-history-row{display:grid;grid-template-columns:25px 1fr auto;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #ffffff0b}
+.lottery-history-row>span{font:10px var(--mono);color:#a79bb9}
+.lottery-history-row strong{font:700 11px var(--sans)}
+.lottery-history-row small{font:10px var(--mono);color:#a99fbe}
+@media(max-width:1000px){.dob{grid-template-columns:repeat(6,minmax(0,1fr))}.ds-cols{grid-template-columns:1fr;gap:24px}.lottery-leaderboard{max-width:650px}}
+@media(max-width:650px){.lot-hero{padding:37px 0 25px}.lot-lock h1{font-size:56px}.mb-lottery-crest{width:53px;height:64px;font-size:19px}.dob{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.dob-slot{padding:10px 3px}.dob-nm{font-size:9px}.ds-cols{gap:22px}.ds-thd,.ds-row{grid-template-columns:30px minmax(0,1fr) 52px 64px;gap:6px;padding-left:5px;padding-right:5px}.ds-tm{font-size:11px}.ds-mv{font-size:10px}.ls-thd,.ls-luck{grid-template-columns:68px minmax(60px,1fr) 39px;gap:7px}.lottery-history-grid{grid-template-columns:1fr}.lot-sec-hd{font-size:16px}}
