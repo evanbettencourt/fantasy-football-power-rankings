@@ -213,12 +213,18 @@ async function init() {
       fetchJson(`/league/${LEAGUE_ID}`),fetchJson(`/league/${LEAGUE_ID}/users`),fetchJson(`/league/${LEAGUE_ID}/rosters`)
     ]);
     state.league=league;state.users=users;state.rosters=rosters;buildTeams();
-    const season=league.season||"2026";
-    $("season-label").textContent=`${season} SLEEPER LEAGUE`;
-    $("season-tag").textContent=`${season} SEASON`;
+    const season=league.season||String(new Date().getFullYear());
+    $("season-label").textContent=`${season} SLEEPER LEAGUE · EST. 2017`;
+    $("season-tag").textContent=`${season} SEASON · EST. 2017`;
+    $("season-tag-rankings").textContent=`${season} SEASON · EST. 2017`;
     const maxWeek=getWeeksToLoad();
-    const weeks=await Promise.all(Array.from({length:maxWeek},(_,i)=>i+1).map(async w=>[w,await fetchJson(`/league/${LEAGUE_ID}/matchups/${w}`)]));
-    for(const [week,data] of weeks) state.weeks[week]=data;
+    // Load each week independently so one failed matchup request cannot block the page.
+    const weekResults=await Promise.all(Array.from({length:maxWeek},(_,i)=>i+1).map(async w=>{
+      try { return [w,await fetchJson(`/league/${LEAGUE_ID}/matchups/${w}`),true]; }
+      catch(error) { console.warn(`Could not load Sleeper week ${w}`,error); return [w,[],false]; }
+    }));
+    const failedWeeks=weekResults.filter(item=>!item[2]).map(item=>item[0]);
+    for(const [week,data] of weekResults) state.weeks[week]=data;
     const completed=Array.from({length:maxWeek},(_,i)=>i+1).filter(w=>(state.weeks[w]||[]).some(m=>num(m.points)>0));
     const defaultWeek=completed.length?Math.max(...completed):1;
     const select=$("week-select");
@@ -232,9 +238,10 @@ async function init() {
     $("status").textContent="COULD NOT LOAD LEAGUE DATA · PLEASE REFRESH";
     $("status").classList.add("error");
     $("rankings-body").innerHTML='<tr><td colspan="7" class="loading-cell">Unable to connect to Sleeper. Check the league ID and try again.</td></tr>';
-    $("scoreboard").innerHTML='<div class="empty-note">Matchups unavailable.</div>';
-    const standingsBody = $("standings-body");
-    if (standingsBody) standingsBody.innerHTML='<tr><td colspan="5" class="loading-cell">Standings unavailable.</td></tr>';
+    const playoff = $("playoff-standings");
+    const bubble = $("bubble-standings");
+    if (playoff) playoff.innerHTML = '<div class="empty-note">Standings unavailable. Please refresh.</div>';
+    if (bubble) bubble.innerHTML = '';
   }
 }
 
