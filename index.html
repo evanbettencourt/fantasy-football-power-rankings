@@ -17,6 +17,7 @@
   <nav class="site-nav" aria-label="Main navigation">
     <span class="nav-crest" aria-hidden="true">MB</span>
     <button class="nav-tab active" data-tab="league">League</button>
+    <button class="nav-tab" data-tab="lottery">Draft Lottery</button>
     <button class="nav-tab" data-tab="rankings">Power Rankings</button>
 <button class="nav-tab" data-tab="hall">Hall of Fame</button>
     <button class="nav-tab" data-tab="rules">Rules</button>
@@ -43,6 +44,33 @@
         <div class="standings-group-title"><span class="playoff-dot"></span> PLAYOFF CUTOFF <small>TOP 6</small></div><div id="standings-list" class="league-team-list"></div>
       </article>
     </section>
+    <section class="section tab-panel lottery-page" data-panel="lottery" hidden>
+      <div class="intro lottery-intro">
+        <div class="eyebrow">MONKEY BOYS FOOTBALL CLUB · EST. 2017</div>
+        <div class="intro-row"><div><h1>DRAFT <em>LOTTERY</em></h1><p class="lede">THE DRAW · THE ORDER · THE HISTORY</p></div></div>
+      </div>
+      <section class="lottery-block">
+        <div class="lottery-heading"><div><div class="eyebrow">THE SNAKE DRAFT</div><h2>Actual Draft Order</h2></div><span class="lottery-season" id="draft-order-season">SLEEPER DATA</span></div>
+        <p class="lottery-explainer">The finalized draft-slot order retrieved from the league's Sleeper draft.</p>
+        <div id="actual-draft-order" class="lottery-order-grid"><div class="lottery-empty">Loading draft order from Sleeper…</div></div>
+      </section>
+      <section class="lottery-block">
+        <div class="lottery-heading"><div><div class="eyebrow">THE DRAW</div><h2>2026 Lottery Results</h2></div><span class="lottery-season">12 MANAGERS</span></div>
+        <p class="lottery-explainer">The order in which managers earned the right to choose their draft slot.</p>
+        <div id="lottery-current-results" class="lottery-results-grid"></div>
+      </section>
+      <section class="lottery-block">
+        <div class="lottery-heading"><div><div class="eyebrow">THE LUCK INDEX</div><h2>Luck Leaderboard</h2></div><span class="lottery-season">2021–2026</span></div>
+        <p class="lottery-explainer">Luck is measured against the average lottery position for that year's field. Earlier-than-expected draws earn positive points; later draws earn negative points.</p>
+        <div class="table-wrap lottery-table-wrap"><table class="lottery-table"><thead><tr><th>RANK</th><th>MANAGER</th><th>LOTTERY DRAWS</th><th>LUCK POINTS</th></tr></thead><tbody id="lottery-luck-body"></tbody></table></div>
+        <div class="lottery-formula">LUCK POINTS = (FIELD SIZE + 1) ÷ 2 − LOTTERY POSITION · CUMULATIVE FROM 2021–2026</div>
+      </section>
+      <section class="lottery-block lottery-history-block">
+        <div class="lottery-heading"><div><div class="eyebrow">THE ARCHIVE</div><h2>Lottery History</h2></div><span class="lottery-season">2021–2026</span></div>
+        <div id="lottery-history" class="lottery-history-grid"></div>
+      </section>
+    </section>
+
     <section class="intro tab-panel" data-panel="rankings" hidden>
       <div class="eyebrow">MONKEY BOYS FOOTBALL CLUB <span id="season-tag-rankings">2026 SEASON</span></div>
       <div class="intro-row"><div><h1>POWER <em>RANKINGS</em></h1><p class="lede">EST. 2017 · POWER INDEX</p></div>
