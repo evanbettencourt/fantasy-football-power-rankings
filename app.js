@@ -88,7 +88,7 @@ function computeRankings(week) {
     if (weeklyScores.length) {
       const sorted = [...weeklyScores].sort((a,b)=>a-b);
       const median = (sorted[sorted.length/2-1] + sorted[sorted.length/2]) / 2;
-      if (w < getWeeksToLoad()) for (const m of valid) {
+      if (w <= getWeeksToLoad()) for (const m of valid) {
         const t = byId.get(Number(m.roster_id));
         if (!t) continue;
         if (num(m.points) > median) t.wins++;
@@ -150,7 +150,7 @@ function renderScoreboard(week) {
     <div class="matchup">
       <div class="match-team">${avatarMarkup(m.a)}<span class="match-team-name">${teamName(m.a)}</span></div>
       <div class="match-score ${m.winner===1?'winner':''}">${fmt(m.scoreA)} <span class="versus">—</span> <span class="${m.winner===2?'winner':''}">${fmt(m.scoreB)}</span></div>
-      <div class="match-team">${avatarMarkup(m.b)}<span class="match-team-name">${teamName(m.b)}</span></div>
+      <div class="match-team"><span class="match-team-name">${teamName(m.b)} <small>${escapeHtml(m.b.owner)}</small></span></div>
     </div>`).join("");
 }
 function renderStandings(week) {
@@ -244,4 +244,29 @@ async function init() {
     $("standings-body").innerHTML='<tr><td colspan="5" class="loading-cell">Standings unavailable.</td></tr>';
   }
 }
+
+function renderSchedule() {
+  const rows = [];
+  for (let week=1; week<=getWeeksToLoad(); week++) {
+    const games = calculateWeek(week).results;
+    for (const game of games) rows.push(`<div class="schedule-row"><span class="schedule-week">W${week}</span><span>${teamName(game.a)} <small>${escapeHtml(game.a.owner)}</small></span><strong>${fmt(game.scoreA)} – ${fmt(game.scoreB)}</strong><span>${teamName(game.b)} <small>${escapeHtml(game.b.owner)}</small></span></div>`);
+  }
+  $("schedule-content").innerHTML = rows.length ? rows.join("") : '<p class="empty-note">No completed schedule data yet.</p>';
+}
+function setupNavigation() {
+  const tabs = [...document.querySelectorAll(".nav-tab")];
+  const panels = [...document.querySelectorAll(".tab-panel")];
+  tabs.forEach(tab => tab.addEventListener("click", () => {
+    const target = tab.dataset.tab;
+    tabs.forEach(item => item.classList.toggle("active", item === tab));
+    panels.forEach(panel => {
+      const visible = panel.dataset.panel === target;
+      panel.hidden = !visible;
+    });
+    if (target === "schedule") renderSchedule();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }));
+}
+setupNavigation();
+
 init();
