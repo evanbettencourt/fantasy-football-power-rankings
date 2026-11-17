@@ -217,6 +217,7 @@ function renderWeek(week) {
   renderScoreboard(week);
   renderStandings(week);
   renderStats(week,rankings);
+  renderEditorial(week,rankings);
   $("week-select").value=String(week);
   $("status").textContent=`CONNECTED · ${state.teams.size} TEAMS · DATA THROUGH WEEK ${week}`;
 }
@@ -257,6 +258,44 @@ function renderSchedule() {
   }
   $("schedule-content").innerHTML = rows.length ? rows.join("") : '<p class="empty-note">No completed schedule data yet.</p>';
 }
+
+function renderEditorial(week, rankings) {
+  const scores=(state.weeks[week]||[]).filter(m=>num(m.points)>0).sort((a,b)=>num(b.points)-num(a.points));
+  const chart=$("weekly-chart-bars");
+  if(chart) chart.innerHTML=scores.map(m=>{
+    const t=teamFor(m.roster_id), pct=Math.max(5,Math.round(num(m.points)/(num(scores[0]&&scores[0].points)||1)*100));
+    return '<div class="chart-bar-item" title="'+teamName(t)+': '+fmt(m.points)+'"><span class="chart-bar-value">'+fmt(m.points)+'</span><div class="chart-bar" style="height:'+pct+'px"></div><span class="chart-bar-label">'+escapeHtml(t&&t.owner||"")+'</span></div>';
+  }).join("");
+  const notes=$("team-notes");
+  if(notes) notes.innerHTML=rankings.map((t,i)=>{
+    const movement=t.move>0?"up "+t.move+" place"+(t.move===1?"":"s"):t.move<0?"down "+Math.abs(t.move)+" place"+(t.move===-1?"":"s"):"holding position";
+    const score=t.scores&&t.scores.length?t.scores[t.scores.length-1].score:0;
+    const sentence=score?"Scored "+fmt(score)+" this week and is "+movement+" in the Power Index. The season profile currently shows "+t.record+" with "+fmt(t.pf)+" points for.":"No completed scoring data is available yet. The team is currently "+movement+" in the Power Index.";
+    return '<article class="team-note"><div class="team-note-head"><strong>'+String(i+1).padStart(2,"0")+' — '+teamName(t)+'</strong><span>'+Math.round(t.power)+' POWER</span></div><p>'+sentence+'</p></article>';
+  }).join("");
+}
+function renderRules() {
+  const target=$("rules-content");
+  if(!target||target.dataset.ready==="yes") return;
+  const sections=[
+    ["Miscellaneous league rules",
+      '<h3>Rule changes</h3><ul><li>All league rules are open to be changed from the end of the fantasy football season until draft night of the following fantasy football season.</li><li>If a league member proposes a new rule, a Sleeper poll will be created to cast votes for the proposal. A simple majority (&gt;50%) of league members must vote in favor of a proposed change for it to occur.</li><li>Exception for rules related to buy in or payout, where a supermajority (&gt;2/3) of league members must vote in favor of a proposed change for it to occur.</li></ul><h3>Buy in</h3><ul><li>$50 per person</li><li>Must be paid to league commissioner by draft day</li></ul><h3>Payout</h3><ul><li>First place playoffs: $300 (50% of pot)</li><li>Second place playoffs: $180 (30% of pot)</li><li>First place regular season: $120 (20% of pot)</li></ul><h3>Last place punishment</h3><ul><li>Last place punishment for the season will be agreed upon by all league mates prior to the draft</li><li>The team that finishes last place in the regular season is considered last place</li><li>Punishment must be completed prior to the next season’s draft lottery date. If it is not, that league mate will automatically be assigned last position in the draft lottery AND forfeit their first round draft pick</li></ul>'],
+    ["General settings",
+      '<ul><li>League type: Redraft</li><li>Teams: 12</li><li>Lineup type: Classic</li><li>Waiver order: FAAB</li><li>Waiver budget: 100</li><li>Minimum bid: 0</li><li>Show FAAB suggestions: Off</li><li>After games waivers clear: 3 AM Wednesday</li><li>Time players are on waivers after drop: 1 day</li><li>Allow custom daily waivers: On — Monday: Free agency; Tuesday: Locked; Wednesday, Thursday, Friday, and Saturday: Waivers; Sunday: Free agency</li><li>Time to review pending trades: None</li><li>Trade deadline: None (in app) — Once a given team is mathematically eliminated from the playoffs, they are only allowed to trade with other mathematically eliminated teams.</li><li>Player auto-subs: 1</li><li>Require auto-sub to not play before starter: On</li><li>Lock auto-sub if starter active: Off</li><li>Allow draft pick trading: Off</li><li>Extra game each week against league median: On</li><li>Prevent bench players from being dropped after game starts: Off</li></ul>'],
+    ["Roster",
+      '<h3>Starters</h3><ul><li>1 QB</li><li>2 RB</li><li>2 WR</li><li>1 TE</li><li>1 Flex (RB/WR/TE)</li><li>1 Superflex (QB/RB/WR/TE)</li></ul><ul><li>6 bench</li><li>2 injured reserve</li></ul><h3>Injured reserve eligibility</h3><p>Players eligible for injured reserve include IR, PUP, and OUT. All other players are ineligible, including COVID players, Out players, Suspended players, NA players, DNR/Holdout players, and Doubtful players.</p>'],
+    ["Draft",
+      '<ul><li>Draft start time: TBD by league determination</li><li>Autostart draft: Enabled</li><li>Draft type: Snake</li><li>Available players to draft: All players</li><li>Time per pick: 1.5 minutes</li><li>CPU Autopick: Enabled</li></ul><h3>Draft order determination</h3><ul><li>Random wheel spinner creates an “order” of league members</li><li>League members select draft spot in that order starting ~2 weeks before the draft day, giving each league member ~1 day to make their decision</li></ul>'],
+    ["Playoffs",
+      '<ul><li>Playoff weeks: 15, 16, 17</li><li>Playoff teams: 6</li><li>Playoff seed tiebreaker: Points forced</li><li>Playoff weeks per round: One week per round</li><li>Playoff seeding rules: Re-seed</li><li>Playoffs lower bracket type: Toilet bowl</li><li>Playoff matchup tiebreaker: Higher seed advances</li></ul>'],
+    ["Scoring",
+      '<h3>Passing</h3><div class="rule-kicker">Active measures</div><ul><li>Passing yards: 1 point every 25 yards (+0.04 per yard)</li><li>Passing TD: 4</li><li>2-Pt conversion: 2</li><li>Pass intercepted: -2</li></ul><div class="rule-kicker">Inactive measures</div><ul><li>Passing 1st down</li><li>Pick 6 thrown</li><li>Pass completed</li><li>Incomplete pass</li><li>Pass attempts</li><li>QB sacked</li><li>40+ yard completion bonus</li><li>40+ yard pass TD bonus</li><li>50+ yard pass TD bonus</li></ul><h3>Rushing</h3><div class="rule-kicker">Active measures</div><ul><li>Rushing yards: 1 point every 10 yards (+0.1 per yard)</li><li>Rushing TD: 6</li><li>2-Pt conversion: 2</li></ul><div class="rule-kicker">Inactive measures</div><ul><li>Rushing 1st down</li><li>Rush attempts</li><li>40+ yard rush bonus</li><li>40+ yard rush TD bonus</li><li>50+ yard rush TD bonus</li></ul><h3>Receiving</h3><div class="rule-kicker">Active measures</div><ul><li>Reception: 0.5</li><li>Receiving yards: 1 point every 10 yards (+0.1 per yard)</li><li>Receiving TD: 6</li><li>2-Pt conversion: 2</li></ul><div class="rule-kicker">Inactive measures</div><ul><li>Receiving 1st down</li><li>0-4 yard reception bonus</li><li>5-9 yard reception bonus</li><li>10-19 yard reception bonus</li><li>20-29 yard reception bonus</li><li>30-39 yard reception bonus</li><li>40+ yard reception bonus</li><li>40+ yard reception TD bonus</li><li>50+ yard reception TD bonus</li><li>Reception bonus - RB</li><li>Reception bonus - WR</li><li>Reception bonus - TE</li></ul><h3>Kicking</h3><div class="rule-kicker">Active measures</div><ul><li>FG made: 3</li><li>PAT made: 1</li></ul><div class="rule-kicker">Inactive measures</div><ul><li>FG made (0-19 yards)</li><li>FG made (20-29 yards)</li><li>FG made (30-39 yards)</li><li>FG made (40-49 yards)</li><li>FG made (50-59 yards)</li><li>FG made (50+ yards)</li><li>FG made (60+ yards)</li><li>Points per FG yard</li><li>Points per FG yard over 30</li><li>FG missed</li><li>FG missed (0-19 yards)</li><li>FG missed (20-29 yards)</li><li>FG missed (30-39 yards)</li><li>FG missed (40-49 yards)</li><li>FG missed (50-59 yards)</li><li>FG missed (50+ yards)</li><li>FG missed (60+ yards)</li><li>PAT missed</li></ul><h3>Team Defense</h3><p>Scoring settings are unnecessary since team defenses are not on the current league roster settings.</p><h3>Special Teams</h3><p>Scoring settings are unnecessary since team defenses are not on the current league roster settings.</p><h3>Special Teams Player</h3><div class="rule-kicker">Inactive measures</div><ul><li>Special teams player TD</li><li>Special teams player forced fumble</li><li>Special teams player fumble recovery</li><li>Special teams player solo tackle</li><li>Player punt return yards</li><li>Player kick return yards</li></ul><h3>Miscellaneous</h3><div class="rule-kicker">Active measures</div><ul><li>Fumble lost: -2</li><li>Fumble recovery TD: 6</li></ul><div class="rule-kicker">Inactive measures</div><ul><li>Fumble</li></ul><h3>Bonuses</h3><div class="rule-kicker">Inactive measures</div><ul><li>100-199 yard rushing game</li><li>200+ yard rushing game</li><li>100-199 yard receiving game</li><li>200+ yard receiving game</li><li>300-399 yard passing game</li><li>400+ yard passing game</li><li>100-199 combined rush + rec yards</li><li>200+ combined rush + rec yards</li><li>25+ pass completions</li><li>20+ carries</li><li>1st down bonus - RB</li><li>1st down bonus - WR</li><li>1st down bonus - TE</li><li>1st down bonus - QB</li></ul><h3>IDP</h3><p>Scoring settings are unnecessary since IDP are not on the current league roster settings.</p>'],
+    ["Divisions",'<ul><li>Number of divisions: 0</li></ul>']
+  ];
+  target.innerHTML=sections.map((section,index)=>'<details class="rule-group" '+(index===0?'open':'')+'><summary>'+section[0]+'</summary><div class="rule-body">'+section[1]+'</div></details>').join("");
+  target.dataset.ready="yes";
+}
+
 function setupNavigation() {
   const tabs = [...document.querySelectorAll(".nav-tab")];
   const panels = [...document.querySelectorAll(".tab-panel")];
@@ -268,9 +307,12 @@ function setupNavigation() {
       panel.hidden = !visible;
     });
     if (target === "schedule") renderSchedule();
+    if (target === "rules") renderRules();
     window.scrollTo({top:0,behavior:"smooth"});
   }));
 }
 setupNavigation();
+const reveal=$("reveal-button");
+if(reveal) reveal.addEventListener("click",()=>{const body=$("rankings-body");const hidden=body.classList.toggle("rankings-hidden");reveal.textContent=hidden?"REVEAL RANKINGS":"HIDE RANKINGS";});
 
 init();
