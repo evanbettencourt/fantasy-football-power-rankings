@@ -1,5 +1,5 @@
 const LEAGUE_ID = "1313563024161787904";
-const API = "https://api.sleeper.app/v1";
+const API = "/api/sleeper";
 const $ = (id) => document.getElementById(id);
 const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [] };
 
