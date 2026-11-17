@@ -86,13 +86,6 @@
             <div class="pr-mast-row"><div class="pr-word"><h1>POWER<br>RANKINGS</h1><p id="pr-edition-label">THE WEEKLY LEAGUE DISPATCH</p></div><div class="pr-crest" aria-label="Monkey Boys crest">MB</div></div>
             <div class="pr-controls"><label for="week-select">EDITION</label><select id="week-select" aria-label="Select Power Rankings edition"></select><button id="pr-reveal" class="reveal-button" type="button">REVEAL RANKINGS</button></div>
           </header></div>
-          <section class="pr-report-panel" aria-labelledby="pr-report-title">
-            <div class="pr-report-heading"><div><div class="pr-report-kicker">EDITORIAL WORKSPACE</div><h2 id="pr-report-title">WEEKLY RANKINGS REPORT</h2><p>Pull the league context from Sleeper, then copy it into ChatGPT for the weekly editorial rankings.</p></div><span class="pr-report-live">SLEEPER CONNECTED</span></div>
-            <div class="pr-report-controls"><label for="pr-report-week">REPORT WEEK</label><select id="pr-report-week" aria-label="Select report week"></select><button id="pr-report-generate" type="button" disabled>GENERATE REPORT</button><button id="pr-report-copy" type="button" disabled>COPY REPORT</button></div>
-            <p id="pr-report-status" class="pr-report-status" role="status">Loading report tools…</p>
-            <textarea id="pr-report-output" class="pr-report-output" readonly aria-label="Generated weekly rankings report" placeholder="Your weekly report will appear here after generation."></textarea>
-            <p class="pr-report-footnote">Scores, standings, rosters, transactions, injury designations, and available player news are retrieved from Sleeper. Player news includes linked-provider headlines and analysis when available. Rosters reflect the current snapshot, not a historical roster for the selected week.</p>
-          </section>
           <main class="pr-wrap">
             <section class="pr-section pr-chart-wrap"><div class="pr-section-head"><h2>THE SCORING PICTURE</h2><span>WEEKLY POINTS · HUNDREDTHS</span></div><div id="weekly-chart-bars" class="pr-chart-img" aria-label="Weekly scores chart"></div><p class="pr-chart-note">Green indicates a head-to-head win; red indicates a head-to-head loss. Gold indicates a tie.</p></section>
             <section class="pr-section"><div class="pr-section-head"><h2>THE POWER RANKINGS</h2><span id="pr-rank-count">12 MANAGERS</span></div><div id="pr-board" class="pr-board"><div class="pr-empty">Loading the weekly edition…</div></div></section>
@@ -108,6 +101,5 @@
 </div>
 <script src="js/power-rankings-reveal.js"></script>
 <script src="app.js"></script>
-<script src="js/weekly-rankings-report.js"></script>
 </body>
 </html>
