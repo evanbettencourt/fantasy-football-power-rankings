@@ -24,10 +24,10 @@ async function fetchJson(path) {
   return response.json();
 }
 function buildTeams() {
-  const userById = new Map(state.users.map(u => [u.user_id, u]));
+  const userById = new Map(state.users.map(u => [String(u.user_id ?? "").trim(), u]));
   state.teams = new Map();
   for (const roster of state.rosters) {
-    const owner = userById.get(roster.owner_id);
+    const owner = userById.get(String(roster.owner_id ?? "").trim());
     const metadata = owner?.metadata || {};
     const username = String(owner?.username || "").trim().replace(/^@/, "").toLowerCase();
     const displayName = String(owner?.display_name || "").trim().replace(/^@/, "").toLowerCase();
