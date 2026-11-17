@@ -539,3 +539,53 @@ html,body{background:#17132b;color:var(--text);font-family:"DM Sans",Arial,sans-
   .lottery-page .ls-thd,.lottery-page .ls-luck{grid-template-columns:68px minmax(0,1fr) 39px;gap:7px}
   .lottery-page .lottery-history-grid{grid-template-columns:1fr}
 }
+
+
+/* Power Rankings — editorial archive layout */
+.pr-page{width:calc(100% + 56px);margin:0 -28px;min-height:calc(100vh - 76px);color:#F5F4EB;background:linear-gradient(165deg,#121122 0%,#3B1E78 100%);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.pr-shell{display:grid;grid-template-columns:176px minmax(0,880px);gap:30px;max-width:1140px;margin:0 auto;padding:34px 24px 60px;align-items:start}
+.pr-rail{position:sticky;top:20px;padding-top:9px}.pr-rail-title,.pr-kicker{color:#F74193;font-size:10px;font-weight:800;letter-spacing:.2em}
+.pr-archive{display:flex;flex-direction:column;gap:4px;margin-top:14px}
+.pr-archive-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 9px;border:1px solid transparent;border-radius:6px;background:transparent;color:#F5F4EB;text-align:left;cursor:pointer}
+.pr-archive-item span{font-size:11px;font-weight:800;letter-spacing:.06em}.pr-archive-item small{color:#b9a9d2;font-size:8px;white-space:nowrap}
+.pr-archive-item.active{border-color:#D5943B66;background:#D5943B16}
+.pr-stage{min-width:0}.pr-mast{padding:0 0 22px;border-bottom:1px solid #ffffff25}
+.pr-mast-row{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.pr-mast h1{margin:12px 0 8px;font-size:clamp(42px,6vw,66px);line-height:.88;letter-spacing:-.055em;font-weight:950}
+.pr-mast-row p{margin:12px 0 0;color:#EAB4F9;font-size:10px;font-weight:800;letter-spacing:.16em}
+.pr-crest{width:59px;height:72px;display:grid;place-items:center;flex:none;clip-path:polygon(0 0,100% 0,100% 78%,50% 100%,0 78%);background:#239FC2;color:#121122;font-weight:950;font-size:20px}
+.pr-controls{display:flex;align-items:center;gap:10px;margin-top:20px}
+.pr-controls label{color:#EAB4F9;font-size:9px;font-weight:800;letter-spacing:.14em}
+.pr-controls select,.pr-controls button{height:34px;padding:0 11px;border:1px solid #ffffff30;border-radius:5px;background:#ffffff0b;color:#F5F4EB;font-size:10px;font-weight:800}
+.pr-controls select{min-width:112px}.pr-controls select option{background:#21183c}
+.pr-controls button{border-color:#D5943B88;color:#D5943B;cursor:pointer;letter-spacing:.08em}
+.pr-section{margin-top:30px}.pr-section-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}
+.pr-section-head h2{margin:0;color:#D5943B;font-size:15px;font-weight:900;letter-spacing:.01em}
+.pr-section-head>span{color:#EAB4F9;font-size:8px;font-weight:800;letter-spacing:.1em;text-align:right}
+.pr-chart-img{display:flex;align-items:flex-end;justify-content:space-between;gap:5px;min-height:160px;padding:15px 8px 8px;border:1px solid #ffffff18;border-radius:7px;background:#ffffff06;overflow-x:auto}
+.pr-chart-bar-item{display:flex;flex:1 0 34px;min-width:34px;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px}
+.pr-chart-bar-item span{font:9px ui-monospace,monospace;color:#F5F4EB}
+.pr-chart-bar-item i{display:block;width:min(70%,28px);min-height:5px;border-radius:3px 3px 0 0}
+.pr-chart-bar-item i.above{background:#57F26B}.pr-chart-bar-item i.below{background:#F2685C}
+.pr-chart-bar-item b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#EAB4F9;font-size:9px}
+.pr-chart-note,.pr-allplay-note{margin:9px 0 0;color:#b9accb;font-size:10px;line-height:1.6}
+.pr-board{display:flex;flex-direction:column;gap:7px}
+.pr-card{display:grid;grid-template-columns:66px minmax(0,1fr);gap:13px;padding:12px;border:1px solid #ffffff18;border-radius:7px;background:#ffffff06}
+.pr-rank{display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid #ffffff1b;padding-right:10px}
+.pr-rank span{color:#EAB4F9;font-size:8px;font-weight:800;letter-spacing:.12em}.pr-rank strong{font-size:30px;line-height:1.1;font-weight:950}
+.pr-rank small{margin-top:4px;font:800 9px ui-monospace,monospace}.pr-rank small.up{color:#57F26B}.pr-rank small.down{color:#F2685C}.pr-rank small.same{color:#b9accb}
+.pr-card-body{min-width:0}.pr-card-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.pr-card-head h3{margin:0;color:#F5F4EB;font-size:15px;font-weight:900}.pr-card-head span{color:#EAB4F9;font:9px ui-monospace,monospace;text-align:right}
+.pr-card-body p{margin:7px 0 0;color:#d7cfe2;font-size:12px;line-height:1.55}.pr-note-pending{color:#a99fbe;font-style:italic}
+.pr-empty{padding:20px;border:1px dashed #ffffff35;border-radius:7px;color:#d7cfe2;font-size:12px;line-height:1.6}
+.pr-empty strong{color:#D5943B;font-size:11px;letter-spacing:.1em}.pr-empty p{margin:8px 0 0}
+.pr-table-wrap{overflow-x:auto;border:1px solid #ffffff18;border-radius:7px}
+.pr-standings{width:100%;border-collapse:collapse;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pr-standings th,.pr-standings td{padding:10px 9px;border-bottom:1px solid #ffffff12;text-align:right;font-size:10px}
+.pr-standings th{color:#EAB4F9;font-size:8px;font-weight:800;letter-spacing:.1em}
+.pr-standings th:nth-child(2),.pr-standings td:nth-child(2){text-align:left}.pr-standings td{color:#F5F4EB}
+.pr-standings td:first-child{color:#b9accb;font-family:ui-monospace,monospace}
+.pr-standings tr.playoff-divider td{border-top:2px solid #239FC2}
+.pr-stage.pr-concealed .pr-board{filter:blur(7px);user-select:none}
+@media(max-width:900px){.pr-shell{grid-template-columns:1fr;gap:18px;padding:25px 18px 45px}.pr-rail{position:static;padding:0}.pr-archive{flex-direction:row;overflow-x:auto;padding-bottom:5px}.pr-archive-item{flex:0 0 auto;flex-direction:column;align-items:flex-start;min-width:90px}.pr-archive-item small{white-space:normal}.pr-page{width:calc(100% + 30px);margin:0 -15px}}
+@media(max-width:600px){.pr-shell{padding:22px 14px 40px}.pr-mast h1{font-size:46px}.pr-crest{width:49px;height:60px;font-size:17px}.pr-controls{flex-wrap:wrap}.pr-controls button{margin-left:auto}.pr-section-head h2{font-size:13px}.pr-section-head>span{font-size:7px}.pr-card{grid-template-columns:52px minmax(0,1fr);gap:9px;padding:10px}.pr-rank strong{font-size:25px}.pr-card-head{align-items:flex-start;flex-direction:column;gap:3px}.pr-card-head span{text-align:left}.pr-card-body p{font-size:11px}.pr-standings th,.pr-standings td{padding:9px 7px;font-size:9px}}
