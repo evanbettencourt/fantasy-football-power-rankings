@@ -312,26 +312,55 @@ const LOTTERY_HISTORY = {
 const LOTTERY_NAMES = { Kev:"Kevin", Colb:"Colby" };
 function lotteryName(name) { return LOTTERY_NAMES[name] || name; }
 function lotteryLuck(position, fieldSize) { return (fieldSize + 1) / 2 - position; }
+const LOTTERY_MANAGER_COLORS = ["#20b9d7","#ff4f91","#9a68ff","#e8b83d","#50c99a","#f0784f","#b5a0ff","#5dc4ee","#e47eb4","#a7d86c","#f1a34c","#8d9cf5"];
+function lotteryColor(name) {
+  const names = [...new Set(Object.values(LOTTERY_HISTORY).flat().map(lotteryName))].sort();
+  return LOTTERY_MANAGER_COLORS[Math.max(0,names.indexOf(lotteryName(name))) % LOTTERY_MANAGER_COLORS.length];
+}
 function renderLotteryHistory() {
   const years=Object.keys(LOTTERY_HISTORY).map(Number).sort((a,b)=>b-a);
   const current=LOTTERY_HISTORY[2026];
-  $("lottery-current-results").innerHTML=current.map((name,i)=>'<div class="lottery-result-row"><span class="lottery-position">'+String(i+1).padStart(2,"0")+'</span><strong>'+escapeHtml(lotteryName(name))+'</strong>'+(i===0?'<span class="lottery-first">FIRST DRAW</span>':'')+'</div>').join("");
+  const draftSlots=state.actualDraftSlots || new Map();
+  const fieldSize=current.length;
+  const currentRows=current.map((name,index)=>{
+    const manager=lotteryName(name);
+    const luck=lotteryLuck(index+1,fieldSize);
+    const slot=draftSlots.get(manager);
+    const luckClass=luck>0?"up":luck<0?"dn":"even";
+    const luckLabel=luck>0?"▲ "+Math.round(luck):luck<0?"▼ "+Math.abs(Math.round(luck)):"—";
+    return '<div class="ds-row"><span class="ds-pk">'+(index===0?'🏆':String(index+1))+'</span><span class="ds-tm"><span class="ds-dot" style="background:'+lotteryColor(manager)+'"></span><span style="color:'+lotteryColor(manager)+'">'+escapeHtml(manager)+'</span></span><span class="ds-mv '+luckClass+'">'+luckLabel+'</span><span class="ds-slot"><span class="pill">'+(slot?'#'+slot:'—')+'</span></span></div>';
+  }).join("");
+  $("lottery-current-results").innerHTML=currentRows;
+
   const totals=new Map();
   for(const [year,draw] of Object.entries(LOTTERY_HISTORY)){
-    const fieldSize=draw.length;
     draw.forEach((name,index)=>{
       const manager=lotteryName(name);
       const entry=totals.get(manager)||{name:manager,years:0,luck:0};
       entry.years++;
-      entry.luck+=lotteryLuck(index+1,fieldSize);
+      entry.luck+=lotteryLuck(index+1,draw.length);
       totals.set(manager,entry);
     });
   }
   const leaderboard=[...totals.values()].sort((a,b)=>b.luck-a.luck||a.name.localeCompare(b.name));
-  $("lottery-luck-body").innerHTML=leaderboard.map((entry,index)=>'<tr><td class="lottery-rank">'+String(index+1).padStart(2,"0")+'</td><td class="lottery-manager">'+escapeHtml(entry.name)+'</td><td>'+entry.years+'</td><td class="lottery-points '+(entry.luck>0?"luck-positive":entry.luck<0?"luck-negative":"")+'">'+(entry.luck>0?"+":"")+entry.luck.toFixed(1)+'</td></tr>').join("");
+  const maxAbs=Math.max(1,...leaderboard.map(entry=>Math.abs(entry.luck)));
+  $("lottery-luck-list").innerHTML=leaderboard.map(entry=>{
+    const positive=entry.luck>=0;
+    const width=Math.abs(entry.luck)/maxAbs*46;
+    const fill=entry.luck>0
+      ? '<span class="ls-fill up" style="left:50%;width:'+width+'%"></span>'
+      : entry.luck<0
+        ? '<span class="ls-fill dn" style="right:50%;width:'+width+'%"></span>'
+        : '';
+    return '<div class="ls-luck"><span class="ls-lnm" style="color:'+lotteryColor(entry.name)+'">'+escapeHtml(entry.name)+'</span><span class="ls-track"><span class="ls-axis"></span>'+fill+'</span><span class="ls-lval '+(positive?'up':'dn')+'">'+(entry.luck>0?'+':'')+entry.luck.toFixed(1)+'</span></div>';
+  }).join("");
+
   $("lottery-history").innerHTML=years.map(year=>{
     const draw=LOTTERY_HISTORY[year];
-    return '<article class="lottery-year-card"><div class="lottery-year-heading"><strong>'+year+'</strong><span>'+draw.length+' TEAMS</span></div>'+draw.map((name,index)=>'<div class="lottery-history-row"><span>'+String(index+1).padStart(2,"0")+'</span><strong>'+escapeHtml(lotteryName(name))+'</strong><small>'+(lotteryLuck(index+1,draw.length)>0?"+":"")+lotteryLuck(index+1,draw.length).toFixed(1)+' LUCK</small></div>').join("")+'</article>';
+    return '<article class="lottery-year-card"><div class="lottery-year-heading"><strong>'+year+'</strong><span>'+draw.length+' MANAGERS</span></div>'+draw.map((name,index)=>{
+      const luck=lotteryLuck(index+1,draw.length);
+      return '<div class="lottery-history-row"><span>'+String(index+1).padStart(2,"0")+'</span><strong>'+escapeHtml(lotteryName(name))+'</strong><small class="'+(luck>0?'luck-positive':luck<0?'luck-negative':'')+'">'+(luck>0?'+':'')+luck.toFixed(1)+'</small></div>';
+    }).join("")+'</article>';
   }).join("");
 }
 async function loadActualDraftOrder() {
@@ -361,11 +390,16 @@ async function loadActualDraftOrder() {
       ordered=firstRound.map((pick,index)=>({slot:index+1,manager:state.teams.get(Number(pick.roster_id))?.name||"Manager"}));
     }
     if(!ordered.length) throw new Error("Sleeper did not return a draft-slot order.");
+    state.actualDraftSlots=new Map(ordered.map(item=>[lotteryName(item.manager),item.slot]));
     $("draft-order-season").textContent=String(state.draftSeason)+" SLEEPER DRAFT";
-    target.innerHTML=ordered.map(item=>'<div class="lottery-order-card"><span>'+String(item.slot).padStart(2,"0")+'</span><strong>'+escapeHtml(item.manager)+'</strong></div>').join("");
+    $("draft-order-count").textContent=ordered.length+" / 12";
+    target.innerHTML=ordered.map(item=>'<div class="dob-slot"><span class="dob-n">#'+item.slot+'</span><span class="dob-dot" style="background:'+lotteryColor(item.manager)+'"></span><span class="dob-nm" style="color:'+lotteryColor(item.manager)+'">'+escapeHtml(item.manager)+'</span></div>').join("");
+    renderLotteryHistory();
   } catch(error) {
     console.warn("Unable to load Sleeper draft order",error);
+    $("draft-order-count").textContent="— / 12";
     target.innerHTML='<div class="lottery-empty">Draft order is not available from Sleeper yet.</div>';
+    renderLotteryHistory();
   }
 }
 
