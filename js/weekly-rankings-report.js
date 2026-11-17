@@ -291,7 +291,10 @@
         lines.push(team.name + ":");
         lines.push(...rosterLines(team));
       });
-      section("05  /  INJURY & PRACTICE REPORT — CURRENT ROSTERS");\n      lines.push(...injuryLines());\n      lines.push("  Sleeper player-directory fields only; designations and practice information may lag breaking news.");\n      section("06  /  EDITORIAL NOTES TO ADD");
+      section("05  /  INJURY & PRACTICE REPORT — CURRENT ROSTERS");
+      lines.push(...injuryLines());
+      lines.push("  Sleeper player-directory fields only; designations and practice information may lag breaking news.");
+      section("06  /  EDITORIAL NOTES TO ADD");
       lines.push("• Injuries, expected return timelines, or role changes not reflected accurately by Sleeper:");
       lines.push("• Major league context, manager tendencies, trade evaluations, or other notes:");
       $("pr-report-output").value = lines.join("\n");
