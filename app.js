@@ -183,6 +183,7 @@ function renderPowerRankings(week) {
   const palette=["#5B21B6","#F4C13E","#F74193","#39A7E3","#E4002B","#EE6A5B","#17B8A6","#034694","#6FC24A","#EF8E3C","#B499D3","#909090"];
   const teamOrder=[...state.teams.keys()];
   const colorFor=t=>t?.color||palette[Math.max(0,teamOrder.indexOf(t?.id))%palette.length];
+  const ordinal=n=>n%100>=11&&n%100<=13?n+"th":n%10===1?n+"st":n%10===2?n+"nd":n%10===3?n+"rd":n+"th";
   const pfRanks=new Map([...stats].sort((a,b)=>b.pf-a.pf).map((t,i)=>[t.name,i+1]));
   const paRanks=new Map([...stats].sort((a,b)=>b.pa-a.pa).map((t,i)=>[t.name,i+1]));
   if(!hasEdition)$("pr-board").innerHTML='<div class="pr-empty"><strong>THIS EDITION HAS NOT BEEN PUBLISHED.</strong><p>Power Rankings are editorial, not an automated sort of the standings. The live scoring picture and standings are shown below; this edition’s ranked order and written analysis have not been entered yet.</p></div>';
@@ -213,7 +214,7 @@ function renderPowerRankings(week) {
   $("pr-standings-body").innerHTML=standings.map((t,i)=>{
     const color=colorFor(t),rank=editorialRanks.get(t.name),record=t.record.split("-");
     return '<tr class="'+(i===6?"pr-cut":"")+'"><th scope="row" class="c-team"><span class="sd">'+(i+1)+'</span><span class="nm" style="color:'+color+'">'+escapeHtml(t.name)+'</span></th>'+
-      '<td class="c-rec"><span class="w">'+(record[0]||0)+'</span><span class="dash">-</span><span class="l">'+(record[1]||0)+'</span></td>'+
+      '<td class="c-rec"><span class="w">'+(record[0]||0)+'</span><span class="dash">-</span><span class="l">'+(record[1]||0)+'</span>'+(record[2]?'<span class="dash">-</span><span>'+record[2]+'</span>':'')+'</td>'+
       '<td class="num">'+fmt(t.pf)+'</td><td class="num">'+fmt(t.pa)+'</td><td class="num">'+escapeHtml(t.allPlayRecord)+'</td>'+
       '<td><span class="pr-pr">'+(rank||"—")+'</span></td></tr>';
   }).join("");
