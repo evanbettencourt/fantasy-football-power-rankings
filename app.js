@@ -88,7 +88,9 @@ function computeRankings(week) {
       for (const t of teams) {
         const score = matchups.find(m => Number(m.roster_id) === t.id);
         if (!score || num(score.points) <= 0) continue;
-        for (const opponentScore of sorted) {
+        for (const opponent of valid) {
+          if (Number(opponent.roster_id) === t.id) continue;
+          const opponentScore = num(opponent.points);
           t.allPlayGames++;
           if (num(score.points) > opponentScore) t.allPlayWins++;
           else if (num(score.points) === opponentScore) t.allPlayWins += .5;
