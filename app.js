@@ -87,6 +87,14 @@ function computeRankings(week) {
     }
     if (weeklyScores.length) {
       const sorted = [...weeklyScores].sort((a,b)=>a-b);
+      const median = (sorted[sorted.length/2-1] + sorted[sorted.length/2]) / 2;
+      if (w < getWeeksToLoad()) for (const m of valid) {
+        const t = byId.get(Number(m.roster_id));
+        if (!t) continue;
+        if (num(m.points) > median) t.wins++;
+        else if (num(m.points) < median) t.losses++;
+        else t.ties++;
+      }
       for (const t of teams) {
         const score = matchups.find(m => Number(m.roster_id) === t.id);
         if (!score || num(score.points) <= 0) continue;
@@ -160,6 +168,19 @@ function renderStandings(week) {
       if (!ta||!tb) continue;
       ta.pf+=num(a.points);tb.pf+=num(b.points);ta.pa+=num(b.points);tb.pa+=num(a.points);
       if(num(a.points)>num(b.points)){ta.wins++;tb.losses++}else if(num(a.points)<num(b.points)){tb.wins++;ta.losses++}else{ta.ties++;tb.ties++}
+    }
+    if (w < getWeeksToLoad()) {
+      const scores = (state.weeks[w] || []).filter(m=>num(m.points)>0).map(m=>num(m.points)).sort((a,b)=>a-b);
+      if (scores.length) {
+        const median = (scores[scores.length/2-1] + scores[scores.length/2]) / 2;
+        for (const m of state.weeks[w]) {
+          const t = map.get(Number(m.roster_id));
+          if (!t || num(m.points)<=0) continue;
+          if (num(m.points)>median) t.wins++;
+          else if (num(m.points)<median) t.losses++;
+          else t.ties++;
+        }
+      }
     }
   }
   standings.sort((a,b)=>b.wins-a.wins || b.pf-a.pf);
