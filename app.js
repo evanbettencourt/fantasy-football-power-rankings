@@ -1,6 +1,7 @@
 const LEAGUE_ID = "1313563024161787904";
 const API = "/api/sleeper";
 const $ = (id) => document.getElementById(id);
+const setTextIfPresent = (id, value) => { const element = $(id); if (element) element.textContent = value; };
 const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [], recoveredWeeks: [], usingCachedCore: false, draftOrder: null, draftSeason: null };
 
 const num = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
@@ -216,7 +217,7 @@ function renderPowerRankings(week) {
       '<div class="pr-mid"><div class="pr-nmrow"><span class="nm">'+escapeHtml(entry.manager)+'</span><span class="pr-meta"><span class="rec"><span class="w">'+t.wins+'</span><span class="dash">-</span><span class="l">'+t.losses+'</span></span><span class="dot">·</span><span class="pf">PF '+fmt(t.pf)+' ('+pfRanks.get(t.name)+'th)</span><span class="dot">·</span><span class="pa">PA '+fmt(t.pa)+' ('+paRanks.get(t.name)+'th)</span></span></div>'+
       '<div class="bl-wrap"><div class="bl">'+(entry.note?escapeHtml(entry.note):'<span class="pr-note-pending">Commentary pending.</span>')+'</div></div></div></article>';
   }).join("");
-  $("pr-rank-count").textContent=hasEdition?edition.rankings.length+" / 12 RANKED":"12 MANAGERS";
+  setTextIfPresent("pr-rank-count",hasEdition?edition.rankings.length+" / 12 RANKED":"12 MANAGERS");
   const reveal=$("pr-reveal");if(reveal){reveal.hidden=!hasEdition;reveal.textContent="REVEAL RANKINGS";window.initPowerRankingsReveal?.();}
   const scores=(state.weeks[week]||[]).filter(m=>num(m.points)>0).sort((a,b)=>num(b.points)-num(a.points));
   const matchupResults=calculateWeek(week).results,outcomeByRoster=new Map();
@@ -283,25 +284,28 @@ function renderLeagueStatus(week){
  if(buttons){buttons.innerHTML=Array.from({length:max},(_,i)=>i+1).map(w=>'<button type="button" class="week-chip '+(w===week?'active':'')+'" data-week="'+w+'">'+w+'</button>').join("");buttons.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>renderWeek(Number(btn.dataset.week))));}
 }
 function renderStats(week, rankings) {
-  const weekData=calculateWeek(week);
-  const scores=(state.weeks[week]||[]).filter(m=>num(m.points)>0);
-  const high=scores.sort((a,b)=>num(b.points)-num(a.points))[0];
-  const average=scores.length?scores.reduce((s,m)=>s+num(m.points),0)/scores.length:0;
-  $("top-team").textContent=rankings[0]?.name||"—";
-  $("top-team-foot").textContent=rankings[0]? `RANKED #1 · ${Math.round(rankings[0].power)} POWER`:"POWER INDEX LEADER";
-  $("weekly-high").textContent=high?fmt(high.points):"—";
-  $("weekly-high-foot").textContent=high?teamFor(high.roster_id)?.name||"WEEKLY HIGH":"NO SCORES YET";
-  $("biggest-riser").textContent="—";$("biggest-riser-foot").textContent="NO MOVEMENT DATA";
-  const riser=rankings.filter(t=>t.move>0).sort((a,b)=>b.move-a.move)[0];
-  if(riser){$("biggest-riser").textContent=riser.name;$("biggest-riser-foot").textContent=`UP ${riser.move} ${riser.move===1?"SPOT":"SPOTS"}`;}
-  $("league-average").textContent=average?fmt(average):"—";
-  if(!average)$("league-average").textContent="—";
-  if(weekData.played && rankings.length){
-    const best=rankings[0],worst=rankings[rankings.length-1];
-    const topScore=high?fmt(high.points):"";
-    const rankMove=riser?`${riser.name} made the biggest move, climbing ${riser.move} place${riser.move===1?"":"s"}.`:"The power rankings held relatively steady this week.";
-    $("takeaway").textContent=`${best.name} sits atop the Power Index, while ${worst.name} has work to do from the bottom. ${rankMove} The week's high score was ${topScore} by ${teamFor(high.roster_id)?.name || "a league team"}.`;
-  } else $("takeaway").textContent="The league story will take shape once this week's matchups are complete. Check back after the scores are in.";
+  // Legacy dashboard statistic cards are not part of the current page layout.
+  // Update them only when the corresponding optional element exists.
+  const weekData = calculateWeek(week);
+  const scores = (state.weeks[week] || []).filter(m => num(m.points) > 0);
+  const high = scores.sort((a,b) => num(b.points) - num(a.points))[0];
+  const average = scores.length ? scores.reduce((sum,m) => sum + num(m.points), 0) / scores.length : 0;
+  setTextIfPresent("top-team", rankings[0]?.name || "—");
+  setTextIfPresent("top-team-foot", rankings[0] ? `RANKED #1 · ${Math.round(rankings[0].power)} POWER` : "POWER INDEX LEADER");
+  setTextIfPresent("weekly-high", high ? fmt(high.points) : "—");
+  setTextIfPresent("weekly-high-foot", high ? teamFor(high.roster_id)?.name || "WEEKLY HIGH" : "NO SCORES YET");
+  const riser = rankings.filter(t => t.move > 0).sort((a,b) => b.move - a.move)[0];
+  setTextIfPresent("biggest-riser", riser ? riser.name : "—");
+  setTextIfPresent("biggest-riser-foot", riser ? `UP ${riser.move} ${riser.move === 1 ? "SPOT" : "SPOTS"}` : "NO MOVEMENT DATA");
+  setTextIfPresent("league-average", average ? fmt(average) : "—");
+  if (weekData.played && rankings.length) {
+    const best = rankings[0], worst = rankings[rankings.length - 1];
+    const topScore = high ? fmt(high.points) : "";
+    const rankMove = riser ? `${riser.name} made the biggest move, climbing ${riser.move} place${riser.move === 1 ? "" : "s"}.` : "The power rankings held relatively steady this week.";
+    setTextIfPresent("takeaway", `${best.name} sits atop the Power Index, while ${worst.name} has work to do from the bottom. ${rankMove} The week's high score was ${topScore} by ${teamFor(high.roster_id)?.name || "a league team"}.`);
+  } else {
+    setTextIfPresent("takeaway", "The league story will take shape once this week's matchups are complete. Check back after the scores are in.");
+  }
 }
 function renderWeek(week) {
   state.selectedWeek=week;
