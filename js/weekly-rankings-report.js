@@ -207,12 +207,13 @@
       })).sort((a,b) => (b.sa+b.sb) - (a.sa+a.sb));
 
       const lines = [];
-      lines.push("MONKEY BOYS — WEEK " + week + " POWER RANKINGS REPORT");
-      lines.push("Season: " + (league.season || "2026") + " | Generated: " + new Date().toLocaleString());
-      lines.push("League: 12 teams | Half-PPR | 4-pt passing TD | Extra game vs league median");
-      lines.push("NOTE: Weekly scores and historical standings are for Week 1 through Week " + week + ". Rosters below are the CURRENT Sleeper roster snapshot, not historical rosters from Week " + week + ".");
+      const section = title => { lines.push(""); lines.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"); lines.push(title); lines.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"); };
+      lines.push("MONKEY BOYS  /  WEEK " + week + " POWER RANKINGS");
+      lines.push("2026 SEASON  •  GENERATED " + new Date().toLocaleString());
+      lines.push("12 TEAMS  ·  HALF-PPR  ·  4-PT PASSING TD  ·  H2H + LEAGUE MEDIAN");
       lines.push("");
-      lines.push("STANDINGS THROUGH WEEK " + week + " (H2H + MEDIAN RECORD)");
+      lines.push("DATA NOTE  Scores and standings cover Weeks 1–" + week + ". Rosters are the CURRENT Sleeper snapshot, not historical rosters from Week " + week + ".");
+      section("01  /  LEAGUE STANDINGS — THROUGH WEEK " + week);
       lines.push("Rank | Manager | Record | PF | PA | All-Play");
       standings.forEach((row, index) => {
         const allGames = row.allWins + row.allLosses + row.allTies;
@@ -220,8 +221,7 @@
           " | " + fmt(row.pf) + " | " + fmt(row.pa) + " | " + row.allWins + "-" + row.allLosses +
           (row.allTies ? "-" + row.allTies : "") + " (" + allGames + ")");
       });
-      lines.push("");
-      lines.push("WEEK " + week + " SCORES & MATCHUPS");
+      section("02  /  WEEK " + week + " SCORES & MATCHUPS");
       lines.push("League median: " + (median == null ? "Not available / week incomplete" : fmt(median)));
       if (median != null) {
         const above = [...scoreMap.entries()].filter(entry => entry[1] > median).map(entry => teams.get(entry[0])?.name).filter(Boolean);
@@ -233,24 +233,21 @@
         const result = game.sa > game.sb ? game.a + " won" : game.sb > game.sa ? game.b + " won" : "Tied";
         lines.push("  " + game.a + " " + fmt(game.sa) + " vs " + game.b + " " + fmt(game.sb) + " — " + result);
       });
-      lines.push("");
-      lines.push("COMPLETED TRANSACTIONS — WEEK " + week);
+      section("03  /  COMPLETED TRANSACTIONS — WEEK " + week);
       const completedTransactions = Array.isArray(transactions)
         ? transactions.filter(tx => tx.status === "complete" || tx.status === "completed")
         : [];
       if (!completedTransactions.length) lines.push("  No completed transactions returned for this week.");
       else completedTransactions.sort((a,b) => Number(a.created||0)-Number(b.created||0))
         .forEach(tx => lines.push(transactionDescription(tx)));
-      lines.push("");
-      lines.push("CURRENT ROSTERS (SLEEPER SNAPSHOT)");
+      section("04  /  CURRENT ROSTERS — SLEEPER SNAPSHOT");
       [...teams.values()].sort((a,b) => a.name.localeCompare(b.name)).forEach(team => {
         lines.push(team.name + ":");
         lines.push(...rosterLines(team));
       });
-      lines.push("");
-      lines.push("EDITORIAL NOTES TO ADD MANUALLY");
-      lines.push("- Injuries / expected return timelines / role changes not reflected accurately by Sleeper:");
-      lines.push("- Major league context, manager tendencies, trade evaluations, or other notes:");
+      section("05  /  EDITORIAL NOTES TO ADD");
+      lines.push("• Injuries, expected return timelines, or role changes not reflected accurately by Sleeper:");
+      lines.push("• Major league context, manager tendencies, trade evaluations, or other notes:");
       $("pr-report-output").value = lines.join("\n");
       copy.disabled = false;
       reportReady = true;
