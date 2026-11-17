@@ -157,3 +157,5 @@ html,body{background:#17132b;color:var(--text);font-family:"DM Sans",Arial,sans-
 /* Four league phases and a single, continuous standings table */
 .phase-track{grid-template-columns:repeat(4,1fr)}.phase-track span.phase-done{background:linear-gradient(90deg,#ff4f91,#8c3ee9)}.phase-labels{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;text-align:center;font-size:8px}.phase-labels span:first-child{text-align:left}.phase-labels span:last-child{text-align:right}.standings-columns{display:block}.standings-group-title{margin:2px 0 9px}.league-team-row.playoff-divider{border-top:2px solid #20b9d7;margin-top:5px;padding-top:14px}.league-team-identity small{display:none}
 @media(max-width:650px){.phase-labels{font-size:7px;letter-spacing:0}.league-team-row{padding:10px 7px}.league-team-identity strong{font-size:12px}.league-team-record{font-size:10px}}
+
+.eliminated-label{display:inline-block;margin-left:8px;padding:3px 6px;border:1px solid #ff4f91;border-radius:4px;color:#ff79a9;font:800 8px/1 "DM Sans",Arial,sans-serif;letter-spacing:.12em;vertical-align:middle}
