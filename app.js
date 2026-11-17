@@ -156,7 +156,7 @@ function renderPowerRankings(week) {
   $("pr-rank-count").textContent=hasEdition?edition.rankings.length+" / 12 RANKED":"12 MANAGERS";
   const reveal=$("pr-reveal");if(reveal){reveal.hidden=!hasEdition;reveal.textContent="REVEAL RANKINGS";window.initPowerRankingsReveal?.();}
   const scores=(state.weeks[week]||[]).filter(m=>num(m.points)>0).sort((a,b)=>num(b.points)-num(a.points)),sorted=[...scores].sort((a,b)=>num(a.points)-num(b.points)),median=sorted.length>=2?(num(sorted[Math.floor(sorted.length/2)-1].points)+num(sorted[Math.floor(sorted.length/2)].points))/2:0;
-  $("weekly-chart-bars").innerHTML=scores.length?scores.map(m=>{const t=teamFor(m.roster_id),score=num(m.points),height=Math.max(10,Math.round(score/(num(scores[0]?.points)||1)*118));return '<div class="pr-chart-bar-item" title="'+escapeHtml(t?.name||"Manager")+': '+fmt(score)+'"><span>'+fmt(score)+'</span><i class="'+(score>=median?"above":"below")+'" style="height:'+height+'px"></i><b>'+escapeHtml(t?.name||"—")+'</b></div>';}).join(""):'<div class="pr-empty">No completed scoring data for this week.</div>';
+  $("weekly-chart-bars").innerHTML=scores.length?scores.map((m,index)=>{const t=teamFor(m.roster_id),score=num(m.points),height=Math.max(10,Math.round(score/(num(scores[0]?.points)||1)*118)),result=score>median?"above":score<median?"below":"even";return '<div class="pr-chart-bar-item" title="'+escapeHtml(t?.name||"Manager")+': '+fmt(score)+'"><span>'+fmt(score)+'</span><i class="'+result+'" style="height:'+height+'px"></i><b>'+escapeHtml(t?.name||"—")+'</b></div>'+(index===5?'<div class="pr-chart-median-divider" aria-label="Median cutoff"></div>':"");}).join(""):'<div class="pr-empty">No completed scoring data for this week.</div>';
   const standings=[...stats].sort((a,b)=>b.wins-a.wins||b.pf-a.pf),editorialRanks=new Map((edition?.rankings||[]).map((r,i)=>[r.manager,i+1]));
   $("pr-standings-body").innerHTML=standings.map((t,i)=>'<tr class="'+(i===6?"playoff-divider":"")+'"><td>'+String(i+1).padStart(2,"0")+'</td><td>'+escapeHtml(t.name)+'</td><td>'+escapeHtml(t.record)+'</td><td>'+fmt(t.pf)+'</td><td>'+fmt(t.pa)+'</td><td>'+escapeHtml(t.allPlayRecord)+'</td><td>'+(editorialRanks.get(t.name)||"—")+'</td></tr>').join("");
 }
@@ -223,6 +223,7 @@ function renderStats(week, rankings) {
 }
 function renderWeek(week) {
   state.selectedWeek=week;
+  renderScoreboard(week);
   renderStandings(week);
   renderLeagueStatus(week);
   $("week-select").value=String(week);
