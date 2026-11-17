@@ -163,6 +163,9 @@ function renderPowerRankings(week) {
 function renderScoreboard(week) {
   const {results} = calculateWeek(week);
   const el = $("scoreboard");
+  // The current League page does not include a weekly scoreboard element.
+  // Keep this renderer optional so a missing section cannot abort dashboard startup.
+  if (!el) return;
   if (!results.length) { el.innerHTML = '<div class="empty-note">No completed matchups found for this week yet.</div>'; return; }
   el.innerHTML = results.sort((a,b)=>Math.max(b.scoreA,b.scoreB)-Math.max(a.scoreA,a.scoreB)).map(m=>`
     <div class="matchup">
