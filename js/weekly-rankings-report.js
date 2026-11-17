@@ -129,51 +129,6 @@
     return rows.sort((a,b) => b.wins-a.wins || b.pf-a.pf);
   }
 
-  function injuryLines() {
-    const entries = [];
-    const seen = new Set();
-    [...teams.values()].forEach(team => {
-      const ids = (team.roster && team.roster.players || []).map(String);
-      ids.forEach(id => {
-        if (seen.has(id)) return;
-        seen.add(id);
-        const player = players[id] || {};
-        const status = String(player.injury_status || "").trim();
-        const bodyPart = String(player.injury_body_part || "").trim();
-        const startDate = String(player.injury_start_date || "").trim();
-        const practice = String(player.practice_participation || "").trim();
-        const practiceDescription = String(player.practice_description || "").trim();
-        const notes = String(player.injury_notes || "").trim();
-        const hasInjuryInfo = status && !/^active$/i.test(status) ||
-          bodyPart || startDate || practice || practiceDescription || notes;
-        if (!hasInjuryInfo) return;
-        const details = [];
-        if (status) details.push("Status: " + status);
-        if (bodyPart) details.push("Injury: " + bodyPart);
-        if (startDate) details.push("Since: " + startDate);
-        if (practice) details.push("Practice: " + practice);
-        if (practiceDescription) details.push("Practice detail: " + practiceDescription);
-        if (notes) details.push("Notes: " + notes);
-        entries.push({
-          manager: team.name,
-          name: playerName(id),
-          position: player.position || "",
-          team: player.team || "",
-          details
-        });
-      });
-    });
-    entries.sort((a,b) => a.manager.localeCompare(b.manager) || a.name.localeCompare(b.name));
-    if (!entries.length) return [
-      "  Sleeper did not return injury or practice details for players on the current rosters.",
-      "  This does not confirm that every player is healthy; check team reports for late-breaking news."
-    ];
-    return entries.map(entry =>
-      "  " + entry.manager + " — " + entry.name +
-      (entry.position || entry.team ? " (" + [entry.position, entry.team].filter(Boolean).join(" · ") + ")" : "") +
-      "\\n    " + entry.details.join(" | ")
-    );
-  }
 
   async function fetchPlayerNews(id) {
     const cacheKey = "mb-sleeper-player-news-v1-" + id;
@@ -185,7 +140,7 @@
       }
     } catch (_) {}
 
-    const response = await fetch("/api/sleeper-news?player_id=" + encodeURIComponent(id) + "&limit=5");
+    const response = await fetch("/api/sleeper-news?player_id=" + encodeURIComponent(id) + "&limit=2");
     if (!response.ok) throw new Error("Player news request failed (" + response.status + ")");
     const payload = await response.json();
     const news = Array.isArray(payload.news) ? payload.news : [];
@@ -239,7 +194,7 @@
           seen.add(key);
           return true;
         })
-        .slice(0, 3);
+        .slice(0, 2);
       if (!items.length) return;
       lines.push("  " + result.name + ":");
       items.forEach(item => {
@@ -376,13 +331,10 @@
         lines.push(team.name + ":");
         lines.push(...rosterLines(team));
       });
-      section("05  /  INJURY & PRACTICE REPORT — CURRENT ROSTERS");
-      lines.push(...injuryLines());
-      lines.push("  Sleeper player-directory fields only; designations and practice information may lag breaking news.");
-      section("06  /  PLAYER NEWS & INJURY OUTLOOK — SLEEPER NEWS FEED");
+      section("05  /  LATEST PLAYER NEWS — UP TO 2 ITEMS EACH");
       lines.push(...newsLines);
-      lines.push("  News is supplied by Sleeper's linked providers; publication dates and source labels are shown where available.");
-      section("07  /  EDITORIAL NOTES TO ADD");
+      lines.push("  Limited to the two newest available Sleeper news items per rostered player with injury information.");
+      section("06  /  EDITORIAL NOTES TO ADD");
       lines.push("• Injuries, expected return timelines, or role changes not reflected accurately by Sleeper:");
       lines.push("• Major league context, manager tendencies, trade evaluations, or other notes:");
       $("pr-report-output").value = lines.join("\n");
