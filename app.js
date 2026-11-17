@@ -16,7 +16,7 @@ function avatarMarkup(team, sizeClass = "") {
 function teamName(team) { return escapeHtml(team?.name || "Unknown team"); }
 function getWeeksToLoad() {
   const playoffStart = num(state.league?.settings?.playoff_week_start) || 15;
-  return Math.max(1, Math.min(18, playoffStart - 1));
+  return Math.max(1, Math.min(18, playoffStart + 2));
 }
 async function fetchJson(path) {
   const response = await fetch(`${API}${path}`);
@@ -243,10 +243,8 @@ async function init() {
     $("status").textContent="COULD NOT LOAD LEAGUE DATA · PLEASE REFRESH";
     $("status").classList.add("error");
     $("rankings-body").innerHTML='<tr><td colspan="7" class="loading-cell">Unable to connect to Sleeper. Check the league ID and try again.</td></tr>';
-    const playoff = $("playoff-standings");
-    const bubble = $("bubble-standings");
-    if (playoff) playoff.innerHTML = '<div class="empty-note">Standings unavailable. Please refresh.</div>';
-    if (bubble) bubble.innerHTML = '';
+    const standings = $("standings-list");
+    if (standings) standings.innerHTML = '<div class="empty-note">Standings unavailable. Please refresh.</div>';
   }
 }
 
