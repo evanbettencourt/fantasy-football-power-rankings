@@ -29,8 +29,9 @@ function buildTeams() {
   for (const roster of state.rosters) {
     const owner = userById.get(roster.owner_id);
     const metadata = owner?.metadata || {};
-    const username = owner?.username || "";
-    const name = MANAGERS[username] || owner?.display_name || username || `Team ${roster.roster_id}`;
+    const username = String(owner?.username || "").trim().replace(/^@/, "").toLowerCase();
+    const displayName = String(owner?.display_name || "").trim().replace(/^@/, "").toLowerCase();
+    const name = MANAGERS[username] || MANAGERS[displayName] || `Manager ${roster.roster_id}`;
     state.teams.set(Number(roster.roster_id), {
       id: Number(roster.roster_id), name, owner: "", username,
       avatar: metadata.avatar || owner?.avatar || null, wins: 0, losses: 0, ties: 0,
@@ -169,7 +170,10 @@ function renderStandings(week) {
  }
  teams.sort((x,y)=>y.wins-x.wins||y.pf-x.pf);
  const colors=["#ff4d91","#26b9d5","#9a68ff","#e8b83d","#50c99a","#f0784f","#b5a0ff","#5dc4ee","#e47eb4","#a7d86c","#f1a34c","#8d9cf5"];
- const row=(t,i)=>`<div class="league-team-row ${i===6?"playoff-divider":""}"><span class="team-rank">${String(i+1).padStart(2,"0")}</span><div class="league-team-identity"><strong>${teamName(t)}</strong></div><span class="league-team-record">${t.wins}-${t.losses}${t.ties?"-"+t.ties:""}</span></div>`;
+ const playoffStart=num(state.league?.settings?.playoff_week_start)||15;
+ const remainingWeeks=Math.max(0,playoffStart-week-1);
+ const cutoffWins=teams[5]?.wins ?? Infinity;
+ const row=(t,i)=>{const eliminated=i>=6 && t.wins+(2*remainingWeeks)<cutoffWins;return `<div class="league-team-row ${i===6?"playoff-divider":""}"><span class="team-rank">${String(i+1).padStart(2,"0")}</span><div class="league-team-identity"><strong>${teamName(t)}${eliminated?` <span class="eliminated-label">ELIMINATED</span>`:""}</strong></div><span class="league-team-record">${t.wins}-${t.losses}${t.ties?"-"+t.ties:""}</span></div>`;};
  $("standings-list").innerHTML=teams.map(row).join("");
 }
 function renderLeagueStatus(week){
