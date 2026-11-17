@@ -336,14 +336,13 @@ function renderLotteryHistory() {
   for(const [year,draw] of Object.entries(LOTTERY_HISTORY)){
     draw.forEach((name,index)=>{
       const manager=lotteryName(name);
-      // Brandon took over Schmeef's place in the league in 2025.
-      // Combine their career luck in the leaderboard, while keeping historical
-      // season cards labeled with the manager who actually participated.
-      const leaderboardManager=manager==="Schmeef"?"Brandon":manager;
-      const entry=totals.get(leaderboardManager)||{name:leaderboardManager,years:0,luck:0};
+      // Schmeef remains in the historical results but is excluded
+      // from the current league's luck leaderboard.
+      if(manager==="Schmeef") return;
+      const entry=totals.get(manager)||{name:manager,years:0,luck:0};
       entry.years++;
       entry.luck+=lotteryLuck(index+1,draw.length);
-      totals.set(leaderboardManager,entry);
+      totals.set(manager,entry);
     });
   }
   const leaderboard=[...totals.values()].sort((a,b)=>b.luck-a.luck||a.name.localeCompare(b.name));
