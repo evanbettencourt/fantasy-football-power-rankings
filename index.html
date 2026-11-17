@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#10130f">
+  <meta name="theme-color" content="#17132b">
   <meta name="description" content="Fantasy football league power rankings, weekly results, and standings.">
   <title>Monkey Boys Fantasy Football</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,16 +14,16 @@
 <body>
   <div class="shell">
     <header class="topbar">
-      <a class="wordmark" href="#" aria-label="League Room home"><span class="mark">MB</span><span>MONKEY BOYS</span></a>
+      <a class="wordmark" href="#" aria-label="Monkey Boys home"><span class="mark">MB</span><span>MONKEY BOYS</span></a>
       <div class="top-meta"><span class="live-dot"></span><span id="season-label">SLEEPER LEAGUE</span><span class="meta-divider">/</span><span>POWER INDEX</span></div>
     </header>
     <nav class="site-nav" aria-label="Main navigation">
-      <button class="nav-tab active" data-tab="league">League</button>
+      <span class="nav-crest" aria-hidden="true">MB</span><button class="nav-tab active" data-tab="league">League</button>
       <button class="nav-tab" data-tab="lottery">Draft Lottery</button>
       <button class="nav-tab" data-tab="rankings">Power Rankings</button>
       <button class="nav-tab" data-tab="schedule">Schedule</button>
       <button class="nav-tab" data-tab="hall">Hall of Fame</button>
-      <button class="nav-tab" data-tab="rules">Rules</button>
+      <button class="nav-tab" data-tab="rules">Constitution</button>
     </nav>
 
     <main>
@@ -31,12 +31,12 @@
         <div class="eyebrow">MONKEY BOYS FOOTBALL CLUB <span id="season-tag">2026 SEASON</span></div>
         <div class="intro-row">
           <div>
-            <h1>The weekly <em>report.</em></h1>
-            <p class="lede">A season-long account of triumph, disaster, and questionable decisions.</p>
+            <h1>Monkey Boys <em>League</em></h1>
+            <p class="lede">SEASON II · 2026</p>
           </div>
           <div class="week-control">
-            <label for="week-select">EDITION</label>
-            <select id="week-select" aria-label="Select week"></select><button id="reveal-button" class="reveal-button" type="button">REVEAL RANKINGS</button>
+            <label for="week-select">WEEK</label>
+            <select id="week-select" aria-label="Select week"></select><button id="reveal-button" class="reveal-button" type="button">REVEAL</button>
           </div>
         </div>
         <div id="status" class="status">Connecting to Sleeper league data…</div>
@@ -86,10 +86,10 @@
       <section class="section tab-panel extra-panel" data-panel="lottery" hidden><div class="eyebrow">02 / THE DRAW</div><h2>Draft Lottery</h2><p>Lottery format and odds will be added once we confirm your league's draft-lottery rules.</p></section>
       <section class="section tab-panel extra-panel" data-panel="schedule" hidden><div class="eyebrow">04 / THE FIXTURES</div><h2>Schedule</h2><p>Weekly schedule and matchup history will appear here.</p><div id="schedule-content"></div></section>
       <section class="section tab-panel extra-panel" data-panel="hall" hidden><div class="eyebrow">05 / THE RECORD BOOK</div><h2>Hall of Fame</h2><p>League records, champions, and all-time achievements will appear here once we connect the league's historical seasons.</p></section>
-      <section class="section tab-panel extra-panel" data-panel="rules" hidden><div class="eyebrow">06 / THE CONSTITUTION</div><h2>The rules of the game</h2><p class="rules-intro">The official rules, settings, roster requirements, and scoring system of Monkey Boys Fantasy Football.</p><div id="rules-content" class="rules-content"></div></section>
+      <section class="section tab-panel extra-panel" data-panel="rules" hidden><div class="eyebrow">06 / THE CONSTITUTION</div><h2>The Constitution</h2><p class="rules-intro">The official rules, settings, roster requirements, and scoring system of Monkey Boys Fantasy Football.</p><div id="rules-content" class="rules-content"></div></section>
     </main>
 
-    <footer><span>MONKEY BOYS <span class="footer-dot">●</span> POWERED BY SLEEPER</span><span id="updated-at">LIVE LEAGUE DATA</span></footer>
+    <footer><span>MONKEY BOYS <span class="footer-dot">●</span> EST. 2025</span><span id="updated-at">LIVE LEAGUE DATA</span></footer>
   </div>
   <script src="app.js"></script>
 </body>
