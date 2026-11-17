@@ -237,7 +237,8 @@ async function init() {
     const season=league.season||String(new Date().getFullYear());
     $("season-label").textContent=`${season} SLEEPER LEAGUE · EST. 2017`;
     $("season-tag").textContent=`${season} SEASON · EST. 2017`;
-    $("season-tag-rankings").textContent=`${season} SEASON · EST. 2017`;
+    const rankingsSeasonTag = $("season-tag-rankings");
+    if (rankingsSeasonTag) rankingsSeasonTag.textContent = `${season} SEASON · EST. 2017`;
     const maxWeek=getWeeksToLoad();
     // Load each week independently so one failed matchup request cannot block the page.
     const weekResults=await Promise.all(Array.from({length:maxWeek},(_,i)=>i+1).map(async w=>{
