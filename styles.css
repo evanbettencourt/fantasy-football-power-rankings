@@ -651,13 +651,13 @@ body:has(.pr-page:not([hidden])) .nav-tab.active{border-bottom-color:var(--jfl-p
 .pr-wrap{max-width:none;margin:14px 0 0;padding:0 0 44px}
 .pr-chart-wrap{overflow:hidden}
 .pr-chart-img{display:flex;align-items:flex-end;justify-content:space-between;gap:5px;min-height:160px;padding:15px 8px 8px;border:1px solid rgba(255,255,255,.09);
-  border-radius:12px;background:rgba(255,255,255,.03);overflow-x:auto}
+  border-radius:12px;background:#fff;overflow-x:auto}
 .pr-chart-bar-item{display:flex;flex:1 0 34px;min-width:34px;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px}
-.pr-chart-bar-item span{font:9px Inter,Arial,sans-serif;color:var(--jfl-cream);font-variant-numeric:tabular-nums}
+.pr-chart-bar-item span{font:9px Inter,Arial,sans-serif;color:#17152F;font-variant-numeric:tabular-nums}
 .pr-chart-bar-item i{display:block;width:min(70%,28px);min-height:5px;border-radius:3px 3px 0 0}
 .pr-chart-bar-item i.win{background:#57F26B}.pr-chart-bar-item i.loss{background:#F2685C}.pr-chart-bar-item i.even{background:#D5943B}
-.pr-chart-bar-item b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--jfl-light-purple);font-size:9px}
-.pr-chart-median-divider{flex:0 0 0;width:0;height:140px;align-self:flex-end;margin:0 3px 18px;border-left:2px dashed #F5F4EB99}
+.pr-chart-bar-item b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#3B1E78;font-size:9px}
+.pr-chart-median-divider{flex:0 0 0;width:0;height:140px;align-self:flex-end;margin:0 3px 18px;border-left:2px dashed #17152F99}
 .pr-chart-note,.pr-tbl-note{font-family:Inter,system-ui,sans-serif;font-size:12px;line-height:1.5;color:rgba(245,244,235,.45);margin:9px 2px 0}
 .pr-board{display:flex;flex-direction:column;margin-top:22px;gap:9px}
 .pr-card{display:grid;grid-template-columns:62px minmax(0,1fr);gap:15px;align-items:start;padding:14px 16px;border-radius:10px;
