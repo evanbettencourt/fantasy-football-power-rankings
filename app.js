@@ -1,7 +1,7 @@
 const LEAGUE_ID = "1313563024161787904";
 const API = "https://api.sleeper.app/v1";
 const $ = (id) => document.getElementById(id);
-const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {} };
+const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [] };
 
 const num = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
 const fmt = (v) => num(v).toFixed(2);
@@ -205,7 +205,7 @@ function renderWeek(week) {
   renderStandings(week);
   renderLeagueStatus(week);
   $("week-select").value=String(week);
-  $("status").textContent=`CONNECTED · ${state.teams.size} TEAMS · DATA THROUGH WEEK ${week}`;
+  $("status").textContent=state.failedWeeks.length ? `CONNECTED · ${state.teams.size} TEAMS · SOME WEEKLY DATA UNAVAILABLE (${state.failedWeeks.join(", ")})` : `CONNECTED · ${state.teams.size} TEAMS · DATA THROUGH WEEK ${week}`;
 }
 async function init() {
   try {
@@ -224,6 +224,7 @@ async function init() {
       catch(error) { console.warn(`Could not load Sleeper week ${w}`,error); return [w,[],false]; }
     }));
     const failedWeeks=weekResults.filter(item=>!item[2]).map(item=>item[0]);
+    state.failedWeeks=failedWeeks;
     for(const [week,data] of weekResults) state.weeks[week]=data;
     const completed=Array.from({length:maxWeek},(_,i)=>i+1).filter(w=>(state.weeks[w]||[]).some(m=>num(m.points)>0));
     const defaultWeek=completed.length?Math.max(...completed):1;
