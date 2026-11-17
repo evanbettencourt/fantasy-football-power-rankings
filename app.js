@@ -148,7 +148,7 @@ function renderScoreboard(week) {
   if (!results.length) { el.innerHTML = '<div class="empty-note">No completed matchups found for this week yet.</div>'; return; }
   el.innerHTML = results.sort((a,b)=>Math.max(b.scoreA,b.scoreB)-Math.max(a.scoreA,a.scoreB)).map(m=>`
     <div class="matchup">
-      <div class="match-team">${avatarMarkup(m.a)}<span class="match-team-name">${teamName(m.a)}</span></div>
+      <div class="match-team"><span class="match-team-name">${teamName(m.a)} <small>${escapeHtml(m.a.owner)}</small></span></div>
       <div class="match-score ${m.winner===1?'winner':''}">${fmt(m.scoreA)} <span class="versus">—</span> <span class="${m.winner===2?'winner':''}">${fmt(m.scoreB)}</span></div>
       <div class="match-team"><span class="match-team-name">${teamName(m.b)} <small>${escapeHtml(m.b.owner)}</small></span></div>
     </div>`).join("");
@@ -169,7 +169,7 @@ function renderStandings(week) {
       ta.pf+=num(a.points);tb.pf+=num(b.points);ta.pa+=num(b.points);tb.pa+=num(a.points);
       if(num(a.points)>num(b.points)){ta.wins++;tb.losses++}else if(num(a.points)<num(b.points)){tb.wins++;ta.losses++}else{ta.ties++;tb.ties++}
     }
-    if (w < getWeeksToLoad()) {
+    if (w <= getWeeksToLoad()) {
       const scores = (state.weeks[w] || []).filter(m=>num(m.points)>0).map(m=>num(m.points)).sort((a,b)=>a-b);
       if (scores.length) {
         const median = (scores[scores.length/2-1] + scores[scores.length/2]) / 2;
