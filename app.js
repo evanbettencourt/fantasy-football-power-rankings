@@ -237,7 +237,8 @@ async function init() {
     $("status").classList.add("error");
     $("rankings-body").innerHTML='<tr><td colspan="7" class="loading-cell">Unable to connect to Sleeper. Check the league ID and try again.</td></tr>';
     $("scoreboard").innerHTML='<div class="empty-note">Matchups unavailable.</div>';
-    $("standings-body").innerHTML='<tr><td colspan="5" class="loading-cell">Standings unavailable.</td></tr>';
+    const standingsBody = $("standings-body");
+    if (standingsBody) standingsBody.innerHTML='<tr><td colspan="5" class="loading-cell">Standings unavailable.</td></tr>';
   }
 }
 
