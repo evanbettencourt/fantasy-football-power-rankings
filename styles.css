@@ -163,3 +163,43 @@ html,body{background:#17132b;color:var(--text);font-family:"DM Sans",Arial,sans-
 
 /* Align each league phase label with the center of its matching progress bar */
 .phase-labels{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;text-align:center}.phase-labels span:first-child,.phase-labels span:last-child{text-align:center}
+
+
+/* Draft lottery page */
+.lottery-page{padding-bottom:42px}
+.lottery-intro{padding:50px 0 28px}
+.lottery-block{margin:0 0 42px}
+.lottery-heading{display:flex;align-items:end;justify-content:space-between;gap:16px;border-bottom:2px solid var(--purple);padding-bottom:13px;margin-bottom:12px}
+.lottery-heading h2{margin:7px 0 0;font-size:30px;font-weight:900;letter-spacing:-.035em;text-transform:uppercase}
+.lottery-season{font:700 10px var(--sans);letter-spacing:.12em;color:var(--muted);white-space:nowrap}
+.lottery-explainer{margin:0 0 18px;color:#bdb3cd;font-size:13px;line-height:1.6}
+.lottery-order-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.lottery-order-card{display:flex;align-items:center;gap:13px;padding:15px 17px;background:#29234f;border:1px solid #51427a;border-radius:12px}
+.lottery-order-card>span{font:900 23px var(--sans);color:var(--lime)}
+.lottery-order-card strong{font-size:14px;font-weight:800}
+.lottery-results-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.lottery-result-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #ffffff12;border-radius:9px;background:#ffffff08}
+.lottery-position{font:800 18px var(--sans);color:var(--pink);width:28px}
+.lottery-result-row strong{font-size:13px;font-weight:800;flex:1}
+.lottery-first{font:700 8px var(--sans);letter-spacing:.1em;color:var(--lime)}
+.lottery-table-wrap{border-radius:12px}
+.lottery-table{width:100%;border-collapse:collapse}
+.lottery-table th,.lottery-table td{padding:13px 16px;text-align:left;border-bottom:1px solid #ffffff12}
+.lottery-table th{font-size:9px;color:var(--muted);letter-spacing:.13em}
+.lottery-table td{font-size:13px;color:#e6deef}
+.lottery-table .lottery-rank{font:800 18px var(--sans);color:#a89cba}
+.lottery-table .lottery-manager{font-weight:800;color:#fff}
+.lottery-points{font:800 15px var(--mono)!important}
+.luck-positive{color:#2ac7aa!important}.luck-negative{color:#ff668f!important}
+.lottery-formula{margin-top:12px;color:#9186a8;font:9px var(--sans);font-weight:700;letter-spacing:.12em;line-height:1.7}
+.lottery-history-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.lottery-year-card{padding:16px;background:linear-gradient(145deg,#251e46,#1e1939);border:1px solid #59477b;border-radius:13px}
+.lottery-year-heading{display:flex;justify-content:space-between;align-items:center;padding-bottom:11px;margin-bottom:4px;border-bottom:1px solid #ffffff20}
+.lottery-year-heading strong{font-size:23px;font-weight:900}.lottery-year-heading span{font:700 9px var(--sans);letter-spacing:.12em;color:var(--muted)}
+.lottery-history-row{display:grid;grid-template-columns:26px 1fr auto;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #ffffff0b}
+.lottery-history-row>span{font:10px var(--mono);color:#a79bb9}
+.lottery-history-row strong{font-size:11px;font-weight:700}
+.lottery-history-row small{font:9px var(--mono);color:#a99fbe}
+.lottery-empty{grid-column:1/-1;padding:20px;border:1px dashed #59477b;border-radius:10px;color:var(--muted);font-size:13px}
+@media(max-width:850px){.lottery-order-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.lottery-history-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.lottery-intro{padding:38px 0 22px}.lottery-heading h2{font-size:22px}.lottery-order-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.lottery-order-card{padding:12px 10px;gap:9px}.lottery-order-card>span{font-size:19px}.lottery-order-card strong{font-size:12px}.lottery-results-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.lottery-result-row{padding:10px 9px;gap:7px}.lottery-result-row strong{font-size:11px}.lottery-first{font-size:7px}.lottery-history-grid{grid-template-columns:1fr}.lottery-table th,.lottery-table td{padding:11px 9px}.lottery-table th{font-size:8px}.lottery-table td{font-size:11px}.lottery-formula{font-size:8px}}
