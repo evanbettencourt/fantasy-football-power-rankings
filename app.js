@@ -1,7 +1,7 @@
 const LEAGUE_ID = "1313563024161787904";
 const API = "/api/sleeper";
 const $ = (id) => document.getElementById(id);
-const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [] };
+const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [], draftOrder: null, draftSeason: null };
 
 const num = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
 const fmt = (v) => num(v).toFixed(2);
@@ -221,6 +221,8 @@ async function init() {
       fetchJson(`/league/${LEAGUE_ID}`),fetchJson(`/league/${LEAGUE_ID}/users`),fetchJson(`/league/${LEAGUE_ID}/rosters`)
     ]);
     state.league=league;state.users=users;state.rosters=rosters;buildTeams();
+    renderLotteryHistory();
+    loadActualDraftOrder();
     const season=league.season||String(new Date().getFullYear());
     $("season-label").textContent=`${season} SLEEPER LEAGUE · EST. 2017`;
     $("season-tag").textContent=`${season} SEASON · EST. 2017`;
@@ -298,6 +300,75 @@ function renderRules() {
   target.dataset.ready="yes";
 }
 
+
+const LOTTERY_HISTORY = {
+  2021: ["Tanz","Kev","Colb","Lee","Ben","Joey","Evan","Butta","Pat","Marc"],
+  2022: ["Schmeef","Ben","Pat","Butta","Lee","Marc","Colb","Ders","Evan","Tanz","Kev","Joey"],
+  2023: ["Kev","Marc","Tanz","Pat","Schmeef","Ders","Ben","Lee","Evan","Colb","Joey","Butta"],
+  2024: ["Butta","Ders","Evan","Kev","Marc","Colb","Ben","Tanz","Joey","Pat","Lee","Schmeef"],
+  2025: ["Marc","Butta","Colb","Brandon","Tanz","Pat","Kev","Evan","Joey","Ders","Ben","Lee"],
+  2026: ["Pat","Evan","Ben","Lee","Ders","Marc","Brandon","Tanz","Colb","Butta","Joey","Kev"]
+};
+const LOTTERY_NAMES = { Kev:"Kevin", Colb:"Colby" };
+function lotteryName(name) { return LOTTERY_NAMES[name] || name; }
+function lotteryLuck(position, fieldSize) { return (fieldSize + 1) / 2 - position; }
+function renderLotteryHistory() {
+  const years=Object.keys(LOTTERY_HISTORY).map(Number).sort((a,b)=>b-a);
+  const current=LOTTERY_HISTORY[2026];
+  $("lottery-current-results").innerHTML=current.map((name,i)=>'<div class="lottery-result-row"><span class="lottery-position">'+String(i+1).padStart(2,"0")+'</span><strong>'+escapeHtml(lotteryName(name))+'</strong>'+(i===0?'<span class="lottery-first">FIRST DRAW</span>':'')+'</div>').join("");
+  const totals=new Map();
+  for(const [year,draw] of Object.entries(LOTTERY_HISTORY)){
+    const fieldSize=draw.length;
+    draw.forEach((name,index)=>{
+      const manager=lotteryName(name);
+      const entry=totals.get(manager)||{name:manager,years:0,luck:0};
+      entry.years++;
+      entry.luck+=lotteryLuck(index+1,fieldSize);
+      totals.set(manager,entry);
+    });
+  }
+  const leaderboard=[...totals.values()].sort((a,b)=>b.luck-a.luck||a.name.localeCompare(b.name));
+  $("lottery-luck-body").innerHTML=leaderboard.map((entry,index)=>'<tr><td class="lottery-rank">'+String(index+1).padStart(2,"0")+'</td><td class="lottery-manager">'+escapeHtml(entry.name)+'</td><td>'+entry.years+'</td><td class="lottery-points '+(entry.luck>0?"luck-positive":entry.luck<0?"luck-negative":"")+'">'+(entry.luck>0?"+":"")+entry.luck.toFixed(1)+'</td></tr>').join("");
+  $("lottery-history").innerHTML=years.map(year=>{
+    const draw=LOTTERY_HISTORY[year];
+    return '<article class="lottery-year-card"><div class="lottery-year-heading"><strong>'+year+'</strong><span>'+draw.length+' TEAMS</span></div>'+draw.map((name,index)=>'<div class="lottery-history-row"><span>'+String(index+1).padStart(2,"0")+'</span><strong>'+escapeHtml(lotteryName(name))+'</strong><small>'+(lotteryLuck(index+1,draw.length)>0?"+":"")+lotteryLuck(index+1,draw.length).toFixed(1)+' LUCK</small></div>').join("")+'</article>';
+  }).join("");
+}
+async function loadActualDraftOrder() {
+  const target=$("actual-draft-order");
+  try {
+    const drafts=await fetchJson('/league/'+LEAGUE_ID+'/drafts');
+    if(!Array.isArray(drafts)||!drafts.length) throw new Error("No Sleeper draft found for this league.");
+    const draft=[...drafts].sort((a,b)=>Number(b.season||0)-Number(a.season||0))[0];
+    state.draftSeason=draft.season||"CURRENT";
+    let ordered=[];
+    if(draft.draft_order && typeof draft.draft_order==="object"){
+      const usersById=new Map(state.users.map(user=>[String(user.user_id),user]));
+      ordered=Object.entries(draft.draft_order).map(([userId,slot])=>{
+        const user=usersById.get(String(userId));
+        const username=String(user?.username||"").toLowerCase();
+        const displayName=String(user?.display_name||"").toLowerCase();
+        const manager=MANAGERS[username]||MANAGERS[displayName]||user?.display_name||user?.username||"Manager";
+        return {slot:Number(slot),manager};
+      }).filter(item=>Number.isFinite(item.slot)).sort((a,b)=>a.slot-b.slot);
+    }
+    if(!ordered.length && draft.slot_to_roster_id){
+      ordered=Object.entries(draft.slot_to_roster_id).map(([slot,rosterId])=>({slot:Number(slot),manager:state.teams.get(Number(rosterId))?.name||"Manager"})).sort((a,b)=>a.slot-b.slot);
+    }
+    if(!ordered.length && draft.draft_id){
+      const picks=await fetchJson('/draft/'+draft.draft_id+'/picks');
+      const firstRound=picks.filter(p=>Number(p.round)===1).sort((a,b)=>Number(a.pick_no)-Number(b.pick_no));
+      ordered=firstRound.map((pick,index)=>({slot:index+1,manager:state.teams.get(Number(pick.roster_id))?.name||"Manager"}));
+    }
+    if(!ordered.length) throw new Error("Sleeper did not return a draft-slot order.");
+    $("draft-order-season").textContent=String(state.draftSeason)+" SLEEPER DRAFT";
+    target.innerHTML=ordered.map(item=>'<div class="lottery-order-card"><span>'+String(item.slot).padStart(2,"0")+'</span><strong>'+escapeHtml(item.manager)+'</strong></div>').join("");
+  } catch(error) {
+    console.warn("Unable to load Sleeper draft order",error);
+    target.innerHTML='<div class="lottery-empty">Draft order is not available from Sleeper yet.</div>';
+  }
+}
+
 function setupNavigation() {
   const tabs = [...document.querySelectorAll(".nav-tab")];
   const panels = [...document.querySelectorAll(".tab-panel")];
@@ -309,6 +380,7 @@ function setupNavigation() {
       panel.hidden = !visible;
     });
     if (target === "rules") renderRules();
+    if (target === "lottery") renderLotteryHistory();
     if (target === "rankings") { const rankings=renderRankings(state.selectedWeek); renderEditorial(state.selectedWeek,rankings); }
     window.scrollTo({top:0,behavior:"smooth"});
   }));
