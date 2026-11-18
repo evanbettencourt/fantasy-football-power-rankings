@@ -1072,6 +1072,8 @@ async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,
    if(!Array.isArray(picks))continue;
    const draftOrder=draft.draft_order||{},slotMap=draft.slot_to_roster_id||{};
    const managerByUser=new Map(users.map(user=>[String(user.user_id),hallManagerFromSleeperUser(user)]));
+   const managerBySlot=new Map();
+   for(const pick of picks){const slot=Number(pick.draft_slot),manager=managerByRoster.get(Number(pick.roster_id))||managerByUser.get(String(pick.picked_by||pick.metadata?.picked_by||""));if(slot>0&&manager&&!managerBySlot.has(slot))managerBySlot.set(slot,manager);}
    const picksMapped=picks.map(pick=>{
     const player=players?.[pick.player_id]||{};
     const rosterId=Number(pick.roster_id);
@@ -1079,7 +1081,9 @@ async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,
     const slot=Number(pick.draft_slot)||null;
     return {playerId:String(pick.player_id||""),player:player.full_name||pick.metadata?.first_name&&pick.metadata?.last_name?((player.full_name)||(pick.metadata.first_name+" "+pick.metadata.last_name)):pick.player_id||"Unknown player",position:player.position||pick.metadata?.position||"—",team:player.team||"FA",manager:drafter,rosterId,round:Number(pick.round)||Math.ceil(Number(pick.pick_no)/Math.max(1,rosters.length)),pick:Number(pick.pick_no)||0,slot,originalSlotManager:slot?managerByRoster.get(Number(slotMap[slot]||slotMap[String(slot)]))||null:null};
    });
-   draftRows.push({draftId:draft.draft_id,type:draft.type||"snake",season:year,picks:picksMapped,slotManagers:Array.from({length:Number(draft.settings?.teams)||rosters.length},(_,i)=>managerByRoster.get(Number(slotMap[i+1]||slotMap[String(i+1)]))||"Slot "+(i+1)),rounds:Number(draft.settings?.rounds)||Math.ceil(picksMapped.length/Math.max(1,rosters.length)),slots:Number(draft.settings?.teams)||rosters.length});
+   const slots=Number(draft.settings?.teams)||rosters.length;
+   const slotManagers=Array.from({length:slots},(_,i)=>managerBySlot.get(i+1)||managerByRoster.get(Number(slotMap[i+1]||slotMap[String(i+1)]))||"");
+   draftRows.push({draftId:draft.draft_id,type:draft.type||"snake",season:year,picks:picksMapped,slotManagers,rounds:Number(draft.settings?.rounds)||Math.ceil(picksMapped.length/Math.max(1,rosters.length)),slots});
   }catch(error){errors.push("Draft picks unavailable for "+(draft.draft_id||year));}
  }
  const weeks=Array.from({length:regularWeeks},(_,i)=>i+1);
@@ -1091,9 +1095,9 @@ async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,
     const pos=players?.[playerId]?.position;
     if(!["QB","RB","WR","TE"].includes(pos))continue;
     const stats=row?.stats||row;
-    const hasHalfPpr=stats?.pts_half_ppr!=null&&stats?.pts_half_ppr!=="";
-    const halfPpr=hasHalfPpr?Number(stats.pts_half_ppr):NaN;
-    const pts=hasHalfPpr&&Number.isFinite(halfPpr)?halfPpr:hallScoringPoints(stats,league.scoring_settings);
+    const leaguePoints=hallScoringPoints(stats,league.scoring_settings);
+    const halfPpr=stats?.pts_half_ppr!=null&&stats?.pts_half_ppr!==""?Number(stats.pts_half_ppr):NaN;
+    const pts=leaguePoints!=null?leaguePoints:(Number.isFinite(halfPpr)?halfPpr:null);
     if(pts==null)continue;
     const old=statsByPlayer.get(playerId)||{points:0,playerId,position:pos};
     old.points+=pts;statsByPlayer.set(playerId,old);
@@ -1115,11 +1119,11 @@ function hallDraftMarkup(row){
  if(!drafts.length)return '<section class="hall-season-draft"><h3>LEAGUE DRAFT</h3><div class="hall-bracket-empty">SLEEPER DRAFT BOARD NOT AVAILABLE FOR THIS SEASON.</div></section>';
  return drafts.map((draft,index)=>{
   const picks=[...draft.picks].sort((a,b)=>a.pick-b.pick),columns=Array.from({length:draft.slots},(_,i)=>i+1),byCell=new Map(picks.map(p=>[p.round+":"+p.slot,p]));
-  return '<section class="hall-season-draft"><h3>'+(drafts.length>1?"DRAFT "+(index+1):"LEAGUE DRAFT")+'</h3><div class="hall-draft-scroll"><table class="hall-draft-table"><thead><tr><th>ROUND</th>'+columns.map(slot=>'<th><b>'+escapeHtml(draft.slotManagers?.[slot-1]||("Slot "+slot))+'</b></th>').join("")+'</tr></thead><tbody>'+Array.from({length:draft.rounds},(_,round)=>'<tr><th>'+(round+1)+'</th>'+columns.map(slot=>{
+  return '<section class="hall-season-draft"><h3>'+(drafts.length>1?"DRAFT "+(index+1):"LEAGUE DRAFT")+'</h3><div class="hall-draft-scroll"><table class="hall-draft-table"><thead><tr><th>ROUND</th>'+columns.map(slot=>'<th class="hall-draft-slot-manager"><b>'+escapeHtml(draft.slotManagers?.[slot-1]||"—")+'</b></th>').join("")+'</tr></thead><tbody>'+Array.from({length:draft.rounds},(_,round)=>'<tr><th>'+(round+1)+'</th>'+columns.map(slot=>{
    const pick=byCell.get((round+1)+":"+slot);if(!pick)return '<td>—</td>';
    const position=String(pick.position||"").toUpperCase(),posClass=position==="QB"?"qb":position==="RB"?"rb":position==="WR"?"wr":position==="TE"?"te":["DEF","DST","D/ST"].includes(position)?"sflx":position==="K"?"flex":"other";
    const pickInRound=String(((Number(pick.pick)||0)-round*draft.slots)||slot).padStart(2,"0");
-   return '<td class="hall-draft-pick pos-'+posClass+'"><b>'+escapeHtml(pick.player)+'</b><small>'+escapeHtml(position)+' · '+escapeHtml(pick.manager||"Unknown")+'</small><em>'+(round+1)+'.'+pickInRound+'</em></td>';
+   return '<td class="hall-draft-pick pos-'+posClass+'"><b>'+escapeHtml(pick.player)+'</b><small>'+escapeHtml(position)+'</small><em>'+(round+1)+'.'+pickInRound+'</em></td>';
   }).join("")+'</tr>').join("")+'</tbody></table></div></section>';
  }).join("");
 }
@@ -1269,14 +1273,15 @@ async function loadSleeperHallHistory(){
       if(Array.isArray(rows))playoffScoreByWeek.set(round,new Map(rows.filter(row=>row.points!=null&&Number.isFinite(Number(row.points))).map(row=>[Number(row.roster_id),Number(row.points)])));
      }catch(error){errors.push(year+" playoff Week "+(playoffStart+round-1)+" scores unavailable");}
     }));
-    const seedByRoster=new Map(rosters.map(roster=>[Number(roster.roster_id),Number(roster.settings?.playoff_seed||roster.settings?.seed)||null]));
-    const byeTeams=playoffTeams>=6?rosters.map(roster=>({seed:seedByRoster.get(Number(roster.roster_id)),manager:managerByRoster.get(Number(roster.roster_id))})).filter(team=>team.seed===1||team.seed===2).sort((a,b)=>a.seed-b.seed):[];
+    const rosterByManager=new Map([...managerByRoster.entries()].map(([rosterId,manager])=>[manager,Number(rosterId)]));
+    const seedByRoster=new Map(seasonStandings.map((standing,index)=>[rosterByManager.get(standing.manager),index+1]).filter(([rosterId])=>rosterId!=null));
+    const byeTeams=playoffTeams>=6?seasonStandings.slice(0,2).map((standing,index)=>({seed:index+1,manager:standing.manager})):[];
     const seasonBracketGames=bracket.map(game=>({
      matchId:Number(game.m)||0,round:Number(game.r)||1,placement:Number(game.p)||null,
      team1:resolveBracketSlot(game.t1,game.t1_from),team2:resolveBracketSlot(game.t2,game.t2_from),
      source1:game.t1_from||(game.t1&&typeof game.t1==="object"?game.t1:null),source2:game.t2_from||(game.t2&&typeof game.t2==="object"?game.t2:null),
-     seed1:game.t1!=null&&typeof game.t1!=="object"?seedByRoster.get(Number(game.t1))||null:null,
-     seed2:game.t2!=null&&typeof game.t2!=="object"?seedByRoster.get(Number(game.t2))||null:null,
+     seed1:seedByRoster.get(resolveBracketRoster(game.t1,game.t1_from))||null,
+     seed2:seedByRoster.get(resolveBracketRoster(game.t2,game.t2_from))||null,
      winner:managerByRoster.get(Number(game.w))||null,loser:managerByRoster.get(Number(game.l))||null,
      score1:game.p1!=null&&Number.isFinite(Number(game.p1))?Number(game.p1):(playoffScoreByWeek.get(Number(game.r)||1)?.get(resolveBracketRoster(game.t1,game.t1_from))??null),
      score2:game.p2!=null&&Number.isFinite(Number(game.p2))?Number(game.p2):(playoffScoreByWeek.get(Number(game.r)||1)?.get(resolveBracketRoster(game.t2,game.t2_from))??null),
