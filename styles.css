@@ -2604,3 +2604,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .hall-draft-table td.hall-draft-pick em{bottom:6px;right:7px}
 .hall-draft-table tbody tr>th{display:none}
 .hall-draft-scroll{border:0;overflow-x:auto}
+
+.hall-season-summary-grid .hall-leader-card .hall-leader-player{display:flex;align-items:baseline;flex-wrap:wrap;gap:3px 8px}
+.hall-season-summary-grid .hall-leader-card .hall-leader-player strong{display:inline;font-size:15px}
+.hall-season-summary-grid .hall-leader-card .hall-leader-player small{display:inline;margin:0;font-size:10px}
