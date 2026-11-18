@@ -1076,7 +1076,7 @@ async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,
     const slot=Number(pick.draft_slot)||null;
     return {playerId:String(pick.player_id||""),player:player.full_name||pick.metadata?.first_name&&pick.metadata?.last_name?((player.full_name)||(pick.metadata.first_name+" "+pick.metadata.last_name)):pick.player_id||"Unknown player",position:player.position||pick.metadata?.position||"—",team:player.team||"FA",manager:drafter,rosterId,round:Number(pick.round)||Math.ceil(Number(pick.pick_no)/Math.max(1,rosters.length)),pick:Number(pick.pick_no)||0,slot,originalSlotManager:slot?managerByRoster.get(Number(slotMap[slot]||slotMap[String(slot)]))||null:null};
    });
-   draftRows.push({draftId:draft.draft_id,type:draft.type||"snake",season:year,picks:picksMapped,rounds:Number(draft.settings?.rounds)||Math.ceil(picksMapped.length/Math.max(1,rosters.length)),slots:Number(draft.settings?.teams)||rosters.length});
+   draftRows.push({draftId:draft.draft_id,type:draft.type||"snake",season:year,picks:picksMapped,slotManagers:Array.from({length:Number(draft.settings?.teams)||rosters.length},(_,i)=>managerByRoster.get(Number(slotMap[i+1]||slotMap[String(i+1)]))||"Slot "+(i+1)),rounds:Number(draft.settings?.rounds)||Math.ceil(picksMapped.length/Math.max(1,rosters.length)),slots:Number(draft.settings?.teams)||rosters.length});
   }catch(error){errors.push("Draft picks unavailable for "+(draft.draft_id||year));}
  }
  const weeks=Array.from({length:regularWeeks},(_,i)=>i+1);
@@ -1112,7 +1112,7 @@ function hallDraftMarkup(row){
   const picks=[...draft.picks].sort((a,b)=>a.pick-b.pick);
   const columns=Array.from({length:draft.slots},(_,i)=>i+1);
   const byCell=new Map(picks.map(p=>[p.round+":"+p.slot,p]));
-  return '<section class="hall-season-draft"><h3>'+(drafts.length>1?"DRAFT "+(index+1):"LEAGUE DRAFT")+'</h3><div class="hall-draft-scroll"><table class="hall-draft-table"><thead><tr><th>ROUND</th>'+columns.map(slot=>'<th>'+slot+'</th>').join("")+'</tr></thead><tbody>'+Array.from({length:draft.rounds},(_,round)=>'<tr><th>'+(round+1)+'</th>'+columns.map(slot=>{const pick=byCell.get((round+1)+":"+slot);return '<td>'+(pick?'<b>'+escapeHtml(pick.player)+'</b><small>'+escapeHtml(pick.position)+' · '+escapeHtml(pick.manager||"Unknown")+'</small><em>#'+pick.pick+'</em>':'—')+'</td>';}).join("")+'</tr>').join("")+'</tbody></table></div></section>';
+  return '<section class="hall-season-draft"><h3>'+(drafts.length>1?"DRAFT "+(index+1):"LEAGUE DRAFT")+'</h3><div class="hall-draft-scroll"><table class="hall-draft-table"><thead><tr><th>ROUND</th>'+columns.map(slot=>'<th><b>'+escapeHtml(draft.slotManagers?.[slot-1]||("Slot "+slot))+'</b><small>#'+slot+'</small></th>').join("")+'</tr></thead><tbody>'+Array.from({length:draft.rounds},(_,round)=>'<tr><th>'+(round+1)+'</th>'+columns.map(slot=>{const pick=byCell.get((round+1)+":"+slot);return '<td>'+(pick?'<b>'+escapeHtml(pick.player)+'</b><small>'+escapeHtml(pick.position)+' · '+escapeHtml(pick.manager||"Unknown")+'</small><em>#'+pick.pick+'</em>':'—')+'</td>';}).join("")+'</tr>').join("")+'</tbody></table></div></section>';
  }).join("");
 }
 function hallLeadersMarkup(row){
