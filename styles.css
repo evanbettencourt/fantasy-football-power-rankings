@@ -1075,3 +1075,69 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 }
 .pr-card.moving[data-dir="up"]{box-shadow:0 0 0 1px rgba(87,242,107,.35),0 6px 26px rgba(87,242,107,.12)}
 .pr-card.moving[data-dir="dn"]{box-shadow:0 0 0 1px rgba(242,104,92,.35),0 6px 26px rgba(242,104,92,.12)}
+
+/* Page-specific accents: mint for Rules, blue for Schedule. */
+[data-panel="rules"] > .eyebrow,
+[data-panel="rules"] .rules-overview .rule-kicker,
+[data-panel="rules"] .rules-payout .rule-kicker,
+[data-panel="rules"] .rules-section-body .rule-kicker,
+[data-panel="rules"] .rules-index {
+  color: #A8E6CF !important;
+}
+[data-panel="rules"] .rules-section-head h3,
+[data-panel="rules"] .rules-section-body h3 {
+  color: #A8E6CF;
+  font-weight: 800;
+  font-style: normal;
+}
+[data-panel="rules"] .rules-toc a:hover,
+[data-panel="rules"] .rules-toc a.active {
+  color: #D5F5E8;
+  border-left-color: #A8E6CF !important;
+  background: rgba(168, 230, 207, .10) !important;
+}
+[data-panel="rules"] .rules-section-body li::marker,
+[data-panel="rules"] .rules-week-grid .waiver strong,
+[data-panel="rules"] .rules-visual-title span,
+[data-panel="rules"] .rules-depth b,
+[data-panel="rules"] .rules-playoff-visual strong,
+[data-panel="rules"] .rules-scoring-visual strong {
+  color: #A8E6CF;
+}
+[data-panel="rules"] .rules-payout-first,
+[data-panel="rules"] .rules-payout-legend i {
+  background: #A8E6CF;
+}
+[data-panel="rules"] .rules-payout-second,
+[data-panel="rules"] .rules-payout-legend i.second {
+  background: #70C9A8;
+}
+[data-panel="rules"] .rules-week-grid .waiver {
+  background: rgba(168, 230, 207, .08);
+  border-color: rgba(168, 230, 207, .35);
+}
+[data-panel="rules"] .rules-source-note a {
+  color: #A8E6CF;
+  text-decoration-color: rgba(168, 230, 207, .55);
+}
+
+/* Schedule uses a cool blue accent instead of lavender. */
+.sch-hero .eyebrow,
+.sch-sec-hd {
+  color: #A8D8EA;
+}
+.sch-crest {
+  background: linear-gradient(145deg, #239FC2, #A8D8EA);
+}
+.sch-seg.regular {
+  background: rgba(35, 159, 194, .14);
+  border-color: rgba(35, 159, 194, .52);
+}
+.sch-wk-tag.regular {
+  color: #A8D8EA;
+  border-color: rgba(35, 159, 194, .55);
+}
+.sch-nm.selected {
+  color: #A8D8EA;
+}
+
