@@ -1001,6 +1001,10 @@ function getPreSleeperManagerStats(){
 function hallManagerFromSleeperUser(user){
  const username=String(user?.username||"").trim().replace(/^@/,"").toLowerCase();
  const display=String(user?.display_name||"").trim().replace(/^@/,"").toLowerCase();
+ const userId=String(user?.user_id||"");
+ const currentAccount=state.users.find(current=>String(current.user_id||"")===userId);
+ const currentUsername=String(currentAccount?.username||"").trim().replace(/^@/,"").toLowerCase();
+ if(MANAGERS[currentUsername])return MANAGERS[currentUsername];
  if(MANAGERS[username])return MANAGERS[username];
  const known=[...new Set(Object.values(MANAGERS)),...RETIRED_MANAGERS];
  const normalized=value=>String(value||"").toLowerCase().replace(/[^a-z0-9]/g,"");
