@@ -2293,3 +2293,11 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 @media(max-width:1000px){.hall-manager-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hall-flip-card{height:244px}}
 @media(max-width:720px){.hall-manager-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hall-flip-card{height:238px}}
 @media(max-width:440px){.hall-manager-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.hall-flip-card{height:226px}.hall-avatar-line{width:72px;height:72px}.hall-manager-name{font-size:15px}}
+
+
+/* Match the compact JFL footprint */
+.hall-manager-grid{max-width:920px}
+.hall-data-summary{max-width:920px}
+.hall-manager-grid .hall-flip-card{height:232px}
+@media(max-width:1000px){.hall-manager-grid{max-width:760px}}
+@media(max-width:720px){.hall-manager-grid{max-width:560px}}
