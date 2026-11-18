@@ -1275,3 +1275,59 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   .mu-rank{flex-basis:30px;height:30px;font-size:13px}
   .mu-prob-row{grid-template-columns:35px minmax(0,1fr) 35px;gap:6px}
 }
+
+
+/* Matchups: constrain the centered reading column and make roster details readable. */
+.matchups-page{
+  width:72%;
+  max-width:960px;
+  margin-inline:auto;
+}
+.mu-method-note{font-size:12px;line-height:1.6}
+.mu-eyebrow,.mu-week-control label{font-size:11px}
+.mu-week-control select{font-size:12px}
+.mu-card-head{font-size:10px}
+.mu-live-tag{font-size:9px}
+.mu-manager-copy strong{font-size:16px}
+.mu-manager-copy small{font-size:9px;line-height:1.35}
+.mu-versus{font-size:10px}
+.mu-score-line>strong{font-size:clamp(26px,2.5vw,32px)}
+.mu-projection-line{font-size:10px}
+.mu-projection-line b{font-size:11px}
+.mu-prob-value{font-size:11px}
+.mu-prob-label{font-size:9px}
+.mu-rosters summary,.mu-bench-details>summary{font-size:10px;padding:13px 15px}
+.mu-roster-grid{gap:14px;padding:0 15px 15px}
+.mu-roster-team{padding:12px}
+.mu-roster-team h4{font-size:15px;margin-bottom:11px}
+.mu-player-head,.mu-player-row{
+  grid-template-columns:38px minmax(0,1fr) 44px 48px;
+  gap:7px;
+}
+.mu-player-head{font-size:9px;padding-bottom:7px}
+.mu-player-row{min-height:32px;font-size:11px}
+.mu-player-pos{min-width:34px;min-height:21px;font-size:9px}
+.mu-player-name{font-size:11px}
+.mu-player-name small{font-size:9px}
+.mu-player-points,.mu-player-proj{font-size:10px}
+.mu-empty{font-size:13px}
+@media(max-width:900px){
+  .matchups-page{width:88%}
+}
+@media(max-width:600px){
+  .matchups-page{width:100%;padding-top:18px}
+  .mu-method-note{font-size:11px}
+  .mu-card-head{font-size:9px}
+  .mu-manager-copy strong{font-size:13px}
+  .mu-manager-copy small{font-size:8px}
+  .mu-roster-grid{grid-template-columns:1fr;gap:10px;padding-inline:10px}
+  .mu-roster-team{padding:11px}
+  .mu-roster-team h4{font-size:14px}
+  .mu-player-head,.mu-player-row{grid-template-columns:38px minmax(0,1fr) 42px 46px;gap:6px}
+  .mu-player-head{font-size:9px}
+  .mu-player-row{min-height:34px}
+  .mu-player-pos{font-size:9px}
+  .mu-player-name{font-size:11px}
+  .mu-player-name small{font-size:9px}
+  .mu-player-points,.mu-player-proj{font-size:10px}
+}
