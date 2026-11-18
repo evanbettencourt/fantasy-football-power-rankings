@@ -967,7 +967,7 @@ const PARLAY_PLAYER_ALIASES = {
 const PARLAY_TEAM_ALIASES = {
  "eagles":"Philadelphia Eagles","bengals":"Cincinnati Bengals","giants":"New York Giants","cardinals":"Arizona Cardinals","patriots":"New England Patriots","pats":"New England Patriots","chiefs":"Kansas City Chiefs","bills":"Buffalo Bills","lions":"Detroit Lions"
 };
-const PARLAY_PLAYER_ID_OVERRIDES = { "Lamar Jackson": "4881" };
+const PARLAY_PLAYER_ID_OVERRIDES = { "Lamar Jackson": "4881", "Justin Jefferson": "6794" };
 function normalizeParlayPlayerName(value){
  return String(value||"").toLowerCase()
   .replace(/\b(jr|sr|ii|iii|iv|v)\.?\b/g,"")
@@ -1078,10 +1078,22 @@ function gradeParlayPick(pick,stats,players,schedule,diagnostics={}){
     :"Stats request returned no player records";
   return {status:"PENDING",detail};
  }
- const playerTeam=({JAC:"JAX",WAS:"WSH",LA:"LAR"}[String(player.team||"").toUpperCase()]||String(player.team||"").toUpperCase());
- const game=(schedule?.events||[]).find(ev=>(ev.competitions?.[0]?.competitors||[]).some(c=>String(c.team?.abbreviation||"").toUpperCase()===playerTeam));
- const competition=game?.competitions?.[0],competitionStatus=competition?.status?.type||{},eventStatus=game?.status?.type||{},finished=Boolean(competitionStatus.completed===true||eventStatus.completed===true||competitionStatus.state==="post"||eventStatus.state==="post"||competitionStatus.name==="STATUS_FINAL"||eventStatus.name==="STATUS_FINAL");
- if(!finished)return {status:"PENDING",detail:"Player's NFL game not final"};
+ const rawTeam=String(player.team||player.team_abbr||player.team_abbreviation||"").toUpperCase();
+ const playerTeam=({JAC:"JAX",WAS:"WSH",LA:"LAR",BAL:"BAL"}[rawTeam]||rawTeam);
+ const teamNames={BAL:"baltimore ravens",JAX:"jacksonville jaguars",LAR:"los angeles rams",WAS:"washington commanders"};
+ const game=(schedule?.events||[]).find(ev=>(ev.competitions?.[0]?.competitors||[]).some(c=>{
+  const abbreviation=String(c.team?.abbreviation||"").toUpperCase();
+  const displayName=String(c.team?.displayName||c.team?.name||"").toLowerCase();
+  return abbreviation===playerTeam||(teamNames[playerTeam]&&displayName===teamNames[playerTeam]);
+ }));
+ const competition=game?.competitions?.[0],competitionStatus=competition?.status?.type||competition?.status||{},eventStatus=game?.status?.type||game?.status||{};
+ const finished=Boolean(
+  competitionStatus.completed===true||eventStatus.completed===true||
+  competitionStatus.state==="post"||eventStatus.state==="post"||
+  competitionStatus.name==="STATUS_FINAL"||eventStatus.name==="STATUS_FINAL"||
+  competitionStatus.description==="Final"||eventStatus.description==="Final"
+ );
+ if(!finished)return {status:"PENDING",detail:!schedule?"NFL schedule unavailable":!playerTeam?"Player team unavailable":!game?"No schedule game found for "+playerTeam:"Game status not final ("+String(competitionStatus.state||eventStatus.state||competitionStatus.name||eventStatus.name||"unknown")+")"};
  if(/yards?\s*\+\s*TD/i.test(raw)){
   const yards=parlayStatNumber(stat,"rush_yd"),td=["rush_td","rec_td","def_td","st_td","fum_rec_td"].reduce((sum,key)=>sum+(parlayStatNumber(stat,key)||0),0);
   if(yards==null)return {status:"PENDING",detail:"Rushing yards unavailable"};
