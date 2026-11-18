@@ -863,7 +863,7 @@ const LOTTERY_HISTORY = {
 };
 const LOTTERY_NAMES = { Kev:"Kevin", Colb:"Colby" };
 function lotteryName(name) { return LOTTERY_NAMES[name] || name; }
-function lotteryLuck(position, fieldSize) { return (fieldSize + 1) / 2 - position; }
+function lotteryLuck(position, fieldSize) { const expectedPosition = fieldSize / 2 + 0.5; return expectedPosition - position; }
 const LOTTERY_MANAGER_COLORS = ["#20b9d7","#ff4f91","#9a68ff","#e8b83d","#50c99a","#f0784f","#b5a0ff","#5dc4ee","#e47eb4","#a7d86c","#f1a34c","#8d9cf5"];
 function lotteryColor(name) {
   const names = [...new Set(Object.values(LOTTERY_HISTORY).flat().map(lotteryName))].sort();
