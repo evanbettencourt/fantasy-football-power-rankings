@@ -377,8 +377,10 @@ async function init() {
       state.league = core.league; state.users = core.users; state.rosters = core.rosters;
       state.usingCachedCore = results.some(item => item.cached);
       buildTeams();
-      renderLotteryHistory();
-      loadActualDraftOrder();
+      if (!refresh) {
+        renderLotteryHistory();
+        loadActualDraftOrder();
+      }
       const season = core.league.season || String(new Date().getFullYear());
       $("season-label").textContent = season + " SLEEPER LEAGUE · EST. 2017";
       $("season-tag").textContent = season + " SEASON · EST. 2017";
