@@ -753,7 +753,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 
 
 /* Power Rankings typography and scoring chart refinements. */
-:root{--pr-rank-size:48px;--pr-name-size:17px}
+:root{--pr-rank-size:64px;--pr-name-size:17px}
 .pr-chart-img{min-height:160px;padding:15px 8px 8px;border:1px solid #ffffff18;border-radius:7px;background:#ffffff06}
 .pr-chart-bar-item span{font:9px ui-monospace,monospace;color:#F5F4EB}
 .pr-chart-bar-item b{color:#EAB4F9;font-size:9px}
@@ -766,8 +766,16 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .pr-tbl .c-team .nm{font-size:14px}
 .pr-chart-note,.pr-tbl-note{font-size:11px}
 @media(max-width:520px){
-  :root{--pr-rank-size:38px;--pr-name-size:15px}
+  :root{--pr-rank-size:54px;--pr-name-size:15px}
   .pr-mast .wk{font-size:28px}
   .pr-mid .bl{font-size:12.5px;line-height:1.52}
   .pr-tbl .c-team .nm{font-size:12px}
 }
+
+
+/* Match the JFL-sized rank treatment and the League standings cutoff. */
+.pr-card{grid-template-columns:88px minmax(0,1fr)}
+.pr-num{font-size:var(--pr-rank-size);font-weight:950;line-height:1}
+.pr-cut td{height:0!important;padding:0!important;border:0!important;border-top:2px solid var(--jfl-sky)!important;background:transparent!important}
+.pr-eliminated{display:inline-block;margin-left:8px;padding:3px 6px;border:1px solid #ff79a9;border-radius:4px;color:#ff9fc2;font:800 8px/1 Inter,Arial,sans-serif;letter-spacing:.12em;vertical-align:middle}
+@media(max-width:600px){.pr-card{grid-template-columns:70px minmax(0,1fr)}}
