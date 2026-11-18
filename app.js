@@ -970,10 +970,19 @@ const PARLAY_TEAM_ALIASES = {
 const PARLAY_PLAYER_INDEX = new WeakMap();
 const PARLAY_TEAM_ABBR = {eagles:"PHI",bengals:"CIN",giants:"NYG",cardinals:"ARI",patriots:"NE",pats:"NE",chiefs:"KC",bills:"BUF",lions:"DET"};
 function normalizeParlayStats(value){
- const rows=Array.isArray(value)?value:value&&typeof value==="object"?Object.entries(value).map(([id,row])=>({player_id:row?.player_id??row?.id??id,...(row&&typeof row==="object"?row:{})})):[];
+ let source=value;
+ if(source&&typeof source==="object"&&!Array.isArray(source)&&!source.player_id&&!source.id){
+  for(const key of ["stats","players","data","results"]){
+   const candidate=source[key];
+   if(candidate&&typeof candidate==="object"&&(Array.isArray(candidate)||Object.keys(candidate).length)){
+    source=candidate;break;
+   }
+  }
+ }
+ const rows=Array.isArray(source)?source:source&&typeof source==="object"?Object.entries(source).map(([id,row])=>({player_id:row?.player_id??row?.id??id,...(row&&typeof row==="object"?row:{})})):[];
  const normalized={};
  for(const row of rows){
-  const id=String(row?.player_id??row?.id??"");
+  const id=String(row?.player_id??row?.playerId??row?.id??"");
   if(!id)continue;
   const nested=row?.stats&&typeof row.stats==="object"?row.stats:{};
   normalized[id]={...row,...nested};
@@ -1033,7 +1042,7 @@ function describeParlayPick(pick){
  const threshold=line?(line[1].toUpperCase()+" "+line[2]):plus?(plus[1]+"+"):bare?(bare[1]+"+"):"";
  return name+" — "+(threshold?threshold+" ":"")+(type||"Prop needs clarification");
 }
-function gradeParlayPick(pick,stats,players,schedule){
+function gradeParlayPick(pick,stats,players,schedule,diagnostics={}){
  const raw=String(pick||"").trim();
  if(!raw||raw==="N/A")return {status:"NA",detail:"No pick"};
  const lower=raw.toLowerCase(),identity=parlayPickIdentity(raw);
@@ -1052,7 +1061,15 @@ function gradeParlayPick(pick,stats,players,schedule){
  const playerEntry=parlayPlayerEntry(players,identity.name);
  if(!playerEntry)return {status:"REVIEW",detail:"Player not found in Sleeper directory"};
  const [playerId,player]=playerEntry,stat=stats?.[playerId];
- if(!stat)return {status:"PENDING",detail:"Sleeper stats unavailable"};
+ if(!stat){
+  const count=Object.keys(stats||{}).length;
+  const detail=diagnostics.statsError
+   ?"Stats request failed: "+diagnostics.statsError
+   :count
+    ?"Stats loaded ("+count+" players), but player ID "+playerId+" was not present"
+    :"Stats request returned no player records";
+  return {status:"PENDING",detail};
+ }
  const playerTeam=({JAC:"JAX",WAS:"WSH",LA:"LAR"}[String(player.team||"").toUpperCase()]||String(player.team||"").toUpperCase());
  const game=(schedule?.events||[]).find(ev=>(ev.competitions?.[0]?.competitors||[]).some(c=>String(c.team?.abbreviation||"").toUpperCase()===playerTeam));
  const competition=game?.competitions?.[0],competitionStatus=competition?.status?.type||{},eventStatus=game?.status?.type||{},finished=Boolean(competitionStatus.completed===true||eventStatus.completed===true||competitionStatus.state==="post"||eventStatus.state==="post"||competitionStatus.name==="STATUS_FINAL"||eventStatus.name==="STATUS_FINAL");
@@ -1106,18 +1123,20 @@ async function loadParlayWeek(week){
  if(state.parlayDataByWeek[week]?.loaded||state.parlayDataByWeek[week]?.loading)return;
  state.parlayDataByWeek[week]={loading:true};
  const season=state.league?.season||String(new Date().getFullYear());
+ let statsError=null;
  const [stats,schedule,players]=await Promise.all([
-  fetchJson("/api/sleeper-stats/regular/"+season+"/"+week,{attempts:1,timeoutMs:18000}).catch(()=>null),
-  fetchJson("/api/nfl-schedule?seasontype=2&week="+week+"&year="+encodeURIComponent(season),{attempts:1,timeoutMs:18000}).catch(()=>null),
-  state.players?Promise.resolve(state.players):(state.playersPromise||=fetchJson("/players/nfl?active=true",{attempts:1,timeoutMs:25000}).then(v=>{state.players=v||{};return state.players}).catch(()=>({})))
+  fetchJson("/api/sleeper-stats/regular/"+season+"/"+week,{attempts:1,timeoutMs:18000}).catch(error=>{statsError=error?.message||String(error);console.warn("Parlay Sleeper stats unavailable for week "+week,error);return null;}),
+  fetchJson("/api/nfl-schedule?seasontype=2&week="+week+"&year="+encodeURIComponent(season),{attempts:1,timeoutMs:18000}).catch(error=>{console.warn("Parlay NFL schedule unavailable for week "+week,error);return null;}),
+  state.players?Promise.resolve(state.players):(state.playersPromise||=fetchJson("/players/nfl?active=true",{attempts:1,timeoutMs:25000}).then(v=>{state.players=v||{};return state.players}).catch(error=>{console.warn("Parlay player directory unavailable",error);return {}}))
  ]);
- state.parlayDataByWeek[week]={loaded:true,stats:normalizeParlayStats(stats),schedule:schedule||null,players:players||{}};
+ const normalizedStats=normalizeParlayStats(stats);
+ state.parlayDataByWeek[week]={loaded:true,stats:normalizedStats,statsError,schedule:schedule||null,players:players||{}};
 }
 function renderParlays(){
  const target=$("parlays-content");if(!target)return;
  const weeks=PARLAY_WEEKS.map((row,i)=>{
   const week=i+1,data=state.parlayDataByWeek[week]||{};
-  const picks=row.map((pick,j)=>({manager:PARLAY_MANAGERS[j],pick,result:pick&&pick!=="N/A"?gradeParlayPick(pick,data.stats,data.players,data.schedule):{status:"NA"}}))
+  const picks=row.map((pick,j)=>({manager:PARLAY_MANAGERS[j],pick,result:pick&&pick!=="N/A"?gradeParlayPick(pick,data.stats,data.players,data.schedule,data):{status:"NA"}}))
     .filter(item=>item.pick&&item.pick!=="N/A");
   return {week,row,picks,placer:PARLAY_PLACERS[i]||"Not assigned"};
  }).filter(item=>item.picks.length);
