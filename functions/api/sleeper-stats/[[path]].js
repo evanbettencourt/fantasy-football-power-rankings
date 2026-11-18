@@ -1,6 +1,7 @@
 export async function onRequestGet(context) {
   try {
-    // Keep stats traffic separate from the existing api.sleeper.app/v1 proxy.
+    // Frontend requests /regular/<season>/<week>; Sleeper expects
+    // /<season>/<week>?season_type=regular.
     const rawPath = context.params.path;
     const parts = Array.isArray(rawPath)
       ? rawPath
@@ -8,11 +9,29 @@ export async function onRequestGet(context) {
         ? rawPath.split("/").filter(Boolean)
         : [];
 
+    let seasonType = "regular";
+    let season;
+    let week;
+
+    if (parts.length >= 3 && ["regular", "post", "pre", "off"].includes(parts[0])) {
+      seasonType = parts[0];
+      season = parts[1];
+      week = parts[2];
+    } else {
+      season = parts[0];
+      week = parts[1];
+    }
+
+    if (!season || !week) {
+      return Response.json({ error: "Season and week are required" }, { status: 400 });
+    }
+
     const upstreamUrl = new URL(
       "https://api.sleeper.com/stats/nfl/" +
-      parts.map(part => encodeURIComponent(part)).join("/")
+      encodeURIComponent(season) + "/" + encodeURIComponent(week)
     );
     upstreamUrl.search = new URL(context.request.url).search;
+    upstreamUrl.searchParams.set("season_type", seasonType);
 
     const upstream = await fetch(upstreamUrl.toString(), {
       headers: { "Accept": "application/json" }
