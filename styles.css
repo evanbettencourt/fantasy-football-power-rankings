@@ -888,3 +888,18 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .rules-source-note a{color:var(--pink);text-decoration-color:color-mix(in srgb,var(--pink) 50%,transparent);text-underline-offset:3px}
 .rules-section-body strong{color:var(--text)}
 @media(max-width:520px){.rules-week-grid{gap:3px}.rules-week-grid>div{min-height:58px;padding:6px 1px}.rules-week-grid strong{font-size:7px}.rules-week-grid b{font-size:9px}}
+
+
+/* Explicit Rules-page pink override: this theme does not define --pink. */
+[data-panel="rules"] > .eyebrow,
+[data-panel="rules"] .rules-overview .rule-kicker,
+[data-panel="rules"] .rules-payout .rule-kicker,
+[data-panel="rules"] .rules-section-body .rule-kicker,
+[data-panel="rules"] .rules-index {
+  color: #ff3297 !important;
+}
+[data-panel="rules"] .rules-toc a:hover,
+[data-panel="rules"] .rules-toc a.active {
+  border-left-color: #ff3297 !important;
+  background: rgba(255, 50, 151, .09) !important;
+}
