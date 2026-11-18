@@ -1792,3 +1792,64 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 @media(max-width:600px){
   .mu-side.side-a{grid-template-columns:auto auto minmax(0,1fr)}
 }
+
+
+/* Final Matchups alignment: mirror the right side so the left score sits beside VS. */
+.mu-side.side-a{
+  grid-template-columns:minmax(0,.82fr) minmax(0,1fr) minmax(0,.9fr);
+  grid-template-areas:"meta manager score";
+}
+.mu-side.side-a .mu-manager-meta{
+  justify-self:start;
+  align-items:flex-end;
+  text-align:right;
+}
+.mu-side.side-a .mu-manager-copy{
+  align-items:center;
+  text-align:center;
+}
+.mu-side.side-a .mu-score-stack{justify-self:end}
+@media(max-width:600px){
+  .mu-side.side-a{
+    grid-template-columns:minmax(0,.78fr) minmax(0,1fr) minmax(0,.86fr);
+    gap:3px;
+  }
+}
+
+/* Parlays: larger type and clearer separation between manager, pick and result. */
+.parlay-summary{padding:22px;gap:16px}
+.parlay-kicker{font-size:11px}
+.parlay-summary strong{font-size:32px}
+.parlay-summary small{font-size:10px}
+.parlay-week-grid{grid-template-columns:1fr;gap:18px}
+.parlay-week-head{padding:17px 19px}
+.parlay-week-head h3{font-size:17px}
+.parlay-placer span{font-size:10px}
+.parlay-placer strong{font-size:14px}
+.parlay-pick-list{padding:5px 19px}
+.parlay-pick{
+  grid-template-columns:78px minmax(0,1fr) 68px;
+  gap:12px;
+  padding:12px 0;
+}
+.parlay-manager{font-size:13px}
+.parlay-selection{font-size:13px;line-height:1.45;color:var(--text)}
+.parlay-selection strong{font-weight:600}
+.parlay-result{font-size:10px;letter-spacing:.06em}
+.parlay-result small{font-size:9px;line-height:1.35}
+.parlay-week-foot{padding:13px 19px;font-size:10px}
+.parlay-empty{font-size:14px}
+@media(max-width:760px){
+  .parlay-summary{padding:16px;gap:10px}
+  .parlay-summary strong{font-size:27px}
+  .parlay-summary small{font-size:9px}
+  .parlay-week-grid{gap:14px}
+  .parlay-week-head{padding:14px}
+  .parlay-pick-list{padding:4px 14px}
+  .parlay-pick{grid-template-columns:64px minmax(0,1fr) 58px;gap:8px;padding:11px 0}
+  .parlay-manager{font-size:11px}
+  .parlay-selection{font-size:12px}
+  .parlay-result{font-size:9px}
+  .parlay-result small{font-size:8px}
+  .parlay-week-foot{padding:11px 14px;font-size:9px}
+}
