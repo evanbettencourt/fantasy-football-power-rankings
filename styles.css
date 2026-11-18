@@ -3045,7 +3045,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 /* Scoring rules are grouped into compact visual cards instead of long bullet lists. */
 .rules-scoring-board{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-columns:repeat(5,minmax(0,1fr));
   gap:10px;
   margin:0 0 25px;
 }
@@ -3072,7 +3072,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 }
 .rules-scoring-card>div{display:flex;flex-direction:row;align-items:baseline;justify-content:space-between;gap:12px}
 .rules-scoring-card strong{font:800 23px/1 var(--sans);color:var(--lime)}
-.rules-scoring-card small{color:var(--muted);font:500 9px/1.35 var(--sans)}
+.rules-scoring-card small{color:var(--muted);font:500 11px/1.35 var(--sans)}
 .rules-scoring-card .negative strong{color:#F2685C}
 .rules-median-visual{
   display:grid;
@@ -3093,7 +3093,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .rules-median-visual small{color:var(--muted);font-size:9px}
 .rules-median-visual>b{color:var(--pink);font:800 16px var(--sans)}
 @media(max-width:560px){
- .rules-scoring-board{grid-template-columns:1fr}
+ .rules-scoring-board{grid-template-columns:repeat(2,minmax(0,1fr))}
  .rules-median-visual{gap:5px;padding:10px 6px}
  .rules-median-visual span{font-size:7px}
  .rules-median-visual strong{font-size:20px}
