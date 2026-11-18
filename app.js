@@ -948,7 +948,7 @@ async function loadActualDraftOrder() {
     state.actualDraftSlots=new Map(ordered.map(item=>[lotteryName(item.manager),item.slot]));
     $("draft-order-season").textContent=String(state.draftSeason)+" SLEEPER DRAFT";
     $("draft-order-count").textContent=ordered.length+" / 12";
-    target.innerHTML=ordered.map(item=>'<div class="dob-slot"><span class="dob-n">#'+item.slot+'</span><span class="dob-dot"></span><span class="dob-nm" style="color:'+lotteryColor(item.manager)+'">'+escapeHtml(item.manager)+'</span></div>').join("");
+    target.innerHTML=ordered.map(item=>'<div class="dob-slot"><span class="dob-n">#'+item.slot+'</span><span class="dob-dot" style="background:'+lotteryColor(item.manager)+'"></span><span class="dob-nm" style="color:'+lotteryColor(item.manager)+'">'+escapeHtml(item.manager)+'</span></div>').join("");
     renderLotteryHistory();
   } catch(error) {
     console.warn("Unable to load Sleeper draft order",error);
