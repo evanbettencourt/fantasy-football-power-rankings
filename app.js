@@ -1099,19 +1099,31 @@ async function loadSleeperHallHistory(){
     try{const value=await fetchJson("/league/"+league.league_id+"/winners_bracket",{attempts:2,timeoutMs:12000});if(Array.isArray(value))bracket=value;}
     catch(error){errors.push(year+" playoff bracket unavailable");}
     const completed=bracket.filter(game=>game.w!=null&&game.l!=null);
+    const completedRegularWeeks=weekData.filter(({rows})=>rows.filter(row=>Number(row.points)>0).length===rosters.length).length;
     const seasonStandings=[...seasonPoints.entries()].map(([manager,points])=>({manager,points,wins:seasonWins.get(manager)||0})).sort((a,b)=>b.wins-a.wins||b.points-a.points);
-    const regularSeasonChampion=seasonStandings[0]?.manager||null;
+    const regularSeasonChampion=completedRegularWeeks>=regularWeeks?seasonStandings[0]?.manager||null:null;
     if(regularSeasonChampion)hallStatFor(stats,regularSeasonChampion).regularSeasonChampionships.add(year);
     const rawBracketById=new Map(bracket.map(game=>[Number(game.m),game]));
-    const resolveBracketSlot=(rosterId,source)=>{
-     if(rosterId!=null&&typeof rosterId!=="object")return managerByRoster.get(Number(rosterId))||null;
+    const resolveBracketRoster=(rosterId,source)=>{
+     if(rosterId!=null&&typeof rosterId!=="object")return Number(rosterId);
      const ref=source||(rosterId&&typeof rosterId==="object"?rosterId:null);
      if(!ref)return null;
-     const sourceId=Number(ref.w??ref.l),sourceGame=rawBracketById.get(sourceId);
+     const sourceGame=rawBracketById.get(Number(ref.w??ref.l));
      if(!sourceGame)return null;
      const resolvedRoster=ref.w!=null?sourceGame.w:sourceGame.l;
-     return resolvedRoster!=null?(managerByRoster.get(Number(resolvedRoster))||null):null;
+     return resolvedRoster!=null?Number(resolvedRoster):null;
     };
+    const resolveBracketSlot=(rosterId,source)=>{
+     const resolved=resolveBracketRoster(rosterId,source);
+     return resolved!=null?(managerByRoster.get(resolved)||null):null;
+    };
+    const playoffScoreByWeek=new Map();
+    await Promise.all([1,2,3].map(async round=>{
+     try{
+      const rows=await fetchJson("/league/"+league.league_id+"/matchups/"+(playoffStart+round-1),{attempts:2,timeoutMs:12000});
+      if(Array.isArray(rows))playoffScoreByWeek.set(round,new Map(rows.map(row=>[Number(row.roster_id),Number(row.points)])));
+     }catch(error){}
+    }));
     const seedByRoster=new Map(rosters.map(roster=>[Number(roster.roster_id),Number(roster.settings?.playoff_seed||roster.settings?.seed)||null]));
     const seasonBracketGames=bracket.map(game=>({
      matchId:Number(game.m)||0,round:Number(game.r)||1,placement:Number(game.p)||null,
@@ -1120,8 +1132,8 @@ async function loadSleeperHallHistory(){
      seed1:game.t1!=null&&typeof game.t1!=="object"?seedByRoster.get(Number(game.t1))||null:null,
      seed2:game.t2!=null&&typeof game.t2!=="object"?seedByRoster.get(Number(game.t2))||null:null,
      winner:managerByRoster.get(Number(game.w))||null,loser:managerByRoster.get(Number(game.l))||null,
-     score1:game.p1!=null&&Number.isFinite(Number(game.p1))?Number(game.p1):null,
-     score2:game.p2!=null&&Number.isFinite(Number(game.p2))?Number(game.p2):null,
+     score1:game.p1!=null&&Number.isFinite(Number(game.p1))?Number(game.p1):(playoffScoreByWeek.get(Number(game.r)||1)?.get(resolveBracketRoster(game.t1,game.t1_from))??null),
+     score2:game.p2!=null&&Number.isFinite(Number(game.p2))?Number(game.p2):(playoffScoreByWeek.get(Number(game.r)||1)?.get(resolveBracketRoster(game.t2,game.t2_from))??null),
      bye:game.t2==null&&!game.t2_from
     })).filter(game=>game.team1||game.team2||game.winner||game.source1||game.source2);
     for(const game of seasonBracketGames){
@@ -1158,7 +1170,7 @@ async function loadSleeperHallHistory(){
     if(thirdPlace)hallStatFor(stats,thirdPlace).thirdPlaces++;
     const bracketGames=seasonBracketGames;
     seasonPoints.forEach((points,manager)=>seasonTotals.push({year,manager,points}));
-    seasons.push({year,champion,runnerUp:runnerUp||"—",thirdPlace,regularSeasonChampion,bracket:bracketGames,leagueId:league.league_id,regularWeeks,completedRegularWeeks:weekData.filter(({rows})=>rows.filter(row=>Number(row.points)>0).length===rosters.length).length,managerCount:managerByRoster.size});
+    seasons.push({year,champion,runnerUp:runnerUp||"—",thirdPlace,regularSeasonChampion,bracket:bracketGames,leagueId:league.league_id,regularWeeks,completedRegularWeeks,managerCount:managerByRoster.size});
    }catch(error){errors.push(year+" season failed: "+(error?.message||String(error)));}
    if(year>2021){
     const previousId=league.previous_league_id;
@@ -1359,7 +1371,7 @@ function renderHallOfFame(){
   return '<button class="hall-flip-card '+(isRetired?'retired':'active')+'" type="button" aria-expanded="false" aria-label="View '+escapeHtml(name)+' career record"><div class="hall-flip-inner"><div class="hall-card-face hall-card-front"><span class="hall-card-top"><span class="hall-card-number">'+String(index+1).padStart(2,"0")+'</span><span class="hall-status">'+(isRetired?"RETIRED":"ACTIVE")+'</span></span><span class="hall-avatar-line">'+hallPixelAvatar(name)+'</span><span class="hall-manager-name">'+escapeHtml(name)+'</span><span class="hall-manager-years">'+escapeHtml(years)+'</span><span class="hall-front-honors">'+(honorIcons||'<span class="hall-honor-empty">—</span>')+'</span><span class="hall-flip-hint">CLICK TO VIEW CAREER ↻</span></div><div class="hall-card-face hall-card-back"><span class="hall-back-heading"><strong>'+escapeHtml(name)+'</strong><small>CAREER RECORD</small></span><span class="hall-back-stats"><span><b>'+record+'</b><small>REGULAR W-L</small></span><span><b>'+winPct+'</b><small>WIN %</small></span><span><b>'+avg+'</b><small>AVG POINTS</small></span><span><b>'+stat.playoffAppearances.size+'</b><small>PLAYOFF APPS</small></span><span><b>'+stat.playoffWins+'</b><small>PLAYOFF WINS</small></span><span><b>'+stat.championships+'</b><small>CHAMPIONSHIPS</small></span></span><div class="hall-back-honors"><small>HONORS</small><ul>'+honorList+'</ul></div><span class="hall-flip-hint">CLICK TO FLIP BACK ↻</span></div></div></button>';
  };
  const champions=PRE_SLEEPER_CHAMPIONS.concat((state.hallHistory.seasons||[]).map(row=>({year:row.year,champion:row.champion,runnerUp:row.runnerUp,thirdPlace:row.thirdPlace,regularSeasonChampion:row.regularSeasonChampion,bracket:row.bracket}))).filter((row,index,all)=>all.findIndex(item=>Number(item.year)===Number(row.year))===index).sort((a,b)=>a.year-b.year);
- const championCards=champions.map((row,index)=>'<button class="hall-champion-card" type="button" data-hall-year="'+row.year+'"><span class="hall-champion-season">'+row.year+' SEASON</span><span class="hall-champion-crown">🏆</span><strong>'+escapeHtml(row.champion||"IN PROGRESS")+'</strong><span class="hall-champion-runner">RUNNER-UP · '+escapeHtml(row.runnerUp||"TBD")+'</span><span class="hall-champion-link">VIEW PLAYOFF BRACKET ↗</span></button>').join("");
+ const championCards=champions.map((row,index)=>'<button class="hall-champion-card" type="button" data-hall-year="'+row.year+'"><span class="hall-champion-season">'+row.year+' SEASON</span><span class="hall-champion-crown">🏆</span><strong>'+escapeHtml(row.champion||"IN PROGRESS")+'</strong><span class="hall-champion-runner">RUNNER-UP · '+escapeHtml(row.runnerUp||"TBD")+'</span><span class="hall-champion-runner">3RD PLACE · '+escapeHtml(row.thirdPlace||"TBD")+'</span><span class="hall-champion-runner">REGULAR SEASON · '+escapeHtml(row.regularSeasonChampion||"TBD")+'</span><span class="hall-champion-link">VIEW PLAYOFF BRACKET ↗</span></button>').join("");
  const unresolved=state.hallHistory.unresolved||[],errors=state.hallHistory.errors||[];
  const diagnostic=unresolved.length?'<p class="hall-footnote">MANAGER IDENTITY NEEDS REVIEW: '+unresolved.map(row=>row.year+' · '+escapeHtml(row.displayName)+' (@'+escapeHtml(row.username)+')').join(' | ')+'</p>':'';
  const errorNote=errors.length?'<p class="hall-footnote">DATA NOTES: '+errors.map(escapeHtml).join(' · ')+'</p>':'';
