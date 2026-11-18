@@ -1042,7 +1042,7 @@ function hallStatFor(stats,name){
  return stats.get(name);
 }
 const HALL_HERO_AVATARS={
- "Kevin":0,"Marc":1,"Colby":2,"Ben":3,"Brandon":4,"Evan":5,"Pat":6,"Joey":7,"Butta":8,"Lee":9,"Ders":10,"Tanz":11,"Roth":12,"Sam":13,"Schmeef":14
+ "Kevin":0,"Marc":1,"Colby":2,"Ben":3,"Brandon":4,"Evan":5,"Pat":6,"Joey":7,"Butta":8,"Lee":9,"Ders":10,"Tanz":11,"Roth":12,"Sam":13,"Schmeef":14,"Hess":0,"Campbell":1
 };
 function hallScoringPoints(stats,settings){
  if(!stats||typeof stats!=="object")return 0;
