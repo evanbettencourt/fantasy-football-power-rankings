@@ -2123,3 +2123,81 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 /* Hall of Fame career card metrics */
 .hall-career-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:560px){.hall-career-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Hall of Fame — JFL Trophy Room-inspired presentation */
+.hall-page{padding-top:38px}
+.hall-page .hall-hero{max-width:1120px;margin:0 auto 28px;padding-bottom:28px}
+.hall-page .hall-hero h1{font-family:var(--sans);font-weight:900;letter-spacing:-.055em;text-transform:uppercase}
+.hall-page .hall-hero h1 em{color:#e5a8ff}
+.hall-page .hall-hero>p{max-width:720px}
+.hall-page .hall-era-note{border-left-color:#45d9f2;background:linear-gradient(110deg,#242044,#1a1934);border-radius:0 8px 8px 0}
+.hall-record-section{max-width:1120px;margin:42px auto 0}
+.hall-section-heading{margin-bottom:18px}
+.hall-kicker{color:#55dff3}
+.hall-count{color:#a7a0c8}
+.hall-section-heading h2{font-family:var(--sans);font-size:clamp(23px,3vw,29px);font-weight:900;letter-spacing:-.035em;text-transform:uppercase}
+.hall-manager-grid,.hall-champion-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.hall-manager-grid{max-width:100%}
+.hall-flip-card{display:block;position:relative;min-width:0;width:100%;height:286px;padding:0;border:1px solid #48406d;border-radius:13px;background:transparent;color:#f7f4ff;text-align:left;cursor:pointer;perspective:1000px;overflow:visible}
+.hall-flip-card:focus-visible,.hall-champion-card:focus-visible{outline:2px solid #55dff3;outline-offset:4px}
+.hall-flip-card:hover{border-color:#a77af5;transform:translateY(-2px)}
+.hall-flip-inner{position:relative;display:block;width:100%;height:100%;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.2,.75,.25,1)}
+.hall-flip-card.is-flipped .hall-flip-inner{transform:rotateY(180deg)}
+.hall-card-face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding:15px 13px 12px;border-radius:12px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.hall-card-front{background:radial-gradient(circle at 50% 28%,#37305e 0,#242044 55%,#1a1932 100%)}
+.hall-card-back{transform:rotateY(180deg);align-items:stretch;background:linear-gradient(145deg,#29244b,#18172e);padding:14px 13px 11px}
+.hall-flip-card.retired .hall-card-front{background:radial-gradient(circle at 50% 28%,#40304e 0,#28213e 58%,#1c192f 100%)}
+.hall-card-top{width:100%;display:flex;align-items:center;justify-content:space-between}
+.hall-card-number{font:700 9px var(--mono);color:#8d87ae}
+.hall-status{font:700 8px var(--mono);color:#54dff1}
+.hall-flip-card.retired .hall-status{color:#f0a6d5}
+.hall-avatar-line{display:grid;place-items:center;width:112px;height:112px;margin:12px auto 8px;border:2px solid #8170ba;border-radius:12px;background:#16152a;box-shadow:0 0 0 5px #ffffff08,0 12px 28px #08071466}
+.hall-pixel-avatar{width:100%;height:100%;image-rendering:pixelated;shape-rendering:crispEdges}
+.hall-manager-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:900 20px var(--sans);letter-spacing:-.04em;text-align:center}
+.hall-manager-years{margin-top:4px;color:#b1abc9;font:700 8px var(--mono);letter-spacing:.12em;text-align:center;text-transform:uppercase}
+.hall-front-honors{display:flex;align-items:center;justify-content:center;gap:8px;min-height:25px;margin-top:10px}
+.hall-honor-icon{display:grid;place-items:center;width:23px;height:23px;border:1px solid #6a5d91;border-radius:6px;background:#ffffff0b;font-size:13px;line-height:1}
+.hall-honor-empty{color:#77718f;font:10px var(--mono)}
+.hall-flip-hint{display:block;margin-top:auto;padding-top:7px;color:#8d87ae;font:700 7px var(--mono);letter-spacing:.12em;text-align:center}
+.hall-back-heading{display:flex;flex-direction:column;gap:3px;padding-bottom:8px;border-bottom:1px solid #ffffff20}
+.hall-back-heading strong{font:900 17px var(--sans);letter-spacing:-.035em}
+.hall-back-heading small,.hall-back-honors>small{color:#55dff3;font:700 8px var(--mono);letter-spacing:.15em}
+.hall-back-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 5px;padding:12px 0;border-bottom:1px solid #ffffff20}
+.hall-back-stats>span{display:flex;flex-direction:column;gap:4px;min-width:0}
+.hall-back-stats b{font:800 17px var(--mono);font-variant-numeric:tabular-nums;color:#fff}
+.hall-back-stats small{color:#aaa4c6;font:700 7px var(--mono);letter-spacing:.06em;line-height:1.25}
+.hall-back-honors{min-height:0;padding-top:9px;overflow:hidden}
+.hall-back-honors ul{display:flex;flex-direction:column;gap:6px;max-height:91px;margin:7px 0 0;padding:0;overflow:auto;list-style:none}
+.hall-back-honors li{display:flex;align-items:center;gap:7px;font-size:10px}
+.hall-back-honors li>span{font-size:13px}
+.hall-back-honors li div{display:flex;flex-direction:column;gap:1px;min-width:0}
+.hall-back-honors li strong{font-size:9px;line-height:1.2}
+.hall-back-honors li small{color:#a9a3c4;font:8px var(--mono)}
+.hall-back-honors .hall-no-honors{color:#9b94b9;font:8px var(--mono)}
+.hall-champions-section{margin-top:34px}
+.hall-champion-card{position:relative;display:flex;min-width:0;min-height:148px;flex-direction:column;align-items:flex-start;padding:14px;border:1px solid #514574;border-radius:12px;background:linear-gradient(145deg,#30264f,#1b1933);color:#f7f4ff;text-align:left;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s}
+.hall-champion-card:hover{transform:translateY(-3px);border-color:#f3c86b;box-shadow:0 12px 28px #09071655}
+.hall-champion-season{color:#56def2;font:700 9px var(--mono);letter-spacing:.13em}
+.hall-champion-crown{position:absolute;top:12px;right:13px;font-size:22px}
+.hall-champion-card strong{margin-top:17px;font:900 21px var(--sans);letter-spacing:-.04em}
+.hall-champion-runner{margin-top:5px;color:#b7b0d0;font:700 8px var(--mono);letter-spacing:.07em}
+.hall-champion-link{margin-top:auto;padding-top:13px;color:#f1c96d;font:700 8px var(--mono);letter-spacing:.1em}
+.hall-history-notes{margin-top:24px}
+.hall-bracket-overlay{position:fixed;z-index:9999;inset:0;display:grid;place-items:center;padding:22px;background:#080714d9;backdrop-filter:blur(8px)}
+.hall-bracket-dialog{position:relative;width:min(900px,100%);max-height:min(86vh,900px);overflow:auto;padding:28px;border:1px solid #66568e;border-radius:16px;background:linear-gradient(145deg,#29234a,#15142b);box-shadow:0 25px 90px #0009}
+.hall-bracket-close{position:absolute;top:15px;right:17px;width:34px;height:34px;border:1px solid #ffffff2a;border-radius:8px;background:#ffffff0c;color:#fff;font-size:24px;cursor:pointer}
+.hall-bracket-dialog h2{margin:7px 45px 18px 0;font:900 clamp(26px,4vw,38px) var(--sans);letter-spacing:-.04em;text-transform:uppercase}
+.hall-bracket-champion{display:flex;flex-direction:column;gap:5px;margin-bottom:22px;padding:14px 16px;border:1px solid #8b713b;border-radius:10px;background:#f3c86b12}
+.hall-bracket-champion span{color:#f1c96d;font:700 8px var(--mono);letter-spacing:.15em}
+.hall-bracket-champion strong{font:900 22px var(--sans)}
+.hall-bracket-champion small{color:#b7b0d0;font:9px var(--mono)}
+.hall-bracket-rounds{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:13px;align-items:start}
+.hall-bracket-round-label{display:block;margin-bottom:9px;color:#55dff3;font:700 8px var(--mono);letter-spacing:.13em}
+.hall-bracket-game{margin-bottom:9px;padding:8px;border:1px solid #ffffff20;border-radius:8px;background:#ffffff06}
+.hall-bracket-team{display:flex;justify-content:space-between;gap:8px;padding:5px 4px;color:#aaa4c6;font-size:11px}
+.hall-bracket-team.winner{color:#f6d27a;font-weight:800}
+.hall-bracket-team small{font:10px var(--mono)}
+.hall-bracket-empty{padding:22px;border:1px dashed #ffffff30;color:#aaa4c6;font:10px var(--mono)}
+@media(max-width:1000px){.hall-manager-grid,.hall-champion-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hall-flip-card{height:286px}}
+@media(max-width:720px){.hall-manager-grid,.hall-champion-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hall-record-section{margin-top:32px}}
+@media(max-width:480px){.hall-page{padding-top:26px}.hall-manager-grid,.hall-champion-grid{grid-template-columns:1fr}.hall-flip-card{height:280px}.hall-bracket-dialog{padding:22px 16px}.hall-section-heading{align-items:flex-start;flex-direction:column;gap:7px}}
