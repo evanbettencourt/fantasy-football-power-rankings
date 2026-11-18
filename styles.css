@@ -2497,3 +2497,20 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .hall-placement-game .hall-bracket-round-label{display:block;margin-bottom:8px;text-align:center;color:#c58c64;font:800 10px/1.3 var(--mono);letter-spacing:.08em}
 .hall-placement-game .hall-tree-game{max-width:none}
 @media(max-width:720px){.hall-bracket-playoff{width:100%;min-width:650px;gap:22px}.hall-bracket-playoff .hall-bracket-round-label{font-size:10px}.hall-placement-games{min-width:600px}}
+
+
+/* Playoff bracket refinements: remove connectors and align placement games beside the final. */
+.hall-bracket-playoff .hall-tree-column:not(:last-child):before,.hall-bracket-playoff .hall-tree-column:not(:last-child):after{display:none!important;content:none!important}
+.hall-bracket-playoff .hall-round-games{gap:0;justify-content:space-around}
+.hall-bracket-playoff .hall-round-games>.hall-tree-game{position:relative}
+.hall-bracket-playoff .hall-round-games>.hall-tree-game:not(:last-child):after{content:"";position:absolute;left:15%;right:15%;bottom:-9px;height:1px;background:#625783;transform:translateY(50%)}
+.hall-bracket-playoff .hall-tree-bye .hall-tree-team:first-child{justify-content:flex-start;text-align:left}
+.hall-bracket-playoff .hall-tree-bye .hall-tree-team:first-child>span{justify-content:flex-start;text-align:left}
+.hall-bracket-playoff .hall-tree-finals{position:relative}
+.hall-bracket-playoff .hall-tree-finals .hall-round-games{height:100%}
+.hall-bracket-playoff .hall-tree-finals .hall-placement-games{position:absolute;top:calc(54px + 74%);left:50%;transform:translateX(-50%);width:calc(100% + 26px);margin:0;padding:0;border:0;display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:8px}
+.hall-bracket-playoff .hall-tree-finals .hall-placement-game{width:calc(50% - 4px);min-width:0;padding:7px 5px}
+.hall-bracket-playoff .hall-tree-finals .hall-placement-game .hall-bracket-round-label{font-size:8px;letter-spacing:.02em;white-space:normal}
+.hall-bracket-playoff .hall-tree-finals .hall-placement-game .hall-tree-team{font-size:9px;padding:6px 3px;gap:3px}
+.hall-bracket-playoff .hall-tree-finals .hall-placement-game .hall-bracket-seed{font-size:7px}
+@media(max-width:720px){.hall-bracket-playoff .hall-tree-finals .hall-placement-games{width:calc(100% + 20px);gap:6px}.hall-bracket-playoff .hall-tree-finals .hall-placement-game{padding:6px 3px}}
