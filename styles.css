@@ -1223,3 +1223,18 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   .mu-score-line span,.mu-win-line{font-size:7px}
   .mu-roster-grid{grid-template-columns:1fr}
 }
+
+
+/* Matchups scoreline and live projection comparison. */
+.mu-score-line{display:block;margin-top:13px;text-align:center}
+.mu-score-line>strong{display:block;font:800 clamp(25px,3vw,32px) var(--mono);letter-spacing:-.06em;color:var(--text);font-variant-numeric:tabular-nums}
+.mu-projection-line{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:2px;font:500 9px var(--mono);letter-spacing:.06em;color:var(--muted)}
+.mu-projection-line b{font-size:10px;font-weight:700;font-variant-numeric:tabular-nums}
+.mu-projection-line.up b{color:#35C878}
+.mu-projection-line.down b{color:#FF4F91}
+.mu-projection-line.even b{color:var(--muted)}
+.mu-win-line b.favored{color:#35C878}
+.mu-win-line b.underdog{color:#FF4F91}
+.mu-win-line b.even{color:var(--text)}
+.mu-prob-track{height:7px;border-radius:8px}
+.mu-prob-track i{display:none}
