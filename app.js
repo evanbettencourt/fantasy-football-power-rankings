@@ -497,7 +497,9 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
       kickoffLabel,
       logo: opponent.team.logo || "",
       opponentName: opponent.team.displayName || opponent.team.name || opponent.team.abbreviation,
-      completed: game.completed
+      completed: game.completed,
+      finalScore: game.completed ? String(team.score ?? "—") : "",
+      opponentFinalScore: game.completed ? String(opponent.score ?? "—") : ""
     });
     addTeam(home, away);
     addTeam(away, home);
@@ -542,10 +544,12 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const gameCompleted = Boolean(game?.completed);
     const playerLogo = player.team ? (game?.teamLogo || teamLogo(player.team)) : "";
     const opponentLogo = game?.logo || (game?.opponent?.abbreviation ? teamLogo(game.opponent.abbreviation) : "");
-    const gameMeta = game
-      ? '<span class="mu-player-game">vs. <img src="' + escapeHtml(opponentLogo) + '" alt="' + escapeHtml(game.opponentName) + '" title="' + escapeHtml(game.opponentName) + '" loading="lazy" onerror="this.style.display=\'none\'"> <span>' + escapeHtml(game.kickoffLabel) + '</span></span>'
-      : '<span class="mu-player-game">' + (player.team ? "BYE WEEK" : "GAME INFO UNAVAILABLE") + '</span>';
     const actualStat = stats[id];
+    const gameMeta = game
+      ? gameCompleted
+        ? '<span class="mu-player-game"><img src="' + escapeHtml(opponentLogo) + '" alt="' + escapeHtml(game.opponentName) + '" title="' + escapeHtml(game.opponentName) + '" loading="lazy" onerror="this.style.display=\\'none\\'"> <span>' + escapeHtml(game.finalScore) + '–' + escapeHtml(game.opponentFinalScore) + '</span><b class="mu-final-label">FINAL</b></span>'
+        : '<span class="mu-player-game">vs. <img src="' + escapeHtml(opponentLogo) + '" alt="' + escapeHtml(game.opponentName) + '" title="' + escapeHtml(game.opponentName) + '" loading="lazy" onerror="this.style.display=\\'none\\'"> <span>' + escapeHtml(game.kickoffLabel) + '</span></span>'
+      : '<span class="mu-player-game">' + (player.team ? "BYE WEEK" : "GAME INFO UNAVAILABLE") + '</span>';
     const matchupPoints = matchup.players_points && matchup.players_points[id];
     const actual = actualStat?.pts_half_ppr != null ? num(actualStat.pts_half_ppr) : num(matchupPoints);
     const projection = num(projections.get(id)?.stats?.pts_half_ppr);
@@ -553,9 +557,22 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const pointsClass = gameCompleted && hasProjection
       ? actual > projection + 0.005 ? "up" : actual < projection - 0.005 ? "down" : "even"
       : "";
+    const statGroups = {
+      QB: [["pass_yd","PASS YDS"],["pass_td","PASS TD"],["pass_int","INT"],["rush_yd","RUSH YDS"],["rush_td","RUSH TD"],["fum_lost","FUM"]],
+      RB: [["rush_yd","RUSH YDS"],["rush_td","RUSH TD"],["rec","REC"],["rec_yd","REC YDS"],["rec_td","REC TD"],["fum_lost","FUM"]],
+      WR: [["rec","REC"],["rec_yd","REC YDS"],["rec_td","REC TD"],["rush_yd","RUSH YDS"],["rush_td","RUSH TD"],["fum_lost","FUM"]],
+      TE: [["rec","REC"],["rec_yd","REC YDS"],["rec_td","REC TD"],["rush_yd","RUSH YDS"],["rush_td","RUSH TD"],["fum_lost","FUM"]],
+      K: [["fgm","FG"],["fga","FGA"],["xpm","XP"],["xpa","XPA"]],
+      DEF: [["sack","SACK"],["int","INT"],["fum_rec","FR"],["def_td","TD"],["pts_allow","PA"]]
+    };
+    const statPosition = String(player.position || player.fantasy_positions?.[0] || position || "").toUpperCase();
+    const statLine = gameCompleted && actualStat
+      ? (statGroups[statPosition] || []).filter(([key]) => actualStat[key] != null && Number(actualStat[key]) !== 0)
+          .map(([key,label]) => '<span>' + label + ' <b>' + escapeHtml(String(actualStat[key])) + '</b></span>').join("")
+      : "";
     return '<div class="mu-player-row ' + (isStarter ? "starter" : "bench") + '">' +
       '<span class="mu-player-pos ' + positionClass(position) + '">' + escapeHtml(label) + '</span>' +
-      '<span class="mu-player-name"><span class="mu-player-primary"><span>' + escapeHtml(name) + '</span>' + (playerLogo ? '<img src="' + escapeHtml(playerLogo) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : '') + '</span>' + gameMeta + '</span>' +
+      '<span class="mu-player-name"><span class="mu-player-primary"><span>' + escapeHtml(name) + '</span>' + (playerLogo ? '<img src="' + escapeHtml(playerLogo) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : '') + '</span>' + gameMeta + (statLine ? '<span class="mu-player-stats">' + statLine + '</span>' : '') + '</span>' +
       '<span class="mu-player-points ' + pointsClass + '">' + (actualStat || num(matchupPoints) > 0 || gameCompleted ? fmt(actual) : "—") + '</span>' +
       '<span class="mu-player-proj">' + (hasProjection ? fmt(projection) : "—") + '</span>' +
     '</div>';
@@ -628,10 +645,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
       else originalTotal += Number(original);
     }
     const score = num(matchup.points);
-    const scoreClass = teamFinished
-      ? score > originalTotal + 0.005 ? "up" : score < originalTotal - 0.005 ? "down" : "even"
-      : "";
-    return { record: record?.record || "0-0", seed: seeds.get(team.id), powerRank, projected, score, scoreClass, color: lotteryColor(team.name) };
+    return { record: record?.record || "0-0", seed: seeds.get(team.id), powerRank, projected, score, finished: teamFinished, color: lotteryColor(team.name) };
   };
   const probability = (a, b) => {
     if (isPast) {
@@ -644,14 +658,15 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
   const cards = games.map((game,index) => {
     const a = teamSummary(game.teamA, game.a), b = teamSummary(game.teamB, game.b);
     const probA = probability(a,b), probB = probA == null ? null : 100 - probA;
-    const status = isPast ? "FINAL" : (a.score > 0 || b.score > 0 ? "LIVE" : "UPCOMING");
-    const side = (team, summary, winChance) => {
-      const projectionDelta = summary.projected.available && summary.projected.original != null
-        ? summary.projected.value - summary.projected.original : 0;
-      const projectionClass = projectionDelta > 0.005 ? "up" : projectionDelta < -0.005 ? "down" : "even";
+    const matchupComplete = a.finished && b.finished;
+    const winnerA = matchupComplete && a.score > b.score;
+    const winnerB = matchupComplete && b.score > a.score;
+    const status = matchupComplete ? "FINAL" : (a.score > 0 || b.score > 0 ? "LIVE" : "UPCOMING");
+    const side = (team, summary, winChance, isWinner) => {
+      const projectionClass = isWinner ? "winner" : "";
       const probabilityClass = winChance == null ? "" : winChance > 50 ? "favored" : winChance < 50 ? "underdog" : "even";
       return '<div class="mu-side ' + (team === game.teamA ? 'side-a' : 'side-b') + '">' +
-        '<div class="mu-score-stack"><div class="mu-score-line"><strong class="' + summary.scoreClass + '">' + fmt(summary.score) + '</strong></div>' +
+        '<div class="mu-score-stack"><div class="mu-score-line"><strong class="' + (isWinner ? "winner" : "") + '">' + fmt(summary.score) + '</strong></div>' +
           '<div class="mu-projection-line ' + projectionClass + '">' + (summary.projected.available ? '<b>' + fmt(summary.projected.value) + '</b>' : '<b>—</b>') + '<span>LIVE PROJ.</span></div></div>' +
         '<div class="mu-manager-copy"><strong style="color:' + summary.color + '">' + escapeHtml(team.name) + '</strong>' +
           '<small>' + escapeHtml(summary.record) + '</small></div>' +
@@ -664,7 +679,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
           '#FF4F91 0%,#FF4F91 ' + probA + '%,#35C878 ' + probA + '%,#35C878 100%') + ')"></div>';
     return '<article class="mu-card">' +
       '<div class="mu-card-head"><span>MATCHUP ' + String(index+1).padStart(2,"0") + '</span><span class="mu-live-tag ' + status.toLowerCase() + '">' + status + '</span></div>' +
-      '<div class="mu-faceoff">' + side(game.teamA,a,probA) + '<div class="mu-versus">VS</div>' + side(game.teamB,b,probB) + '</div>' +
+      '<div class="mu-faceoff">' + side(game.teamA,a,probA,winnerA) + '<div class="mu-versus">VS</div>' + side(game.teamB,b,probB,winnerB) + '</div>' +
       '<div class="mu-prob-wrap">' +
         '<div class="mu-prob-row"><span class="mu-prob-value ' + (probA == null ? '' : probA >= 50 ? 'favored' : 'underdog') + '">' + (probA == null ? '—' : probA + '%') + '</span>' +
         bar +
