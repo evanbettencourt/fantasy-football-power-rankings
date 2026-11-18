@@ -996,7 +996,7 @@ function parlayPlayerEntry(players, fullName){
   index=new Map();
   for(const [id,p] of Object.entries(players)){
    const name=String(p.full_name||[p.first_name,p.last_name].filter(Boolean).join(" ")).trim().toLowerCase();
-   if(name)index.set(name,[id,p]);
+   if(name)index.set(name,[String(p.player_id||id),p]);
   }
   PARLAY_PLAYER_INDEX.set(players,index);
  }
@@ -1105,8 +1105,9 @@ function gradeParlayPick(pick,stats,players,schedule,diagnostics={}){
  else if(/rush attempts?/i.test(raw)){key="rush_att";label="RUSH ATT"}
  else if(/\bint(?:erceptions?)?\b/i.test(raw)){key="pass_int";label="INT"}
  else return {status:"REVIEW",detail:"Prop type not recognized"};
- const value=parlayStatNumber(stat,key);
- if(value==null)return {status:"PENDING",detail:"Stat not available"};
+ // Sleeper omits zero-valued counting stats from some player rows.
+ // Once the player's game is final, an omitted prop stat is a recorded zero.
+ const value=parlayStatNumber(stat,key)??0;
  const hit=plus||bare?value>=threshold:overUnder?.[1].toUpperCase()==="U"?value<threshold:value>threshold;
  const push=!plus&&!bare&&value===threshold;
  return {status:push?"PUSH":hit?"HIT":"MISS",detail:label+" "+value+" / "+(plus||bare?"at least ":overUnder?.[1].toUpperCase()+" ")+threshold};
