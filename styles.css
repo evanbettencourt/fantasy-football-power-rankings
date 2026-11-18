@@ -2538,3 +2538,69 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .hall-season-summary-grid .hall-archive-note{font-size:7px}
 @media(max-width:900px){.hall-season-summary-grid{grid-template-columns:1fr;gap:0}.hall-season-summary-grid .hall-leader-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hall-season-summary-grid .hall-season-table{min-width:420px}}
 @media(max-width:520px){.hall-season-summary-grid .hall-leader-grid{grid-template-columns:1fr}}
+
+
+/* Hall of Fame: keep the playoff bracket fully visible and use true bracket connectors. */
+.hall-bracket-playoff{
+  width:100%;min-width:0;max-width:100%;min-height:500px;
+  grid-template-columns:repeat(3,minmax(0,1fr));gap:34px;padding:10px 4px;
+}
+.hall-bracket-playoff .hall-tree-column{min-width:0;position:relative;overflow:visible}
+.hall-bracket-playoff .hall-round-games{min-height:420px;overflow:visible}
+.hall-bracket-playoff .hall-tree-game{width:100%;max-width:205px;min-width:0;margin:0 auto}
+.hall-bracket-playoff .hall-tree-final .hall-tree-game{width:100%;max-width:205px}
+.hall-bracket-playoff .hall-tree-team{position:relative;justify-content:center;text-align:center;padding:7px 26px 7px 22px}
+.hall-bracket-playoff .hall-tree-team>span{display:block;width:100%;text-align:center;white-space:normal}
+.hall-bracket-playoff .hall-tree-team .hall-bracket-seed{position:absolute;left:9px;top:50%;transform:translateY(-50%);margin:0;text-align:left}
+.hall-bracket-playoff .hall-tree-team .hall-bracket-score{position:absolute;right:8px;top:50%;transform:translateY(-50%);text-align:right}
+.hall-bracket-playoff .hall-tree-column:not(:last-child):before{
+  display:block!important;content:"";position:absolute;z-index:0;right:-18px;top:50%;
+  width:18px;height:1px;background:#786b9c;
+}
+.hall-bracket-playoff .hall-tree-column:not(:last-child):after{
+  display:block!important;content:"";position:absolute;z-index:0;right:-18px;top:27%;bottom:27%;
+  width:1px;background:#786b9c;
+}
+.hall-bracket-playoff .hall-tree-round-one:after{top:25%;bottom:25%}
+.hall-bracket-playoff .hall-tree-round-two:after{top:38%;bottom:38%}
+.hall-bracket-playoff .hall-tree-finals .hall-placement-games{
+  position:static;transform:none;width:100%;margin:18px auto 0;padding:0;border:0;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+.hall-bracket-playoff .hall-tree-finals .hall-placement-game{
+  width:100%;max-width:205px;min-width:0;padding:0;border:0;background:transparent;
+}
+.hall-bracket-playoff .hall-tree-finals .hall-placement-game .hall-tree-game{width:100%;max-width:205px}
+.hall-bracket-playoff .hall-tree-finals .hall-placement-game .hall-bracket-round-label{font-size:9px;margin-bottom:5px}
+.hall-bracket-playoff .hall-round-games>.hall-tree-game:not(:last-child):after{display:none}
+.hall-bracket-playoff .hall-tree-game{z-index:1}
+.hall-bracket-scroll{overflow:visible!important;max-height:none!important;height:auto!important}
+@media(max-width:720px){
+ .hall-bracket-playoff{gap:10px;min-height:460px}
+ .hall-bracket-playoff .hall-bracket-round-label{font-size:8px;letter-spacing:.02em}
+ .hall-bracket-playoff .hall-tree-game,.hall-bracket-playoff .hall-tree-final .hall-tree-game,.hall-bracket-playoff .hall-tree-finals .hall-placement-game,.hall-bracket-playoff .hall-tree-finals .hall-placement-game .hall-tree-game{max-width:100%}
+ .hall-bracket-playoff .hall-tree-team{font-size:8px;padding:6px 18px 6px 16px;gap:2px}
+ .hall-bracket-playoff .hall-tree-team .hall-bracket-seed{left:5px;font-size:7px}
+ .hall-bracket-playoff .hall-tree-team .hall-bracket-score{right:5px;font-size:8px}
+}
+@media(max-width:480px){.hall-bracket-playoff{gap:5px;padding-inline:0}.hall-bracket-playoff .hall-tree-team{font-size:7px;padding-inline:14px}.hall-bracket-playoff .hall-tree-team .hall-bracket-seed{left:3px;font-size:6px}.hall-bracket-playoff .hall-tree-team .hall-bracket-score{right:3px;font-size:7px}}
+
+/* Positional leader cards keep player, drafter and original draft slot on one readable line. */
+.hall-season-summary-grid .hall-leader-card{grid-template-columns:32px minmax(0,1fr);grid-template-areas:"pos player" "pos points";gap:5px 9px}
+.hall-season-summary-grid .hall-leader-card .hall-leader-player{grid-area:player;min-width:0}
+.hall-season-summary-grid .hall-leader-card .hall-leader-player strong{display:block;font-size:15px;line-height:1.25}
+.hall-season-summary-grid .hall-leader-card .hall-leader-player small{display:block;margin-top:3px;font-size:10px;line-height:1.35;overflow-wrap:anywhere}
+.hall-season-summary-grid .hall-leader-card>b{grid-area:points;font-size:13px}
+.hall-season-summary-grid .hall-leader-card>span{font-size:12px}
+.hall-season-summary-grid .hall-archive-note{display:none!important}
+
+/* Draft board pick cells are individual rounded player tiles, not a rigid grid. */
+.hall-draft-table{border-collapse:separate;border-spacing:5px 6px;min-width:0;table-layout:fixed}
+.hall-draft-table th{background:transparent;border:0;padding:8px 4px}
+.hall-draft-table td{border:0!important;padding:0!important;background:transparent!important}
+.hall-draft-table td.hall-draft-pick{height:74px;padding:9px 7px 19px!important;border:0!important;border-radius:9px;overflow:hidden;vertical-align:top}
+.hall-draft-table td.hall-draft-pick b{font-size:11px}
+.hall-draft-table td.hall-draft-pick small{font-size:8px}
+.hall-draft-table td.hall-draft-pick em{bottom:6px;right:7px}
+.hall-draft-table tbody tr>th{display:none}
+.hall-draft-scroll{border:0;overflow-x:auto}
