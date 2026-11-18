@@ -1342,10 +1342,62 @@ function buildHallRecordBook(games,seasonTotals){
   {key:"lowest-win",title:"Fewest Points in a Win",icon:"😬",value:lowestWin?fmt(lowestWin.winnerScore)+" pts":"—",holder:lowestWin?lowestWin.winner+" over "+lowestWin.loser:"No data",detail:lowestWin?lowestWin.year+" · "+lowestWin.label+" · "+fmt(lowestWin.winnerScore)+"–"+fmt(lowestWin.loserScore):"No completed matchups"}
  ];
 }
+const HALL_SPRITE_PALETTES={
+ Kevin:{C:"#2479d8",D:"#12345f",A:"#f4c542",S:"#e9b58c",P:"#174a91"},
+ Marc:{C:"#8a55d8",D:"#38235f",A:"#f3b4ff",S:"#e5ad83",P:"#57339b"},
+ Colby:{C:"#2eaa70",D:"#14543c",A:"#d8ef72",S:"#d89b72",P:"#176a50"},
+ Ben:{C:"#d94b38",D:"#70251f",A:"#ffc34d",S:"#e6b18a",P:"#9e302d"},
+ Brandon:{C:"#db8a24",D:"#68401a",A:"#f7e07a",S:"#d99c76",P:"#a75c1b"},
+ Evan:{C:"#258dba",D:"#16445e",A:"#e9e8f2",S:"#efbd96",P:"#1c5c8a"},
+ Pat:{C:"#b94e9b",D:"#5a2854",A:"#f2d46d",S:"#d99b7a",P:"#7f326c"},
+ Joey:{C:"#d44a36",D:"#63231f",A:"#39d5e6",S:"#e8b18c",P:"#922d2a"},
+ Butta:{C:"#5c9d35",D:"#2b4b22",A:"#e8cb50",S:"#bd805f",P:"#3e7029"},
+ Lee:{C:"#596bdb",D:"#29346d",A:"#d5e5ff",S:"#e5b08a",P:"#35469b"},
+ Ders:{C:"#c3a12e",D:"#66521a",A:"#f4e5a2",S:"#d69b76",P:"#8a6b20"},
+ Tanz:{C:"#a64cc4",D:"#4b2362",A:"#f5a7d7",S:"#e5b08a",P:"#702e8c"},
+ Roth:{C:"#b8b8c2",D:"#51515e",A:"#eeeeef",S:"#c8c8cc",P:"#777783"},
+ Sam:{C:"#aeb7c4",D:"#454f5d",A:"#e9eef5",S:"#c8c8cc",P:"#707d90"},
+ Schmeef:{C:"#a7a7a7",D:"#4c4c4c",A:"#e6e6e6",S:"#c4c4c4",P:"#777777"},
+ Hess:{C:"#a7a7a7",D:"#4c4c4c",A:"#e6e6e6",S:"#c4c4c4",P:"#777777"},
+ Campbell:{C:"#a7a7a7",D:"#4c4c4c",A:"#e6e6e6",S:"#c4c4c4",P:"#777777"}
+};
+const HALL_SPRITE_BODY=[
+"................",
+"......OOOO......",
+".....ODDDDO.....",
+".....DSSSSD.....",
+".....DSSSSD.....",
+"......DAAD......",
+".......DD.......",
+"....OOOCCOOO....",
+"...ODCCCCCCDO...",
+"...DCCCCCCCCD...",
+"....DCCCCCCD....",
+".....DCCCD......",
+"...OOCCCCCCOO...",
+"..ODCCCCCCCCDO..",
+"..DCCCAACCCCD...",
+"...DCCCCCCCD.....",
+".....DD..DD......",
+".....DD..DD......",
+".....DD..DD......",
+"....ODD..DDO.....",
+"....DPP..PPD.....",
+"....DDD..DDD.....",
+"....DDD..DDD.....",
+"....OOOOOOOO....."
+];
 function hallPixelAvatar(name){
- const index=HALL_HERO_AVATARS[name]??0,col=index%3,row=Math.floor(index/3);
- const x=col*50,y=row*25;
- return '<span class="hall-pixel-avatar" role="img" aria-label="'+escapeHtml(name)+' original superhero avatar" style="background-image:url(data:image/png;base64,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);background-size:300% 500%;background-position:'+x+'% '+y+'%"></span>';
+ const palette=HALL_SPRITE_PALETTES[name]||HALL_SPRITE_PALETTES.Kevin;
+ const rows=HALL_SPRITE_BODY;
+ const pixels=[];
+ const colorFor=ch=>({O:"#101321",D:palette.D,S:palette.S,C:palette.C,A:palette.A,P:palette.P})[ch]||null;
+ rows.forEach((line,y)=>[...line].forEach((ch,x)=>{
+  const fill=colorFor(ch);if(fill)pixels.push('<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+fill+'"/>');
+ }));
+ const accent=name==="Kevin"?"⚡":name==="Marc"?"✦":name==="Colby"?"✚":name==="Ben"?"★":name==="Brandon"?"☀":name==="Evan"?"✧":name==="Pat"?"✦":name==="Joey"?"◆":name==="Butta"?"✚":name==="Lee"?"✦":name==="Ders"?"★":"✧";
+ const svg='<svg class="hall-pixel-avatar" viewBox="0 0 16 24" role="img" aria-label="'+escapeHtml(name)+' full-body pixel hero" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="16" height="24" fill="#111426"/><ellipse cx="8" cy="23.4" rx="5" ry=".5" fill="#000" opacity=".5"/>'+pixels.join("")+'<rect x="7" y="8" width="2" height="1" fill="'+palette.A+'"/><rect x="7" y="13" width="2" height="1" fill="'+palette.A+'"/><rect x="7" y="20" width="2" height="1" fill="'+palette.A+'"/></svg>';
+ return svg;
 }
 
 function hallManagerHonors(name,stat){
