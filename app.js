@@ -1873,6 +1873,10 @@ function setupNavigation() {
     panels.forEach(panel => {
       panel.hidden = panel.dataset.panel !== target;
     });
+    // Season detail is appended outside the tab panels, so explicitly hide it
+    // whenever navigation leaves the Hall of Fame view.
+    const seasonPage = document.getElementById("hall-season-page");
+    if (seasonPage) seasonPage.hidden = true;
     if (target === "rules") renderRules();
     if (target === "schedule") renderSchedule();
     if (target === "matchups") renderMatchups(state.matchupWeek);
