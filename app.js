@@ -1118,7 +1118,7 @@ function hallDraftMarkup(row){
 function hallLeadersMarkup(row){
  const leaders=row?.leaders||[];
  if(!leaders.length)return "";
- return '<section class="hall-season-leaders"><h3>JFL HONORS · POSITIONAL LEADERS</h3><div class="hall-leader-grid">'+leaders.map(item=>'<article class="hall-leader-card"><span>'+escapeHtml(item.position)+'</span><strong>'+escapeHtml(item.player)+'</strong><b>'+(item.points==null?"—":fmt(item.points)+" PTS")+'</b><small>'+escapeHtml(item.manager||"Drafter unavailable")+(item.round?' · Round '+item.round+' Pick '+item.pick:'')+'</small></article>').join("")+'</div><p class="hall-archive-note">REGULAR-SEASON FANTASY POINTS USING THAT SEASON’S SLEEPER SCORING SETTINGS. DRAFTER REFERS TO THE ORIGINAL LEAGUE DRAFT PICK.</p></section>';
+ return '<section class="hall-season-leaders"><h3>JFL HONORS · '+(Number(row.completedRegularWeeks)>=Number(row.regularWeeks)&&Number(row.regularWeeks)>0?"FINAL POSITIONAL LEADERS":"SEASON-TO-DATE POSITIONAL LEADERS")+'</h3><div class="hall-leader-grid">'+leaders.map(item=>'<article class="hall-leader-card"><span>'+escapeHtml(item.position)+'</span><strong>'+escapeHtml(item.player)+'</strong><b>'+(item.points==null?"—":fmt(item.points)+" PTS")+'</b><small>'+escapeHtml(item.manager||"Drafter unavailable")+(item.round?' · Round '+item.round+' Pick '+item.pick:'')+'</small></article>').join("")+'</div><p class="hall-archive-note">REGULAR-SEASON FANTASY POINTS USING THAT SEASON’S SLEEPER SCORING SETTINGS. DRAFTER REFERS TO THE ORIGINAL LEAGUE DRAFT PICK.</p></section>';
 }
 async function loadSleeperHallHistory(){
  if(state.hallHistory)return state.hallHistory;
