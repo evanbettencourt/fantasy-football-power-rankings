@@ -476,7 +476,17 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
   const players = data.players || state.players || {};
   const projectionRows = data.projections || [];
   const projections = new Map(projectionRows.map(row => [String(row.player_id ?? row.player?.player_id ?? ""), row]).filter(([id]) => id));
-  const stats = data.stats || {};
+  const rawStats = data.stats || {};
+  const statsByPlayerId = new Map(
+    (Array.isArray(rawStats) ? rawStats : Object.entries(rawStats).map(([id, row]) => ({
+      player_id: row?.player_id ?? id,
+      ...(row && typeof row === "object" ? row : {})
+    }))).map(row => {
+      const id = String(row?.player_id ?? row?.id ?? "");
+      const nested = row?.stats && typeof row.stats === "object" ? row.stats : {};
+      return [id, { ...row, ...nested }];
+    }).filter(([id]) => id)
+  );
   const scheduleGames = (data.schedule?.events || []).flatMap(event => {
     const competition = event.competitions?.[0];
     const competitors = competition?.competitors || [];
@@ -544,7 +554,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const gameCompleted = Boolean(game?.completed);
     const playerLogo = player.team ? (game?.teamLogo || teamLogo(player.team)) : "";
     const opponentLogo = game?.logo || (game?.opponent?.abbreviation ? teamLogo(game.opponent.abbreviation) : "");
-    const actualStat = stats[id];
+    const actualStat = statsByPlayerId.get(id);
     const gameMeta = game
       ? gameCompleted
         ? '<span class="mu-player-game"><img src="' + escapeHtml(opponentLogo) + '" alt="' + escapeHtml(game.opponentName) + '" title="' + escapeHtml(game.opponentName) + '" loading="lazy" onerror="this.style.display=\'none\'"> <span>' + escapeHtml(game.finalScore) + '–' + escapeHtml(game.opponentFinalScore) + '</span><b class="mu-final-label">FINAL</b></span>'
@@ -558,15 +568,15 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
       ? actual > projection + 0.005 ? "up" : actual < projection - 0.005 ? "down" : "even"
       : "";
     const statGroups = {
-      QB: [["pass_yd","PASS YDS"],["pass_td","PASS TD"],["pass_int","INT"],["rush_yd","RUSH YDS"],["rush_td","RUSH TD"],["fum_lost","FUM"]],
-      RB: [["rush_yd","RUSH YDS"],["rush_td","RUSH TD"],["rec","REC"],["rec_yd","REC YDS"],["rec_td","REC TD"],["fum_lost","FUM"]],
-      WR: [["rec","REC"],["rec_yd","REC YDS"],["rec_td","REC TD"],["rush_yd","RUSH YDS"],["rush_td","RUSH TD"],["fum_lost","FUM"]],
-      TE: [["rec","REC"],["rec_yd","REC YDS"],["rec_td","REC TD"],["rush_yd","RUSH YDS"],["rush_td","RUSH TD"],["fum_lost","FUM"]],
-      K: [["fgm","FG"],["fga","FGA"],["xpm","XP"],["xpa","XPA"]],
-      DEF: [["sack","SACK"],["int","INT"],["fum_rec","FR"],["def_td","TD"],["pts_allow","PA"]]
+      QB: [["pass_cmp","CMP"],["pass_att","PASS ATT"],["pass_yd","PASS YDS"],["pass_td","PASS TD"],["pass_int","INT"],["rush_att","RUSH ATT"],["rush_yd","RUSH YDS"],["rush_td","RUSH TD"],["fum_lost","FUM"]],
+      RB: [["rush_att","RUSH ATT"],["rush_yd","RUSH YDS"],["rush_td","RUSH TD"],["rec_tgt","TGT"],["rec","REC"],["rec_yd","REC YDS"],["rec_td","REC TD"],["fum_lost","FUM"]],
+      WR: [["rec_tgt","TGT"],["rec","REC"],["rec_yd","REC YDS"],["rec_td","REC TD"],["rush_att","RUSH ATT"],["rush_yd","RUSH YDS"],["rush_td","RUSH TD"],["fum_lost","FUM"]],
+      TE: [["rec_tgt","TGT"],["rec","REC"],["rec_yd","REC YDS"],["rec_td","REC TD"],["rush_att","RUSH ATT"],["rush_yd","RUSH YDS"],["rush_td","RUSH TD"],["fum_lost","FUM"]],
+      K: [["fgm","FGM"],["fga","FGA"],["fgm_0_19","0-19 FG"],["fgm_20_29","20-29 FG"],["fgm_30_39","30-39 FG"],["fgm_40_49","40-49 FG"],["fgm_50_plus","50+ FG"],["xpm","XP"],["xpa","XP ATT"]],
+      DEF: [["sack","SACK"],["int","INT"],["fum_rec","FR"],["def_td","TD"],["safety","SAFETY"],["pts_allow","PA"]]
     };
     const statPosition = String(player.position || player.fantasy_positions?.[0] || position || "").toUpperCase();
-    const statLine = gameCompleted && actualStat
+    const statLine = actualStat
       ? (statGroups[statPosition] || []).filter(([key]) => actualStat[key] != null && Number(actualStat[key]) !== 0)
           .map(([key,label]) => '<span>' + label + ' <b>' + escapeHtml(String(actualStat[key])) + '</b></span>').join("")
       : "";
