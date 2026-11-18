@@ -3253,3 +3253,11 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .hall-bracket-legacy-four{grid-template-columns:1.25fr .9fr;min-height:320px;gap:30px}
 .hall-bracket-legacy-four .hall-tree-round-one .hall-round-games,.hall-bracket-legacy-four .hall-tree-finals .hall-round-games{min-height:285px}
 @media(max-width:720px){.hall-bracket-legacy-four{min-width:600px;gap:22px}.hall-bracket-legacy-playoff .hall-bracket-round-label{font-size:9px}}
+
+/* 2017's four-team final sits at the midpoint of its two semifinal cards. */
+.hall-bracket-legacy-four{grid-template-columns:1.25fr .9fr;min-height:460px;gap:34px;align-items:stretch}
+.hall-bracket-legacy-four .hall-tree-column{display:grid;grid-template-rows:54px minmax(0,1fr);gap:0;justify-content:stretch}
+.hall-bracket-legacy-four .hall-round-games{display:flex;min-height:390px;flex-direction:column;justify-content:space-around;gap:16px}
+.hall-bracket-legacy-four .hall-tree-finals .hall-round-games{justify-content:center}
+.hall-bracket-legacy-four .hall-tree-final{display:flex;flex:1;align-items:center;justify-content:center;margin:0}
+@media(max-width:720px){.hall-bracket-legacy-four{min-width:600px;gap:22px}}
