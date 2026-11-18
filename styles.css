@@ -2119,3 +2119,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .hall-loading{padding:24px 0;color:var(--muted);font:10px var(--mono)}
 @media(max-width:850px){.hall-manager-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.hall-page{padding-top:28px}.hall-manager-grid{grid-template-columns:1fr}.hall-section-heading{align-items:flex-start;flex-direction:column;gap:7px}.hall-manager-card{padding:14px}.hall-record-section{margin-top:30px}}
+
+/* Hall of Fame career card metrics */
+.hall-career-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:560px){.hall-career-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
