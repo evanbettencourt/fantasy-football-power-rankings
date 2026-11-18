@@ -2,7 +2,7 @@ const LEAGUE_ID = "1313563024161787904";
 const API = "/api/sleeper";
 const $ = (id) => document.getElementById(id);
 const setTextIfPresent = (id, value) => { const element = $(id); if (element) element.textContent = value; };
-const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [], recoveredWeeks: [], usingCachedCore: false, draftOrder: null, draftSeason: null, nflState: null, matchupWeek: 1, players: null, playersPromise: null, matchupDataByWeek: {} };
+const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [], recoveredWeeks: [], usingCachedCore: false, draftOrder: null, draftSeason: null, nflState: null, currentWeek: 1, matchupWeek: 1, players: null, playersPromise: null, matchupDataByWeek: {} };
 
 const num = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
 const fmt = (v) => num(v).toFixed(2);
@@ -379,6 +379,7 @@ async function init() {
     const completed = Array.from({ length: maxWeek }, (_, index) => index + 1).filter(week => (state.weeks[week] || []).some(match => num(match.points) > 0));
     const latestCompletedWeek = completed.length ? Math.max(...completed) : 1;
     const currentWeek = Math.max(1, Math.min(14, num(state.nflState?.week) || latestCompletedWeek));
+    state.currentWeek = currentWeek;
     state.matchupWeek = currentWeek;
     const defaultWeek = latestCompletedWeek;
     const select = $("week-select");
@@ -473,7 +474,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
   const projectionRows = data.projections || [];
   const projections = new Map(projectionRows.map(row => [String(row.player_id ?? row.player?.player_id ?? ""), row]).filter(([id]) => id));
   const stats = data.stats || {};
-  const currentWeek = Math.max(1, Math.min(regularWeeks, num(state.nflState?.week) || state.matchupWeek));
+  const currentWeek = Math.max(1, Math.min(regularWeeks, num(state.currentWeek) || state.matchupWeek));
   const isPast = week < currentWeek;
   const recordRows = week > 1 ? computeRankings(week - 1) : computeRankings(0);
   const recordById = new Map(recordRows.map(team => [team.id, team]));
