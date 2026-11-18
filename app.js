@@ -1128,7 +1128,7 @@ async function loadSleeperHallHistory(){
     const seasonBracketGames=bracket.map(game=>({
      matchId:Number(game.m)||0,round:Number(game.r)||1,placement:Number(game.p)||null,
      team1:resolveBracketSlot(game.t1,game.t1_from),team2:resolveBracketSlot(game.t2,game.t2_from),
-     source1:game.t1_from||null,source2:game.t2_from||null,
+     source1:game.t1_from||(game.t1&&typeof game.t1==="object"?game.t1:null),source2:game.t2_from||(game.t2&&typeof game.t2==="object"?game.t2:null),
      seed1:game.t1!=null&&typeof game.t1!=="object"?seedByRoster.get(Number(game.t1))||null:null,
      seed2:game.t2!=null&&typeof game.t2!=="object"?seedByRoster.get(Number(game.t2))||null:null,
      winner:managerByRoster.get(Number(game.w))||null,loser:managerByRoster.get(Number(game.l))||null,
