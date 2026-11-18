@@ -396,16 +396,17 @@ function renderSchedule() {
   const pickTarget = $("schedule-team-picks");
   const contentTarget = $("schedule-content");
   if (!pickTarget || !contentTarget || !state.teams?.size) return;
+
   const teams = [...state.teams.values()].sort((a,b)=>a.name.localeCompare(b.name));
   const season = state.league?.season || new Date().getFullYear();
   const seasonLabel = $("schedule-season");
-  if (seasonLabel) seasonLabel.textContent = season + " SEASON";
+  if (seasonLabel) seasonLabel.textContent = season;
 
   const teamColor = team => lotteryColor(team.name);
   pickTarget.innerHTML = teams.map(team => {
     const color = teamColor(team);
     const active = selectedScheduleTeam === team.name;
-    return '<button type="button" class="schedule-team-pick '+(active?'active':'')+'" data-schedule-team="'+escapeHtml(team.name)+'" aria-pressed="'+(active?'true':'false')+'" style="--schedule-team-color:'+color+'"><span class="schedule-team-dot"></span><span class="schedule-team-name">'+escapeHtml(team.name)+'</span><span class="schedule-team-check">'+(active?'✓':'＋')+'</span></button>';
+    return '<button type="button" class="sch-pick '+(active?'active':'')+'" data-schedule-team="'+escapeHtml(team.name)+'" aria-pressed="'+(active?'true':'false')+'" style="color:'+color+'">'+escapeHtml(team.name)+'</button>';
   }).join("");
 
   const cards = [];
@@ -421,27 +422,23 @@ function renderSchedule() {
     const games = [...groups.values()].filter(group=>group.length===2).map(group=>{
       const a=teamFor(group[0].roster_id), b=teamFor(group[1].roster_id);
       return a&&b?{a,b}:null;
-    }).filter(Boolean).sort((a,b)=>a.a.name.localeCompare(b.a.name));
+    }).filter(Boolean);
     const rematch = week>=12;
     const rows = games.map(game=>{
       const aSelected = game.a.name===selectedScheduleTeam;
       const bSelected = game.b.name===selectedScheduleTeam;
-      const isMatch = !selectedScheduleTeam || aSelected || bSelected;
-      return '<div class="schedule-matchup '+(selectedScheduleTeam?(isMatch?'is-match':'not-match'):'')+'">'+
-        '<div class="schedule-match-side '+(aSelected?'selected':'')+'" style="--match-team-color:'+teamColor(game.a)+'"><span class="schedule-match-dot"></span><strong>'+escapeHtml(game.a.name)+'</strong></div>'+
-        '<span class="schedule-vs">VS</span>'+
-        '<div class="schedule-match-side right '+(bSelected?'selected':'')+'" style="--match-team-color:'+teamColor(game.b)+'"><strong>'+escapeHtml(game.b.name)+'</strong><span class="schedule-match-dot"></span></div>'+
+      return '<div class="sch-game '+(selectedScheduleTeam?(aSelected||bSelected?'on':'off'):'')+'" data-a="'+escapeHtml(game.a.name)+'" data-b="'+escapeHtml(game.b.name)+'">'+
+        '<span class="sch-nm '+(aSelected?'selected':'')+'" data-name="'+escapeHtml(game.a.name)+'">'+escapeHtml(game.a.name)+'</span>'+
+        '<span class="vs">vs</span>'+
+        '<span class="sch-nm '+(bSelected?'selected':'')+'" data-name="'+escapeHtml(game.b.name)+'">'+escapeHtml(game.b.name)+'</span>'+
       '</div>';
     }).join("");
     const empty = state.failedWeeks.includes(week) ? "Sleeper schedule data is unavailable for this week." : "Matchups have not been posted by Sleeper yet.";
-    const tag = rematch ? 'REMATCH · WEEK '+(week-11) : 'REGULAR SEASON';
-    cards.push('<article class="schedule-week-card '+(rematch?'rematch':'regular')+'">'+
-      '<header class="schedule-week-head"><div class="schedule-week-title"><span class="schedule-week-word">WEEK</span><strong>'+String(week).padStart(2,"0")+'</strong></div>'+
-      '<div class="schedule-week-meta"><span class="schedule-week-phase">'+tag+'</span>'+(rematch?'<small>REPEATS WEEK '+(week-11)+'</small>':'<small>11-GAME ROUND ROBIN</small>')+'</div></header>'+
-      '<div class="schedule-matchups">'+(rows||'<p class="schedule-empty">'+empty+'</p>')+'</div>'+
-      '<div class="schedule-week-foot"><span>'+games.length+' MATCHUPS</span><span>'+(rematch?'REMATCH ROUND':'REGULAR SEASON')+'</span></div>'+
+    const tag = rematch ? "Rematch" : "Regular Season";
+    cards.push('<article class="sch-wk '+(rematch?'rematchwk':'')+'">'+
+      '<div class="sch-wk-hd"><span class="sch-wk-n">Week '+week+'</span><span class="sch-wk-tag '+(rematch?'rematch':'regular')+'">'+tag+'</span></div>'+
+      '<div class="sch-games">'+(rows||'<p class="sch-empty">'+empty+'</p>')+'</div>'+
     '</article>');
-    if (week===11) cards.push('<div class="schedule-grid-divider"><span>THE REMATCH RUN-IN</span><i></i><small>WEEKS 12–14</small></div>');
   }
   contentTarget.classList.toggle("has-selection",!!selectedScheduleTeam);
   contentTarget.innerHTML = cards.join("");
