@@ -1386,30 +1386,59 @@ const HALL_CHARACTER_DESIGNS={
 };
 function hallPixelAvatar(name){
  const d=HALL_CHARACTER_DESIGNS[name]||HALL_CHARACTER_DESIGNS.Kevin;
- const gear={
-  Kevin:'<path d="M34 91L17 113L23 157L42 144L48 106Z" fill="#173f78" stroke="'+d.trim+'" stroke-width="3"/><path d="M93 91L111 112L104 157L86 144L80 106Z" fill="#173f78" stroke="'+d.trim+'" stroke-width="3"/><path d="M99 89L112 66L116 68L109 100" fill="none" stroke="#d8e4ff" stroke-width="5"/><path d="M111 66L120 42L124 67L115 82Z" fill="#d8e4ff" stroke="#f4c542" stroke-width="2"/>',
-  Marc:'<path d="M35 91L22 110L18 174L43 181L52 111Z" fill="#39235f" stroke="'+d.trim+'" stroke-width="3"/><path d="M92 91L106 110L111 174L85 181L76 111Z" fill="#39235f" stroke="'+d.trim+'" stroke-width="3"/><path d="M108 99L111 39" stroke="#b98aff" stroke-width="5"/><path d="M111 31L119 43L111 55L103 43Z" fill="#f3b4ff" stroke="#fff" stroke-width="2"/>',
-  Colby:'<path d="M27 95L12 121L26 166L42 147L43 107Z" fill="#14543c" stroke="'+d.trim+'" stroke-width="3"/><path d="M100 94L114 116L103 164L86 145L81 107Z" fill="#14543c" stroke="'+d.trim+'" stroke-width="3"/><path d="M102 98Q121 83 118 61Q112 48 103 63Q111 78 96 91" fill="none" stroke="#d8ef72" stroke-width="4"/><path d="M102 61L119 47M108 70L124 67M98 77L116 88" stroke="#d8ef72" stroke-width="2"/>',
-  Ben:'<path d="M24 89L5 105L17 132L39 117Z" fill="#70251f" stroke="'+d.trim+'" stroke-width="4"/><path d="M102 89L122 105L109 132L87 117Z" fill="#70251f" stroke="'+d.trim+'" stroke-width="4"/><path d="M111 94L119 45L124 43L120 95" stroke="#8e929c" stroke-width="5"/><path d="M110 46L120 30L126 47L120 65Z" fill="#bfc6d3" stroke="#ffc34d" stroke-width="2"/>',
-  Brandon:'<path d="M30 95L17 118L25 150L43 139L45 107Z" fill="#68401a" stroke="'+d.trim+'" stroke-width="3"/><path d="M98 95L111 118L103 150L85 139L83 107Z" fill="#68401a" stroke="'+d.trim+'" stroke-width="3"/><path d="M102 102L115 93L123 101L111 116Z" fill="#f7e07a" stroke="#34251f" stroke-width="2"/><path d="M15 148L27 148L31 160L18 160Z" fill="#f7e07a"/>',
-  Evan:'<path d="M28 89L12 111L20 160L42 143L45 104Z" fill="#123b54" stroke="'+d.trim+'" stroke-width="3"/><path d="M98 89L114 111L106 160L84 143L81 104Z" fill="#123b54" stroke="'+d.trim+'" stroke-width="3"/><path d="M104 103L121 87L125 90L111 118" fill="none" stroke="#e9e8f2" stroke-width="4"/><path d="M119 82L126 70L126 92Z" fill="#e9e8f2"/>',
-  Pat:'<path d="M24 91L8 110L20 137L42 119Z" fill="#713b26" stroke="'+d.trim+'" stroke-width="3"/><path d="M103 90L120 108L107 137L86 119Z" fill="#713b26" stroke="'+d.trim+'" stroke-width="3"/><path d="M7 102Q-1 119 8 137Q23 147 36 132L30 104Z" fill="#aeb8c8" stroke="#f2d38c" stroke-width="3"/><path d="M8 118L22 118M15 109L15 130" stroke="#713b26" stroke-width="3"/>',
-  Joey:'<path d="M29 90L12 109L21 158L44 141L44 105Z" fill="#7d292c" stroke="'+d.trim+'" stroke-width="3"/><path d="M97 90L114 109L105 158L82 141L82 105Z" fill="#7d292c" stroke="'+d.trim+'" stroke-width="3"/><path d="M102 99L116 84L124 91L110 110Z" fill="#d9dce4" stroke="#7d292c" stroke-width="2"/><path d="M117 84L126 72L123 94Z" fill="#d9dce4"/>',
-  Butta:'<path d="M31 91L14 112L24 160L44 143L45 105Z" fill="#2b4b22" stroke="'+d.trim+'" stroke-width="3"/><path d="M96 91L113 112L103 160L83 143L82 105Z" fill="#2b4b22" stroke="'+d.trim+'" stroke-width="3"/><path d="M104 101L122 76L126 79L111 112" stroke="#d8d8d8" stroke-width="4"/><path d="M120 74L126 62L126 83Z" fill="#d8d8d8"/>',
-  Lee:'<path d="M27 91L10 113L22 157L43 142L44 105Z" fill="#29346d" stroke="'+d.trim+'" stroke-width="3"/><path d="M101 91L118 113L106 157L85 142L84 105Z" fill="#29346d" stroke="'+d.trim+'" stroke-width="3"/><path d="M26 111H43V126H26ZM85 111H102V126H85Z" fill="#9adfff" stroke="#d5e5ff" stroke-width="2"/><path d="M99 96L119 82L123 87L106 105" stroke="#9adfff" stroke-width="4"/>',
-  Ders:'<path d="M29 91L13 110L22 154L43 141L45 106Z" fill="#66521a" stroke="'+d.trim+'" stroke-width="3"/><path d="M99 91L115 110L106 154L85 141L83 106Z" fill="#66521a" stroke="'+d.trim+'" stroke-width="3"/><path d="M109 103Q127 90 119 70Q112 60 106 74Q118 84 101 96" fill="none" stroke="#f4e5a2" stroke-width="3"/><path d="M110 100L125 111" stroke="#f4e5a2" stroke-width="3"/>',
-  Tanz:'<path d="M31 91L13 110L21 161L43 142L45 105Z" fill="#4b2362" stroke="'+d.trim+'" stroke-width="3"/><path d="M97 91L115 110L107 161L85 142L83 105Z" fill="#4b2362" stroke="'+d.trim+'" stroke-width="3"/><path d="M105 97L120 78L125 84L111 111" stroke="#f5a7d7" stroke-width="4"/><circle cx="122" cy="75" r="8" fill="#d97bff" stroke="#fff" stroke-width="2"/>',
-  Roth:'<path d="M31 91L13 111L21 163L44 143L45 106Z" fill="#343b4c" stroke="'+d.trim+'" stroke-width="3"/><path d="M97 91L115 111L107 163L84 143L83 106Z" fill="#343b4c" stroke="'+d.trim+'" stroke-width="3"/><path d="M111 100L116 39" stroke="#eeeeef" stroke-width="4"/><path d="M116 30L124 43L116 55L108 43Z" fill="#b8d8ff"/>',
-  Sam:'<path d="M29 91L12 113L22 161L44 142L44 105Z" fill="#303d51" stroke="'+d.trim+'" stroke-width="3"/><path d="M98 91L115 113L105 161L84 142L84 105Z" fill="#303d51" stroke="'+d.trim+'" stroke-width="3"/><path d="M106 101Q126 88 117 64Q110 55 104 71Q116 82 100 96" fill="none" stroke="#9ed1a8" stroke-width="4"/><path d="M111 98L126 107" stroke="#9ed1a8" stroke-width="3"/>',
-  Schmeef:'<path d="M28 89L8 107L20 141L43 123Z" fill="#555" stroke="'+d.trim+'" stroke-width="4"/><path d="M100 89L120 107L108 141L85 123Z" fill="#555" stroke="'+d.trim+'" stroke-width="4"/><path d="M105 103L119 90L125 98L111 115Z" fill="#c7c7c7" stroke="#555" stroke-width="2"/><circle cx="120" cy="87" r="6" fill="#d5faff"/>',
-  Hess:'<path d="M27 91L9 111L21 159L43 142L44 105Z" fill="#343b3d" stroke="'+d.trim+'" stroke-width="3"/><path d="M100 91L118 111L106 159L85 142L84 105Z" fill="#343b3d" stroke="'+d.trim+'" stroke-width="3"/><path d="M105 96L120 72L126 78L111 109" stroke="#d9dce3" stroke-width="4"/><path d="M118 69L126 59L126 81Z" fill="#d9dce3"/>',
-  Campbell:'<path d="M30 90L12 111L22 157L43 142L44 105Z" fill="#3d3d3d" stroke="'+d.trim+'" stroke-width="3"/><path d="M98 90L116 111L106 157L85 142L84 105Z" fill="#3d3d3d" stroke="'+d.trim+'" stroke-width="3"/><path d="M105 102L119 91L125 98L111 116Z" fill="#e6e6e6" stroke="#777" stroke-width="2"/><circle cx="119" cy="89" r="5" fill="#7ee7ff"/>'
+ const archetypes={
+  Kevin:"knight",Marc:"mage",Colby:"ranger",Ben:"berserker",Brandon:"paladin",Evan:"rogue",Pat:"bard",Joey:"samurai",Butta:"druid",Lee:"engineer",Ders:"viking",Tanz:"sorcerer",
+  Roth:"wizard",Sam:"ranger",Schmeef:"knight",Hess:"berserker",Campbell:"paladin"
  };
- const uniqueGear=gear[name]||gear.Kevin;
- const legs='<path d="M42 139L61 139L58 174L43 176L35 165Z" fill="'+d.shadow+'" stroke="'+d.trim+'" stroke-width="3"/><path d="M66 139L85 139L92 165L84 176L69 174Z" fill="'+d.shadow+'" stroke="'+d.trim+'" stroke-width="3"/><path d="M35 164L57 164L55 181L29 181Z" fill="#242632" stroke="'+d.trim+'" stroke-width="3"/><path d="M70 164L93 164L99 181L73 181Z" fill="#242632" stroke="'+d.trim+'" stroke-width="3"/>';
- const torso='<path d="M42 86L30 96L35 139L58 151L82 139L88 96L74 86L64 94L54 94Z" fill="url(#armor-'+name+')" stroke="'+d.trim+'" stroke-width="3"/><path d="M31 98L17 112L24 139L40 132L44 106Z" fill="'+d.suit+'" stroke="'+d.trim+'" stroke-width="3"/><path d="M87 98L101 112L94 139L78 132L74 106Z" fill="'+d.suit+'" stroke="'+d.trim+'" stroke-width="3"/><path d="M37 132L87 132L84 143L40 143Z" fill="'+d.shadow+'" stroke="'+d.trim+'" stroke-width="2"/><path d="M52 99L64 111L76 99L72 133L58 143L48 133Z" fill="'+d.suit+'" stroke="'+d.trim+'" stroke-width="2"/><circle cx="64" cy="119" r="7" fill="'+d.shadow+'" stroke="'+d.trim+'" stroke-width="2"/><text x="64" y="122.5" text-anchor="middle" font-size="8" font-weight="900" fill="'+d.trim+'">'+d.emblem+'</text>';
- const head='<g transform="translate(6 0)"><path d="M12 116Q15 84 39 78L58 73L78 78Q102 84 105 116Z" fill="none"/><path d="M37 41Q37 24 58 23Q79 24 79 42L76 60Q73 76 58 79Q43 76 40 60Z" fill="url(#face-'+name+')"/><path d="M36 47Q28 44 31 55Q33 62 41 62M80 47Q88 44 85 55Q83 62 75 62" fill="'+d.skin+'" stroke="'+d.shadow+'" stroke-width="1.5"/>'+d.hairPath+'<path d="M43 45Q49 41 54 45M63 45Q69 41 74 45" fill="none" stroke="'+d.brow+'" stroke-width="2.8" stroke-linecap="round"/><ellipse cx="48" cy="51" rx="4.3" ry="3.2" fill="#fff"/><ellipse cx="68" cy="51" rx="4.3" ry="3.2" fill="#fff"/><circle cx="49" cy="51" r="2.1" fill="'+d.eyes+'"/><circle cx="67" cy="51" r="2.1" fill="'+d.eyes+'"/><path d="M58 52L55 61L59 62" fill="none" stroke="#a66e58" stroke-width="1.5" stroke-linecap="round"/><path d="M51 68Q58 72 65 68" fill="none" stroke="#713e3c" stroke-width="2" stroke-linecap="round"/>'+(d.beard||"")+d.accessory+'</g>';
- return '<svg class="hall-character-avatar" viewBox="0 0 128 192" role="img" aria-label="'+escapeHtml(name)+' full-body pixel-art fantasy game character" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><defs><linearGradient id="bg-'+name+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+d.shadow+'"/><stop offset="1" stop-color="#101321"/></linearGradient><linearGradient id="armor-'+name+'" x1="0" y1="0" x2="0" y2="1"><stop stop-color="'+d.suit+'"/><stop offset="1" stop-color="'+d.shadow+'"/></linearGradient><linearGradient id="face-'+name+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+d.skin+'"/><stop offset="1" stop-color="'+d.skin+'" stop-opacity=".72"/></linearGradient></defs><rect width="128" height="192" fill="url(#bg-'+name+')"/><path d="M9 21H25V25H9ZM103 16H119V20H103ZM6 158H19V162H6ZM110 166H124V170H110Z" fill="'+d.trim+'" opacity=".5"/><ellipse cx="64" cy="180" rx="35" ry="6" fill="#05070d" opacity=".55"/>'+uniqueGear+legs+torso+'<path d="M45 84L45 97L64 109L83 97L83 84Z" fill="'+d.shadow+'" stroke="'+d.trim+'" stroke-width="2"/>'+head+'<path d="M47 86L64 101L81 86" fill="none" stroke="'+d.trim+'" stroke-width="3"/><path d="M43 145L56 151L52 159M85 145L72 151L76 159" fill="none" stroke="'+d.trim+'" stroke-width="2"/><path d="M29 181H56M72 181H100" stroke="#fff" stroke-opacity=".4" stroke-width="2"/></svg>';
+ const archetype=archetypes[name]||"knight";
+ const colors={skin:d.skin,hair:d.hair,suit:d.suit,shade:d.shadow,trim:d.trim,black:"#171a28",white:"#f4f0df",eye:d.eyes,metal:"#bfc7d6",boot:"#302b35"};
+ const pixels=new Map();
+ const put=(x,y,c)=>{if(x>=0&&x<16&&y>=0&&y<24&&c)pixels.set(x+","+y,c);};
+ const rect=(x,y,w,h,c)=>{for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)put(xx,yy,c);};
+ const line=(pts,c)=>pts.forEach(([x,y])=>put(x,y,c));
+ // Individual body silhouettes: broad armor, flowing robe, light scout, or heavy barbarian.
+ if(["berserker","viking"].includes(archetype)){rect(4,8,8,7,"shade");rect(3,9,10,5,"suit");rect(2,9,2,5,"trim");rect(12,9,2,5,"trim");}
+ else if(["mage","sorcerer","bard","druid","wizard"].includes(archetype)){rect(5,8,6,5,"suit");for(let y=12;y<17;y++){rect(4-Math.floor((y-12)/2),y,8+Math.floor((y-12)/2)*2,1,y%2?"shade":"suit");}rect(5,8,6,1,"trim");}
+ else if(archetype==="engineer"){rect(5,8,6,7,"shade");rect(4,9,8,5,"suit");rect(3,10,2,4,"trim");rect(11,10,2,4,"trim");}
+ else if(archetype==="rogue"||archetype==="ranger"){rect(5,8,6,7,"shade");rect(5,9,6,5,"suit");rect(4,10,2,4,"suit");rect(11,10,2,4,"suit");}
+ else {rect(4,8,8,7,"shade");rect(5,8,6,7,"suit");rect(3,9,2,5,"suit");rect(11,9,2,5,"suit");}
+ // Head, neck, and distinct hair/helmet silhouettes.
+ rect(7,6,2,2,"skin");rect(5,2,6,5,"skin");rect(4,3,1,3,"skin");rect(11,3,1,3,"skin");
+ const hairStyle={Kevin:0,Marc:1,Colby:2,Ben:3,Brandon:4,Evan:5,Pat:6,Joey:7,Butta:8,Lee:9,Ders:10,Tanz:11,Roth:12,Sam:13,Schmeef:14,Hess:15,Campbell:16}[name]||0;
+ if(hairStyle%4===0){rect(5,1,6,2,"hair");rect(4,2,1,2,"hair");rect(11,2,1,2,"hair");put(6,0,"trim");}
+ else if(hairStyle%4===1){rect(5,1,6,2,"hair");rect(4,2,2,2,"hair");rect(10,2,2,1,"hair");put(5,0,"hair");put(9,0,"trim");}
+ else if(hairStyle%4===2){rect(5,1,6,1,"hair");rect(4,2,1,3,"hair");rect(11,2,1,3,"hair");rect(6,0,4,1,"hair");}
+ else {rect(5,1,6,2,"hair");rect(4,2,2,2,"hair");rect(10,2,2,2,"hair");put(7,0,"trim");put(8,0,"trim");}
+ // Face details remain deliberately chunky, like a classic 8-bit RPG.
+ put(6,4,"white");put(9,4,"white");put(6,4,"eye");put(9,4,"eye");put(7,5,"shade");put(8,5,"shade");
+ if(["Marc","Colby","Ben","Brandon","Evan","Joey","Butta","Ders","Roth","Sam","Hess","Campbell"].includes(name)){rect(6,6,4,1,"hair");}
+ // Neckline, belt, emblem and layered armor.
+ rect(6,8,4,1,"trim");rect(5,13,6,1,"shade");rect(6,13,4,1,"trim");put(7,10,"trim");put(8,10,"trim");
+ // Arms and legs vary by class, with asymmetric pixel highlights.
+ if(archetype==="berserker"||archetype==="viking"){rect(2,10,2,4,"skin");rect(12,10,2,4,"skin");rect(5,16,2,4,"shade");rect(9,16,2,4,"shade");}
+ else if(["mage","sorcerer","bard","druid","wizard"].includes(archetype)){rect(4,10,1,5,"trim");rect(11,10,1,5,"trim");rect(6,16,2,4,"shade");rect(9,16,2,4,"shade");}
+ else {rect(3,10,2,4,"shade");rect(11,10,2,4,"shade");rect(5,16,2,4,"shade");rect(9,16,2,4,"shade");}
+ rect(4,20,4,1,"boot");rect(9,20,4,1,"boot");rect(4,21,4,1,"black");rect(9,21,4,1,"black");
+ // Class-specific equipment creates a different silhouette for every manager.
+ if(archetype==="knight"){line([[13,5],[13,6],[13,7],[13,8],[13,9],[13,10],[14,4],[12,11],[14,11]],"metal");rect(2,10,2,5,"trim");}
+ if(archetype==="mage"||archetype==="wizard"||archetype==="sorcerer"){line([[14,1],[14,2],[14,3],[14,4],[14,5],[14,6],[14,7],[14,8],[14,9],[14,10],[13,3],[15,3]],"trim");put(14,0,"white");}
+ if(archetype==="ranger"){line([[2,4],[2,5],[2,6],[2,7],[2,8],[2,9],[2,10],[2,11],[2,12],[3,4],[3,12]],"trim");line([[3,7],[4,8],[3,9]],"metal");}
+ if(archetype==="berserker"||archetype==="viking"){rect(1,7,2,5,"metal");rect(1,6,2,1,"trim");rect(12,7,3,2,"hair");put(14,6,"trim");}
+ if(archetype==="paladin"){rect(2,9,2,5,"metal");put(2,8,"trim");line([[13,3],[13,4],[13,5],[13,6],[13,7],[13,8],[13,9],[13,10]],"trim");}
+ if(archetype==="rogue"){rect(2,8,2,4,"black");line([[1,7],[2,6],[3,7],[2,8]],"metal");rect(12,11,2,1,"trim");}
+ if(archetype==="bard"){rect(2,8,2,4,"trim");line([[13,3],[13,4],[13,5],[13,6],[13,7],[13,8],[13,9]],"metal");put(12,2,"trim");put(14,2,"trim");}
+ if(archetype==="druid"){line([[13,2],[13,3],[13,4],[13,5],[13,6],[13,7],[13,8],[13,9],[13,10]],"hair");line([[12,3],[14,2],[14,4],[12,7],[14,8]],"trim");}
+ if(archetype==="samurai"){rect(4,1,8,1,"trim");rect(3,2,10,1,"shade");line([[14,5],[14,6],[14,7],[14,8],[14,9],[14,10],[13,4]],"metal");}
+ if(archetype==="engineer"){rect(2,8,2,4,"metal");rect(12,8,2,4,"metal");put(13,7,"trim");put(2,7,"trim");}
+ if(archetype==="viking"){put(4,2,"metal");put(3,1,"metal");put(11,2,"metal");put(12,1,"metal");}
+ // Add a distinct cape/shoulder treatment to several characters.
+ if(["Marc","Pat","Tanz","Roth"].includes(name)){rect(3,9,1,7,"trim");rect(12,9,1,7,"shade");}
+ if(name==="Lee"){rect(5,2,6,1,"metal");put(4,3,"metal");put(11,3,"metal");}
+ if(name==="Butta"){rect(5,0,6,1,"hair");put(4,1,"trim");put(11,1,"trim");}
+ if(name==="Kevin"){put(7,0,"trim");put(8,0,"trim");}
+ if(name==="Ben"){rect(5,0,2,1,"trim");rect(9,0,2,1,"trim");}
+ const rects=[...pixels.entries()].map(([key,color])=>{const [x,y]=key.split(",").map(Number);return '<rect x="'+(x*8)+'" y="'+(y*8)+'" width="8" height="8" fill="'+colors[color]+'"/>';}).join("");
+ return '<svg class="hall-character-avatar hall-pixel-sprite" viewBox="0 0 128 192" role="img" aria-label="'+escapeHtml(name)+' 8-bit full-body game character" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="image-rendering:pixelated"><rect x="24" y="176" width="80" height="8" fill="#080a12" opacity=".45"/>'+rects+'</svg>';
 }
 function hallManagerHonors(name,stat){
  const seasons=[...(stat.seasons||new Set())].sort((a,b)=>a-b);
