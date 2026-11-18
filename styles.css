@@ -1712,3 +1712,18 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   .mu-manager-meta span{gap:3px}
   .mu-manager-meta b{font-size:10px}
 }
+
+
+/* Matchup roster detail alignment and completed-game information. */
+.mu-player-head>span:nth-child(3),.mu-player-head>span:nth-child(4),
+.mu-player-row>.mu-player-points,.mu-player-row>.mu-player-proj{text-align:center}
+.mu-player-game{gap:5px}
+.mu-final-label{color:var(--muted);font:600 8px var(--mono);letter-spacing:.08em}
+.mu-player-stats{display:flex;flex-wrap:wrap;gap:3px 9px;color:var(--muted);font:500 9px var(--mono);line-height:1.25}
+.mu-player-stats span{white-space:nowrap}
+.mu-player-stats b{color:var(--text);font-weight:700}
+.mu-player-points.up,.mu-player-points.down{color:var(--muted)}
+.mu-score-line>strong.winner,.mu-projection-line.winner b{color:#57F26B}
+.mu-score-line>strong.up,.mu-score-line>strong.down{color:var(--text)}
+.mu-projection-line.up b,.mu-projection-line.down b,.mu-projection-line.even b{color:var(--muted)}
+@media(max-width:600px){.mu-player-stats{font-size:8px;gap:2px 7px}.mu-final-label{font-size:7px}}
