@@ -945,6 +945,7 @@ function gradeParlayPick(pick,stats,players,schedule){
   const hit=line[1].toUpperCase()==="U"?value<Number(line[2]):value>Number(line[2]);
   return {status:value===Number(line[2])?"PUSH":hit?"HIT":"MISS",detail:"PASS TD "+value+" / "+line[1].toUpperCase()+" "+line[2]};
  }
+ if(/\bTD\b/i.test(raw)&&/\b[OU]\s*\d/i.test(raw)&&!/(pass|passing|rush|rushing|rec|receiving)\s*(?:TD|touchdowns?)/i.test(raw))return {status:"REVIEW",detail:"Touchdown type is ambiguous"};
  if(/\bTD\b/i.test(raw)){
   const total=["rush_td","rec_td","def_td","st_td","fum_rec_td"].reduce((sum,key)=>sum+(parlayStatNumber(stat,key)||0),0);
   const multi=raw.match(/\b(\d+)\s*\+?\s*TD/i),needed=multi?Number(multi[1]):1;
