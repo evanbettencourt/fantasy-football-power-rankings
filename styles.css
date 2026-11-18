@@ -1505,7 +1505,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .mu-side{
   display:grid;
   grid-template-columns:minmax(58px,.9fr) minmax(64px,1.15fr) minmax(66px,1fr);
-  grid-template-areas:"score manager meta";
+  grid-template-areas:"meta manager score";
   align-items:center;
   justify-items:stretch;
   gap:clamp(5px,.8vw,10px);
@@ -1513,7 +1513,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   min-height:58px;
 }
 .mu-side.side-b{
-  grid-template-areas:"meta manager score";
+  grid-template-areas:"score manager meta";
 }
 .mu-score-stack{
   grid-area:score;
