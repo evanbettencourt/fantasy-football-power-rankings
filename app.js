@@ -1041,6 +1041,85 @@ function hallStatFor(stats,name){
  if(!stats.has(name))stats.set(name,newHallStat(name));
  return stats.get(name);
 }
+const HALL_HERO_AVATARS={
+ "Kevin":0,"Marc":1,"Colby":2,"Ben":3,"Brandon":4,"Evan":5,"Pat":6,"Joey":7,"Butta":8,"Lee":9,"Ders":10,"Tanz":11,"Roth":12,"Sam":13,"Schmeef":14
+};
+function hallScoringPoints(stats,settings){
+ if(!stats||typeof stats!=="object")return 0;
+ const rules=settings&&typeof settings==="object"?settings:{};
+ let total=0,matched=0;
+ for(const [key,multiplier] of Object.entries(rules)){
+  if(typeof multiplier!=="number"||!Number.isFinite(multiplier))continue;
+  const value=Number(stats[key]);
+  if(Number.isFinite(value)){total+=value*multiplier;matched++;}
+ }
+ return matched?total:null;
+}
+async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,regularWeeks){
+ const leagueId=league.league_id,errors=[];
+ const playersPromise=state.players?Promise.resolve(state.players):(state.playersPromise||=fetchJson("/players/nfl?active=true",{attempts:2,timeoutMs:25000}).then(value=>(state.players=value&&typeof value==="object"?value:{},state.players)).catch(()=>({})));
+ const [drafts,players]=await Promise.all([
+  fetchJson("/league/"+leagueId+"/drafts",{attempts:2,timeoutMs:15000}).catch(error=>{errors.push("Draft list unavailable");return[];}),
+  playersPromise
+ ]);
+ const draftRows=[];
+ for(const draft of Array.isArray(drafts)?drafts:[]){
+  try{
+   const picks=await fetchJson("/draft/"+draft.draft_id+"/picks",{attempts:2,timeoutMs:20000});
+   if(!Array.isArray(picks))continue;
+   const draftOrder=draft.draft_order||{},slotMap=draft.slot_to_roster_id||{};
+   const managerByUser=new Map(users.map(user=>[String(user.user_id),hallManagerFromSleeperUser(user)]));
+   const picksMapped=picks.map(pick=>{
+    const player=players?.[pick.player_id]||{};
+    const rosterId=Number(pick.roster_id);
+    const drafter=managerByRoster.get(rosterId)||managerByUser.get(String(pick.picked_by||pick.metadata?.picked_by||""))||null;
+    const slot=Number(pick.draft_slot)||null;
+    return {playerId:String(pick.player_id||""),player:player.full_name||pick.metadata?.first_name&&pick.metadata?.last_name?((player.full_name)||(pick.metadata.first_name+" "+pick.metadata.last_name)):pick.player_id||"Unknown player",position:player.position||pick.metadata?.position||"—",team:player.team||"FA",manager:drafter,rosterId,round:Number(pick.round)||Math.ceil(Number(pick.pick_no)/Math.max(1,rosters.length)),pick:Number(pick.pick_no)||0,slot,originalSlotManager:slot?managerByRoster.get(Number(slotMap[slot]||slotMap[String(slot)]))||null:null};
+   });
+   draftRows.push({draftId:draft.draft_id,type:draft.type||"snake",season:year,picks:picksMapped,rounds:Number(draft.settings?.rounds)||Math.ceil(picksMapped.length/Math.max(1,rosters.length)),slots:Number(draft.settings?.teams)||rosters.length});
+  }catch(error){errors.push("Draft picks unavailable for "+(draft.draft_id||year));}
+ }
+ const weeks=Array.from({length:regularWeeks},(_,i)=>i+1);
+ const statsByPlayer=new Map();
+ await Promise.all(weeks.map(async week=>{
+  try{
+   const data=await fetchJson("/api/sleeper-stats/regular/"+year+"/"+week,{attempts:2,timeoutMs:20000});
+   for(const [playerId,row] of Object.entries(data||{})){
+    const pos=players?.[playerId]?.position;
+    if(!["QB","RB","WR","TE"].includes(pos))continue;
+    const stats=row?.stats||row;
+    const pts=hallScoringPoints(stats,league.scoring_settings);
+    if(pts==null)continue;
+    const old=statsByPlayer.get(playerId)||{points:0,playerId,position:pos};
+    old.points+=pts;statsByPlayer.set(playerId,old);
+   }
+  }catch(error){errors.push("Player stats unavailable for "+year+" Week "+week);}
+ }));
+ const pickByPlayer=new Map();
+ for(const draft of draftRows)for(const pick of draft.picks)if(pick.playerId)pickByPlayer.set(pick.playerId,pick);
+ const leaders=["QB","RB","WR","TE"].map(position=>{
+  const candidates=[...statsByPlayer.values()].filter(row=>row.position===position).sort((a,b)=>b.points-a.points);
+  const best=candidates[0];if(!best)return {position,player:"Unavailable",points:null};
+  const pick=pickByPlayer.get(best.playerId);
+  return {position,player:players?.[best.playerId]?.full_name||best.playerId,playerId:best.playerId,points:best.points,manager:pick?.manager||"Undrafted / not in league draft",round:pick?.round||null,pick:pick?.pick||null,team:players?.[best.playerId]?.team||"—"};
+ });
+ return {drafts:draftRows,leaders,errors};
+}
+function hallDraftMarkup(row){
+ const drafts=row?.drafts||[];
+ if(!drafts.length)return "";
+ return drafts.map((draft,index)=>{
+  const picks=[...draft.picks].sort((a,b)=>a.pick-b.pick);
+  const columns=Array.from({length:draft.slots},(_,i)=>i+1);
+  const byCell=new Map(picks.map(p=>[p.round+":"+p.slot,p]));
+  return '<section class="hall-season-draft"><h3>'+(drafts.length>1?"DRAFT "+(index+1):"LEAGUE DRAFT")+'</h3><div class="hall-draft-scroll"><table class="hall-draft-table"><thead><tr><th>ROUND</th>'+columns.map(slot=>'<th>'+slot+'</th>').join("")+'</tr></thead><tbody>'+Array.from({length:draft.rounds},(_,round)=>'<tr><th>'+(round+1)+'</th>'+columns.map(slot=>{const pick=byCell.get((round+1)+":"+slot);return '<td>'+(pick?'<b>'+escapeHtml(pick.player)+'</b><small>'+escapeHtml(pick.position)+' · '+escapeHtml(pick.manager||"Unknown")+'</small><em>#'+pick.pick+'</em>':'—')+'</td>';}).join("")+'</tr>').join("")+'</tbody></table></div></section>';
+ }).join("");
+}
+function hallLeadersMarkup(row){
+ const leaders=row?.leaders||[];
+ if(!leaders.length)return "";
+ return '<section class="hall-season-leaders"><h3>JFL HONORS · POSITIONAL LEADERS</h3><div class="hall-leader-grid">'+leaders.map(item=>'<article class="hall-leader-card"><span>'+escapeHtml(item.position)+'</span><strong>'+escapeHtml(item.player)+'</strong><b>'+(item.points==null?"—":fmt(item.points)+" PTS")+'</b><small>'+escapeHtml(item.manager||"Drafter unavailable")+(item.round?' · Round '+item.round+' Pick '+item.pick:'')+'</small></article>').join("")+'</div><p class="hall-archive-note">REGULAR-SEASON FANTASY POINTS USING THAT SEASON’S SLEEPER SCORING SETTINGS. DRAFTER REFERS TO THE ORIGINAL LEAGUE DRAFT PICK.</p></section>';
+}
 async function loadSleeperHallHistory(){
  if(state.hallHistory)return state.hallHistory;
  if(state.hallHistoryPromise)return state.hallHistoryPromise;
@@ -1067,6 +1146,7 @@ async function loadSleeperHallHistory(){
      fetchJson("/league/"+league.league_id+"/rosters",{attempts:2,timeoutMs:12000})
     ]);
     if(!Array.isArray(users)||!Array.isArray(rosters)||!rosters.length)throw new Error("Sleeper returned incomplete roster ownership data");
+    const seasonExtras=await loadHallDraftAndHonors(league,year,users,rosters,new Map(rosters.map(roster=>[Number(roster.roster_id),hallManagerFromSleeperUser(userById.get(String(roster.owner_id)))])),Math.max(1,(Number(league.settings?.playoff_week_start)||15)-1));
     const userById=new Map(users.map(user=>[String(user.user_id),user]));
     const managerByRoster=new Map();
     for(const roster of rosters){
@@ -1209,7 +1289,7 @@ async function loadSleeperHallHistory(){
     const regularMatchups=recordGames.length-regularGamesBefore;
     const playoffMatchups=seasonBracketGames.filter(game=>game.team1&&game.team2&&game.score1!=null&&game.score2!=null).length;
     seasonDiagnostics.push({year,leagueId:league.league_id,rosters:rosters.length,mappedManagers:managerByRoster.size,regularWeeksLoaded:weekData.length,regularMatchups,playoffMatchups,completedRegularWeeks});
-    seasons.push({year,champion,runnerUp:runnerUp||null,thirdPlace,regularSeasonChampion,standings:seasonStandings,bracket:bracketGames,leagueId:league.league_id,regularWeeks,completedRegularWeeks,managerCount:managerByRoster.size,mappedManagers:managerByRoster.size,regularMatchups,playoffMatchups});
+    seasons.push({year,champion,runnerUp:runnerUp||null,thirdPlace,regularSeasonChampion,standings:seasonStandings,drafts:seasonExtras.drafts,leaders:seasonExtras.leaders,extraErrors:seasonExtras.errors,bracket:bracketGames,leagueId:league.league_id,regularWeeks,completedRegularWeeks,managerCount:managerByRoster.size,mappedManagers:managerByRoster.size,regularMatchups,playoffMatchups});
    }catch(error){errors.push(year+" season failed: "+(error?.message||String(error)));}
    if(year>2021){
     const previousId=league.previous_league_id;
@@ -1384,7 +1464,7 @@ function openHallBracket(year){
  const awardMarkup=year===2025?hallAwardsMarkup():"";
  const old=document.querySelector(".hall-bracket-overlay");if(old)old.remove();
  const overlay=document.createElement("div");overlay.className="hall-bracket-overlay";
- overlay.innerHTML='<div class="hall-bracket-dialog" role="dialog" aria-modal="true" aria-label="'+year+' playoff bracket"><button class="hall-bracket-close" type="button" aria-label="Close bracket">×</button><div class="hall-kicker">MONKEY BOYS · POSTSEASON ARCHIVE</div><h2>'+year+' Playoff Bracket</h2><div class="hall-bracket-champion"><span>🏆 CHAMPION</span><strong>'+escapeHtml(champion)+'</strong><small>Runner-up · '+escapeHtml(runner)+(row?.thirdPlace?' · 3rd Place · '+escapeHtml(row.thirdPlace):'')+(row?.regularSeasonChampion?' · Regular Season Champion · '+escapeHtml(row.regularSeasonChampion):'')+'</small></div>'+hallBracketMarkup(year,row)+legacyStandings+awardMarkup+'</div>';
+ overlay.innerHTML='<div class="hall-bracket-dialog" role="dialog" aria-modal="true" aria-label="'+year+' playoff bracket"><button class="hall-bracket-close" type="button" aria-label="Close bracket">×</button><div class="hall-kicker">MONKEY BOYS · POSTSEASON ARCHIVE</div><h2>'+year+' Playoff Bracket</h2><div class="hall-bracket-champion"><span>🏆 CHAMPION</span><strong>'+escapeHtml(champion)+'</strong><small>Runner-up · '+escapeHtml(runner)+(row?.thirdPlace?' · 3rd Place · '+escapeHtml(row.thirdPlace):'')+(row?.regularSeasonChampion?' · Regular Season Champion · '+escapeHtml(row.regularSeasonChampion):'')+'</small></div>'+hallBracketMarkup(year,row)+legacyStandings+hallLeadersMarkup(row)+hallDraftMarkup(row)+awardMarkup+'</div>';
  document.body.appendChild(overlay);
  const close=()=>overlay.remove();
  overlay.addEventListener("click",event=>{if(event.target===overlay)close();});
