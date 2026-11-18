@@ -981,7 +981,8 @@ const PRE_SLEEPER_CHAMPIONS=[
  {year:2019,champion:"Ben",runnerUp:"Marc"},
  {year:2020,champion:"Joey",runnerUp:"Marc"}
 ];
-const RETIRED_MANAGERS=["Roth","Sam"];
+const RETIRED_MANAGERS=["Roth","Sam","Schmeef"];
+const MANAGER_TENURES={Brandon:"2025–present",Schmeef:"2021–2024"};
 function getPreSleeperManagerStats(){
  const stats=new Map();
  const get=name=>{if(!stats.has(name))stats.set(name,{name,playoffWins:0,playoffAppearances:new Set(),championships:0,runnerUps:0});return stats.get(name);};
@@ -1001,7 +1002,7 @@ function renderHallOfFame(){
  const makeCard=(name,index,isRetired)=>{
   const stat=historical.get(name)||{playoffWins:0,playoffAppearances:new Set(),championships:0,runnerUps:0};
   const years=[...stat.playoffAppearances].sort((a,b)=>a-b).join(" · ")||"—";
-  return '<article class="hall-manager-card '+(isRetired?'retired':'active')+'"><div class="hall-card-top"><span class="hall-card-number">'+String(index+1).padStart(2,"0")+'</span><span class="hall-status">'+(isRetired?'RETIRED':'ACTIVE')+'</span></div><div class="hall-manager-identity"><span class="hall-avatar">'+escapeHtml(initials(name))+'</span><div><h3>'+escapeHtml(name)+'</h3><span class="hall-manager-years">'+(isRetired?'FORMER MANAGER':'CURRENT MANAGER')+'</span></div></div><div class="hall-card-stats"><div><b>'+stat.championships+'</b><span>CHAMPIONSHIPS</span></div><div><b>'+stat.playoffWins+'</b><span>PLAYOFF WINS*</span></div><div><b>'+stat.playoffAppearances.size+'</b><span>PLAYOFF YEARS*</span></div></div><div class="hall-card-foot">'+(years==='—'?'No pre-2021 playoff result recorded': 'Playoff seasons: '+years)+'</div></article>';
+  return '<article class="hall-manager-card '+(isRetired?'retired':'active')+'"><div class="hall-card-top"><span class="hall-card-number">'+String(index+1).padStart(2,"0")+'</span><span class="hall-status">'+(isRetired?'RETIRED':'ACTIVE')+'</span></div><div class="hall-manager-identity"><span class="hall-avatar">'+escapeHtml(initials(name))+'</span><div><h3>'+escapeHtml(name)+'</h3><span class="hall-manager-years">'+(MANAGER_TENURES[name]|| (isRetired?'FORMER MANAGER':'CURRENT MANAGER'))+'</span></div></div><div class="hall-card-stats"><div><b>'+stat.championships+'</b><span>CHAMPIONSHIPS</span></div><div><b>'+stat.playoffWins+'</b><span>PLAYOFF WINS*</span></div><div><b>'+stat.playoffAppearances.size+'</b><span>PLAYOFF YEARS*</span></div></div><div class="hall-card-foot">'+(years==='—'?'No pre-2021 playoff result recorded': 'Playoff seasons: '+years)+'</div></article>';
  };
  const championRows=PRE_SLEEPER_CHAMPIONS.slice().reverse().map(row=>'<tr><td>'+row.year+'</td><td><strong>'+escapeHtml(row.champion)+'</strong></td><td>'+escapeHtml(row.runnerUp)+'</td></tr>').join("");
  const playoffs=[...historical.values()].sort((a,b)=>b.playoffWins-a.playoffWins||a.name.localeCompare(b.name));
