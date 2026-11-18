@@ -492,6 +492,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const kickoff = new Date(game.date);
     const kickoffLabel = new Intl.DateTimeFormat(undefined, { weekday:"short", hour:"numeric", minute:"2-digit" }).format(kickoff);
     const addTeam = (team, opponent) => teamSchedules.set(teamCode(team.team.abbreviation), {
+      teamLogo: team.team.logo || "",
       opponent: opponent.team,
       kickoffLabel,
       logo: opponent.team.logo || "",
@@ -537,7 +538,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const label = positionLabel(position);
     const playerTeam = teamCode(player.team);
     const game = teamSchedules.get(playerTeam);
-    const playerLogo = player.team ? teamLogo(player.team) : "";
+    const playerLogo = player.team ? (game?.teamLogo || teamLogo(player.team)) : "";
     const opponentLogo = game?.logo || (game?.opponent?.abbreviation ? teamLogo(game.opponent.abbreviation) : "");
     const gameMeta = game
       ? '<span class="mu-player-game">vs. <img src="' + escapeHtml(opponentLogo) + '" alt="' + escapeHtml(game.opponentName) + '" title="' + escapeHtml(game.opponentName) + '" loading="lazy" onerror="this.style.display=\'none\'"> <span>' + escapeHtml(game.kickoffLabel) + '</span></span>'
