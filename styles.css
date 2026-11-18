@@ -1389,3 +1389,19 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   .mu-player-points,.mu-player-proj{font-size:10px}
   .mu-player-pos{font-size:9px}
 }
+
+
+/* Keep Sleeper IR-reserve players at the bottom of the bench list. */
+.mu-ir-divider{
+  grid-column:1/-1;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin:8px 0 3px;
+  padding:8px 0 5px;
+  border-top:1px solid var(--line);
+  color:var(--muted);
+  font:600 9px var(--mono);
+  letter-spacing:.12em;
+}
+.mu-ir-divider::after{content:"";height:1px;flex:1;background:var(--line)}
