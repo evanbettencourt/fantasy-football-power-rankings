@@ -629,8 +629,8 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
       const projectionClass = projectionDelta > 0.005 ? "up" : projectionDelta < -0.005 ? "down" : "even";
       const probabilityClass = winChance == null ? "" : winChance > 50 ? "favored" : winChance < 50 ? "underdog" : "even";
       return '<div class="mu-side ' + (team === game.teamA ? 'side-a' : 'side-b') + '">' +
-        '<div class="mu-score-stack"><div class="mu-score-line"><strong>' + fmt(summary.score) + '</strong><span>SCORE</span></div>' +
-          '<div class="mu-projection-line ' + projectionClass + '">' + (summary.projected.available ? '<b>' + fmt(summary.projected.value) + '</b>' : '<b>—</b>') + '<span>PROJ.</span></div></div>' +
+        '<div class="mu-score-stack"><div class="mu-score-line"><strong>' + fmt(summary.score) + '</strong></div>' +
+          '<div class="mu-projection-line ' + projectionClass + '">' + (summary.projected.available ? '<b>' + fmt(summary.projected.value) + '</b>' : '<b>—</b>') + '<span>LIVE PROJ.</span></div></div>' +
         '<div class="mu-manager-copy"><strong style="color:' + summary.color + '">' + escapeHtml(team.name) + '</strong>' +
           '<small>' + escapeHtml(summary.record) + '</small></div>' +
         '<div class="mu-manager-meta"><span>SEED <b>#' + (summary.seed || "—") + '</b></span><span>POWER RANK <b>#' + (summary.powerRank || "—") + '</b></span></div>' +
