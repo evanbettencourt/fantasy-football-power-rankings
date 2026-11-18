@@ -2971,3 +2971,27 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 @media(max-width:480px){
   .hall-bracket-playoff>.hall-placement-games .hall-tree-team{font-size:7px}
 }
+
+
+/* Rules page typography matches the site's DM Sans visual system. */
+.rules-page,.rules-page *,
+.rules-content,.rules-content *{
+  font-family:var(--sans);
+}
+.rules-page .rule-group summary{
+  font-family:var(--sans);
+  font-weight:800;
+}
+.rules-page .rule-group summary:after{
+  font-family:var(--sans);
+}
+.rules-page .rule-body{
+  font-family:var(--sans);
+  font-size:14px;
+  line-height:1.7;
+}
+.rules-page .rule-body h3{
+  font-family:var(--sans);
+  font-style:normal;
+  font-weight:800;
+}
