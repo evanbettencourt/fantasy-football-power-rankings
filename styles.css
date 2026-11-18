@@ -2364,3 +2364,27 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 
 /* Crisp 8-bit RPG sprites: nearest-neighbour display, no smoothing */
 .hall-character-avatar.hall-pixel-sprite{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated;shape-rendering:crispEdges;filter:none}.hall-avatar-line{background:transparent!important;overflow:visible}
+
+/* Hall of Fame flip-back: compact one-line career stats and honors */
+.hall-manager-grid .hall-flip-card{height:312px}
+.hall-card-back{padding:11px 12px 9px;gap:0}
+.hall-back-heading{padding-bottom:6px;gap:2px}
+.hall-back-heading strong{font-size:16px}
+.hall-back-stats{display:flex;flex-direction:column;gap:0;padding:6px 0;border-bottom:1px solid #ffffff20}
+.hall-back-stats>span{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:8px;min-height:19px;border-bottom:1px solid #ffffff0d}
+.hall-back-stats>span:last-child{border-bottom:0}
+.hall-back-stats b{order:2;font-size:12px;white-space:nowrap}
+.hall-back-stats small{order:1;font-size:7px;letter-spacing:.07em;white-space:nowrap}
+.hall-back-honors{padding-top:6px;overflow:visible}
+.hall-back-honors ul{display:flex;flex-direction:column;gap:2px;max-height:none;margin:4px 0 0;overflow:visible}
+.hall-back-honors li{display:flex;align-items:center;gap:5px;min-height:15px;white-space:nowrap}
+.hall-back-honors li>span{font-size:11px;flex:0 0 14px}
+.hall-back-honors li div{display:flex;flex-direction:row;align-items:baseline;gap:4px;min-width:0;white-space:nowrap}
+.hall-back-honors li strong{font-size:8px;line-height:1.1;white-space:nowrap}
+.hall-back-honors li small{font-size:7px;white-space:nowrap}
+.hall-card-back .hall-flip-hint{padding-top:4px;font-size:6px}
+.hall-front-honors{flex-wrap:wrap;max-width:100%;gap:3px;min-height:25px}
+.hall-honor-icon{width:19px;height:19px;flex:0 0 19px}
+@media(max-width:1000px){.hall-manager-grid .hall-flip-card{height:312px}}
+@media(max-width:720px){.hall-manager-grid .hall-flip-card{height:312px}}
+@media(max-width:440px){.hall-manager-grid .hall-flip-card{height:312px}.hall-card-back{padding:10px 9px 8px}.hall-back-stats small{font-size:6px}.hall-back-honors li strong{font-size:7px}.hall-back-honors li small{font-size:6px}}
