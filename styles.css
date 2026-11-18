@@ -1727,3 +1727,41 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .mu-score-line>strong.up,.mu-score-line>strong.down{color:var(--text)}
 .mu-projection-line.up b,.mu-projection-line.down b,.mu-projection-line.even b{color:var(--muted)}
 @media(max-width:600px){.mu-player-stats{font-size:8px;gap:2px 7px}.mu-final-label{font-size:7px}}
+
+/* Awards page: winner-led cards with nominee details kept expandable. */
+.awards-intro,.parlay-summary{margin:20px 0 24px;padding:20px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(145deg,var(--panel),var(--panel2))}
+.award-kicker,.parlay-kicker{display:block;color:var(--lime);font:600 9px var(--mono);letter-spacing:.14em}
+.awards-intro>strong{display:block;margin-top:7px;font-size:clamp(22px,4vw,34px);letter-spacing:-.04em}
+.awards-intro>p{margin:7px 0 15px;color:var(--muted);font-size:13px}
+.awards-summary{display:flex;flex-wrap:wrap;gap:18px;padding-top:13px;border-top:1px solid var(--line);color:var(--muted);font:600 9px var(--mono);letter-spacing:.08em}
+.awards-summary b{color:var(--text);font-size:15px;margin-right:4px}
+.awards-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.award-card{min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:11px;background:var(--panel)}
+.award-card-top{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--line);background:var(--panel2)}
+.award-number{color:var(--muted);font:600 10px var(--mono)}.award-category{font-size:13px;font-weight:800}
+.award-winner{padding:16px 16px 14px}.award-winner strong{display:block;margin-top:5px;color:var(--text);font-size:clamp(17px,2vw,22px);line-height:1.15}
+.award-winner p{margin:7px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
+.award-nominees{border-top:1px solid var(--line)}.award-nominees summary{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;cursor:pointer;list-style:none;color:var(--muted);font:600 9px var(--mono);letter-spacing:.1em}
+.award-nominees summary::-webkit-details-marker{display:none}.award-nominees summary b{color:var(--text);font-size:11px}
+.award-nominees ol{margin:0;padding:0 18px 14px 37px;color:var(--muted);font-size:11px;line-height:1.5}.award-nominees li{padding:5px 0 5px 3px}
+.award-nominees li.selected{color:var(--text);font-weight:800}.award-nominees li.selected::marker{color:var(--lime)}
+@media(max-width:760px){.awards-grid{grid-template-columns:1fr}.awards-intro{padding:16px}.award-winner{padding:14px}}
+/* Parlays page: week cards with all manager selections visible. */
+.parlay-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.parlay-summary>div{display:flex;flex-direction:column;gap:3px}.parlay-summary strong{font:800 27px var(--mono);line-height:1.1}.parlay-summary small{color:var(--muted);font:600 8px var(--mono);letter-spacing:.1em}
+.parlay-week-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.parlay-week-card{min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:11px;background:var(--panel)}
+.parlay-week-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 15px;background:var(--panel2);border-bottom:1px solid var(--line)}
+.parlay-week-head h3{margin:4px 0 0;font-size:14px}.parlay-placer{text-align:right}.parlay-placer span{display:block;color:var(--muted);font:600 8px var(--mono);letter-spacing:.1em}.parlay-placer strong{display:block;margin-top:4px;font-size:12px}
+.parlay-pick-list{padding:4px 14px}.parlay-pick{display:grid;grid-template-columns:62px minmax(0,1fr) 57px;align-items:center;gap:7px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.055)}
+.parlay-manager{color:var(--text);font-size:10px;font-weight:800}.parlay-selection{min-width:0;color:var(--muted);font-size:10px;line-height:1.35;overflow-wrap:anywhere}
+.parlay-result{justify-self:end;font:600 7px var(--mono);letter-spacing:.08em}.parlay-result.pending{color:var(--muted)}
+.parlay-empty{padding:18px;color:var(--muted);font-size:12px}.parlay-week-foot{display:flex;justify-content:space-between;gap:8px;padding:10px 14px;color:var(--muted);font:600 8px var(--mono);letter-spacing:.08em}
+@media(max-width:760px){.parlay-week-grid{grid-template-columns:1fr}.parlay-summary{padding:15px;gap:7px}.parlay-summary strong{font-size:23px}.parlay-pick{grid-template-columns:58px minmax(0,1fr) 52px}}
+/* Matchup left side mirrors the right-side information hierarchy and spacing. */
+.mu-side.side-a{grid-template-columns:minmax(0,.82fr) minmax(0,1fr) minmax(0,.9fr);grid-template-areas:"meta manager score"}
+.mu-side.side-b{grid-template-columns:minmax(0,.82fr) minmax(0,1fr) minmax(0,.9fr);grid-template-areas:"score manager meta"}
+.mu-side.side-a .mu-manager-meta{justify-self:start;align-items:flex-end;text-align:right}
+.mu-side.side-b .mu-manager-meta{justify-self:end;align-items:flex-start;text-align:left}
+.mu-side.side-a .mu-score-stack{justify-self:end}.mu-side.side-b .mu-score-stack{justify-self:start}
+@media(max-width:600px){.mu-side.side-a,.mu-side.side-b{grid-template-columns:minmax(0,.78fr) minmax(0,1fr) minmax(0,.86fr);gap:3px}}
