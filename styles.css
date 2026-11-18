@@ -3223,14 +3223,14 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 
 .hall-commissioner-label{position:absolute;top:12px;right:13px;display:inline-flex;align-items:center;padding:3px 7px;border:1px solid #d8b45d66;border-radius:999px;background:#d8b45d16;color:#f2d27f;font:700 7px var(--mono);letter-spacing:.14em;line-height:1;text-transform:uppercase}
 
-/* Consistent award-card sizing and aligned content. */
+/* Consistent award-card sizing with fully visible descriptions. */
 .awards-grid{align-items:stretch}
-.award-card{display:grid;grid-template-rows:58px minmax(0,1fr) auto;min-height:300px;height:100%}
+.award-card{display:grid;grid-template-rows:58px auto 1fr;min-height:300px;height:100%}
 .award-card-top{min-height:58px;height:58px;box-sizing:border-box;overflow:hidden}
 .award-category{display:-webkit-box;min-width:0;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;line-height:1.25}
-.award-winner{min-height:0;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden;padding:14px 16px}
+.award-winner{min-height:0;display:flex;flex-direction:column;justify-content:flex-start;overflow:visible;padding:14px 16px}
 .award-winner strong{display:-webkit-box;min-height:2.3em;max-height:2.3em;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;font-size:clamp(16px,1.7vw,20px);line-height:1.15;overflow-wrap:anywhere}
-.award-winner p{display:-webkit-box;min-height:3em;max-height:4.5em;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-height:1.5}
+.award-winner p{display:block;min-height:0;max-height:none;overflow:visible;-webkit-line-clamp:unset;line-height:1.5}
 .award-nominees{align-self:stretch}
 .award-nominees summary{min-height:42px;box-sizing:border-box}
 @media(max-width:760px){.award-card{min-height:280px}.award-winner{padding:13px 14px}}
