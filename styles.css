@@ -3239,3 +3239,17 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 /* Keep the site navigation strictly horizontal on touch and desktop. */
 .site-nav{overflow-x:auto;overflow-y:hidden;overscroll-behavior-y:contain;touch-action:pan-x;}
 @media(max-width:760px){.site-nav{overflow-x:auto!important;overflow-y:hidden!important;touch-action:pan-x;}}
+
+
+/* Legacy playoff brackets use the same matchup-card tree as Sleeper seasons. */
+.hall-bracket-legacy-playoff{min-height:350px}
+.hall-bracket-legacy-playoff .hall-tree-column{min-width:0;position:relative;overflow:visible}
+.hall-bracket-legacy-playoff .hall-round-games{min-height:285px;display:flex;flex-direction:column;justify-content:space-around;gap:12px}
+.hall-bracket-legacy-playoff .hall-tree-game{width:100%;max-width:205px;min-width:0;margin:0 auto}
+.hall-bracket-legacy-playoff .hall-tree-team{position:relative;justify-content:center;text-align:center;padding:7px 26px 7px 22px}
+.hall-bracket-legacy-playoff .hall-tree-team>span{display:block;width:100%;text-align:center;white-space:normal}
+.hall-bracket-legacy-playoff .hall-tree-final{display:flex;align-items:center;justify-content:center;flex:1}
+.hall-bracket-legacy-playoff .hall-tree-finals .hall-round-games{justify-content:center}
+.hall-bracket-legacy-four{grid-template-columns:1.25fr .9fr;min-height:320px;gap:30px}
+.hall-bracket-legacy-four .hall-tree-round-one .hall-round-games,.hall-bracket-legacy-four .hall-tree-finals .hall-round-games{min-height:285px}
+@media(max-width:720px){.hall-bracket-legacy-four{min-width:600px;gap:22px}.hall-bracket-legacy-playoff .hall-bracket-round-label{font-size:9px}}
