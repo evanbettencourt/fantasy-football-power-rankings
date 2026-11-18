@@ -1414,7 +1414,7 @@ function hallBracketMarkup(year,championRow){
 function hallSleeperStandingsMarkup(row){
  const standings=row?.standings||[];
  if(!standings.length)return "";
- return '<section class="hall-season-standings"><h3>FINAL REGULAR-SEASON STANDINGS</h3><div class="hall-season-table-wrap"><table class="hall-season-table"><thead><tr><th>#</th><th>MANAGER</th><th>W-L</th><th>POINTS</th><th>STATUS</th></tr></thead><tbody>'+standings.map(item=>'<tr><td>'+item.rank+'</td><td>'+escapeHtml(item.manager)+'</td><td>'+item.wins+'-'+item.losses+'</td><td>'+fmt(item.points)+'</td><td>'+(item.playoff?'<span class="hall-season-playoff">PLAYOFFS</span>':'—')+'</td></tr>').join("")+'</tbody></table></div><p class="hall-archive-note">SLEEPER ARCHIVE · STANDINGS USE COMPLETED REGULAR-SEASON WEEKS AND LEAGUE MEDIAN WINS WHERE ENABLED.</p></section>';
+ return '<section class="hall-season-standings"><h3>'+(Number(row.completedRegularWeeks)>=Number(row.regularWeeks)&&Number(row.regularWeeks)>0?"FINAL":"CURRENT")+' REGULAR-SEASON STANDINGS</h3><div class="hall-season-table-wrap"><table class="hall-season-table"><thead><tr><th>#</th><th>MANAGER</th><th>W-L</th><th>POINTS</th><th>STATUS</th></tr></thead><tbody>'+standings.map(item=>'<tr><td>'+item.rank+'</td><td>'+escapeHtml(item.manager)+'</td><td>'+item.wins+'-'+item.losses+'</td><td>'+fmt(item.points)+'</td><td>'+(item.playoff?'<span class="hall-season-playoff">PLAYOFFS</span>':'—')+'</td></tr>').join("")+'</tbody></table></div><p class="hall-archive-note">SLEEPER ARCHIVE · STANDINGS USE COMPLETED REGULAR-SEASON WEEKS AND LEAGUE MEDIAN WINS WHERE ENABLED.</p></section>';
 }
 function hallAwardsMarkup(){
  const count=AWARDS_2025.reduce((n,a)=>n+a.nominees.length,0);
