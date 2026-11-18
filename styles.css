@@ -2842,6 +2842,6 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 @media(max-width:720px){
   .hall-bracket-playoff .hall-tree-round-one .hall-round-games{height:308px;min-height:308px;grid-template-rows:repeat(4,68px);row-gap:9px}
   .hall-bracket-playoff .hall-tree-round-two .hall-round-games{height:308px;min-height:308px}
-  .hall-bracket-playoff .hall-tree-round-two .hall-round-games>.hall-tree-game:nth-child(1){top:38px}
-  .hall-bracket-playoff .hall-tree-round-two .hall-round-games>.hall-tree-game:nth-child(2){top:191px}
+  .hall-bracket-playoff .hall-tree-round-two .hall-round-games>.hall-tree-game:nth-child(1){top:35px}
+  .hall-bracket-playoff .hall-tree-round-two .hall-round-games>.hall-tree-game:nth-child(2){top:189px}
 }
