@@ -19,6 +19,7 @@
     <button class="nav-tab active" data-tab="league">League</button>
     <button class="nav-tab" data-tab="lottery">Draft Lottery</button>
     <button class="nav-tab" data-tab="rankings">Power Rankings</button>
+    <button class="nav-tab" data-tab="schedule">Schedule</button>
 <button class="nav-tab" data-tab="hall">Hall of Fame</button>
     <button class="nav-tab" data-tab="rules">Rules</button>
   </nav>
@@ -120,6 +121,34 @@
             </section>
           </main>
         </div>
+      </div>
+    </section>
+    <section class="section tab-panel schedule-page" data-panel="schedule" hidden>
+      <div class="schedule-hero">
+        <div class="eyebrow">MONKEY BOYS · <span id="schedule-season">2026 SEASON</span></div>
+        <div class="schedule-hero-row"><h1>Schedule</h1><div class="schedule-crest" aria-label="Monkey Boys crest">MB</div></div>
+        <p class="schedule-intro">Sleeper randomizes the regular-season schedule after the draft. Over the first 11 weeks, every team faces each of the other 11 teams once. Weeks 12–14 bring back the matchups from Weeks 1–3.</p>
+      </div>
+      <div class="schedule-phase-track" aria-label="Season schedule phases">
+        <div class="schedule-phase regular"><strong>Regular Season</strong><span>Weeks 1–11</span></div>
+        <div class="schedule-phase rematch"><strong>Rematch Weeks</strong><span>Weeks 12–14</span></div>
+        <div class="schedule-phase playoffs"><strong>Playoffs</strong><span>Weeks 15–17</span></div>
+      </div>
+      <div class="schedule-body">
+        <section class="schedule-section">
+          <div class="schedule-section-heading">Follow a Team</div>
+          <p class="schedule-hint">Select a manager to highlight their matchups throughout the schedule. Select them again to clear.</p>
+          <div id="schedule-team-picks" class="schedule-team-picks"></div>
+        </section>
+        <section class="schedule-section">
+          <div class="schedule-section-heading">Week by Week</div>
+          <div id="schedule-content" class="schedule-grid"><p class="empty-note">Loading the Sleeper schedule…</p></div>
+        </section>
+        <section class="schedule-section schedule-playoff-section">
+          <div class="schedule-section-heading">The Playoffs</div>
+          <p class="schedule-playoff-note">The six-team playoff runs Weeks 15–17. The top two seeds receive first-round byes, and the semifinals reseed based on the opening-round results.</p>
+          <div class="schedule-playoff-bracket"><img src="playoff-bracket.svg" alt="Six-team playoff bracket for Weeks 15–17, including first-round byes, reseeded semifinals, and championship payouts."/></div>
+        </section>
       </div>
     </section>
     <section class="section tab-panel extra-panel" data-panel="hall" hidden><div class="eyebrow">THE RECORD BOOK</div><h2>Hall of Fame</h2><p>League champions and all-time achievements.</p><div id="hall-content"></div></section>
