@@ -1092,7 +1092,12 @@ async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,
    draftRows.push({draftId:draft.draft_id,type:draft.type||"snake",season:year,picks:picksMapped,slotManagers,rounds:Number(draft.settings?.rounds)||Math.ceil(picksMapped.length/Math.max(1,rosters.length)),slots});
   }catch(error){errors.push("Draft picks unavailable for "+(draft.draft_id||year));}
  }
- const weeks=Array.from({length:regularWeeks},(_,i)=>i+1);
+ // Positional Leaders use full NFL regular-season half-PPR totals, not
+ // only the fantasy league's Weeks 1 through playoff_week_start - 1.
+ // Historical seasons include NFL regular-season Weeks 1-18; the current
+ // season is limited to completed weeks passed in by the caller.
+ const statsWeeks=year<Number(league.season)?18:regularWeeks;
+ const weeks=Array.from({length:statsWeeks},(_,i)=>i+1);
  const statsByPlayer=new Map();
  await Promise.all(weeks.map(async week=>{
   try{
@@ -1101,12 +1106,10 @@ async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,
     const pos=players?.[playerId]?.position;
     if(!["QB","RB","WR","TE"].includes(pos))continue;
     const stats=row?.stats||row;
-    const leaguePoints=hallScoringPoints(stats,league.scoring_settings);
     const halfPpr=stats?.pts_half_ppr!=null&&stats?.pts_half_ppr!==""?Number(stats.pts_half_ppr):NaN;
-    const pts=leaguePoints!=null?leaguePoints:(Number.isFinite(halfPpr)?halfPpr:null);
-    if(pts==null)continue;
+    if(!Number.isFinite(halfPpr))continue;
     const old=statsByPlayer.get(playerId)||{points:0,playerId,position:pos};
-    old.points+=pts;statsByPlayer.set(playerId,old);
+    old.points+=halfPpr;statsByPlayer.set(playerId,old);
    }
   }catch(error){errors.push("Player stats unavailable for "+year+" Week "+week);}
  }));
