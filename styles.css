@@ -2597,7 +2597,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 /* Draft board pick cells are individual rounded player tiles, not a rigid grid. */
 .hall-draft-table{border-collapse:separate;border-spacing:5px 6px;min-width:0;table-layout:fixed}
 .hall-draft-table th{background:transparent;border:0;padding:8px 4px}
-.hall-draft-table td{border:0!important;padding:0!important;background:transparent!important}
+.hall-draft-table td{border:0!important;padding:0!important}.hall-draft-table td:not(.hall-draft-pick){background:transparent!important}
 .hall-draft-table td.hall-draft-pick{height:74px;padding:9px 7px 19px!important;border:0!important;border-radius:9px;overflow:hidden;vertical-align:top}
 .hall-draft-table td.hall-draft-pick b{font-size:11px}
 .hall-draft-table td.hall-draft-pick small{font-size:8px}
