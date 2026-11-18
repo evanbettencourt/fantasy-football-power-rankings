@@ -1346,80 +1346,42 @@ function buildHallRecordBook(games,seasonTotals){
   {key:"lowest-win",title:"Fewest Points in a Win",icon:"😬",value:lowestWin?fmt(lowestWin.winnerScore)+" pts":"—",holder:lowestWin?lowestWin.winner+" over "+lowestWin.loser:"No data",detail:lowestWin?lowestWin.year+" · "+lowestWin.label+" · "+fmt(lowestWin.winnerScore)+"–"+fmt(lowestWin.loserScore):"No completed matchups"}
  ];
 }
-const HALL_SPRITE_PALETTES={
- Kevin:{C:"#2479d8",D:"#12345f",A:"#f4c542",S:"#e9b58c",P:"#174a91"},
- Marc:{C:"#8a55d8",D:"#38235f",A:"#f3b4ff",S:"#e5ad83",P:"#57339b"},
- Colby:{C:"#2eaa70",D:"#14543c",A:"#d8ef72",S:"#d89b72",P:"#176a50"},
- Ben:{C:"#d94b38",D:"#70251f",A:"#ffc34d",S:"#e6b18a",P:"#9e302d"},
- Brandon:{C:"#db8a24",D:"#68401a",A:"#f7e07a",S:"#d99c76",P:"#a75c1b"},
- Evan:{C:"#258dba",D:"#16445e",A:"#e9e8f2",S:"#efbd96",P:"#1c5c8a"},
- Pat:{C:"#b94e9b",D:"#5a2854",A:"#f2d46d",S:"#d99b7a",P:"#7f326c"},
- Joey:{C:"#d44a36",D:"#63231f",A:"#39d5e6",S:"#e8b18c",P:"#922d2a"},
- Butta:{C:"#5c9d35",D:"#2b4b22",A:"#e8cb50",S:"#bd805f",P:"#3e7029"},
- Lee:{C:"#596bdb",D:"#29346d",A:"#d5e5ff",S:"#e5b08a",P:"#35469b"},
- Ders:{C:"#c3a12e",D:"#66521a",A:"#f4e5a2",S:"#d69b76",P:"#8a6b20"},
- Tanz:{C:"#a64cc4",D:"#4b2362",A:"#f5a7d7",S:"#e5b08a",P:"#702e8c"},
- Roth:{C:"#b8b8c2",D:"#51515e",A:"#eeeeef",S:"#c8c8cc",P:"#777783"},
- Sam:{C:"#aeb7c4",D:"#454f5d",A:"#e9eef5",S:"#c8c8cc",P:"#707d90"},
- Schmeef:{C:"#a7a7a7",D:"#4c4c4c",A:"#e6e6e6",S:"#c4c4c4",P:"#777777"},
- Hess:{C:"#a7a7a7",D:"#4c4c4c",A:"#e6e6e6",S:"#c4c4c4",P:"#777777"},
- Campbell:{C:"#a7a7a7",D:"#4c4c4c",A:"#e6e6e6",S:"#c4c4c4",P:"#777777"}
+const HALL_CHARACTER_DESIGNS={
+ Kevin:{suit:"#2479d8",shadow:"#12345f",trim:"#f4c542",skin:"#d9a17d",hair:"#d9b46c",hairPath:"M35 37Q29 17 46 12Q62 4 76 17Q88 25 80 43L72 34L63 29Q51 38 35 37Z",beard:"",eyes:"#3b91d4",brow:"#68452f",accessory:'<path d="M38 25L48 13L58 20L69 12L81 26" fill="none" stroke="#f4c542" stroke-width="4" stroke-linecap="round"/><path d="M70 14L82 4" stroke="#fff1a8" stroke-width="2.5" stroke-linecap="round"/>',emblem:"⚡"},
+ Marc:{suit:"#8a55d8",shadow:"#38235f",trim:"#f3b4ff",skin:"#e5ad83",hair:"#27233d",hairPath:"M34 37Q28 15 45 13Q63 4 78 18Q87 28 79 40L73 30Q60 33 53 25Q45 35 34 37Z",beard:'<path d="M40 54Q45 64 59 63Q72 62 76 53L72 65Q60 75 47 66Z" fill="#27233d"/>',eyes:"#8a55d8",brow:"#27233d",accessory:'<path d="M34 34Q47 29 58 34" fill="none" stroke="#b98aff" stroke-width="3"/><circle cx="76" cy="42" r="8" fill="none" stroke="#f3b4ff" stroke-width="2.5"/><path d="M82 48L87 54" stroke="#f3b4ff" stroke-width="2"/>',emblem:"✦"},
+ Colby:{suit:"#2eaa70",shadow:"#14543c",trim:"#d8ef72",skin:"#c98b67",hair:"#50352b",hairPath:"M33 39Q25 23 36 15Q42 5 51 13Q59 2 67 12Q82 9 84 25Q88 35 78 42L73 30Q62 35 57 26Q48 35 39 31Z",beard:'<path d="M40 54Q43 69 59 70Q75 68 77 53L70 68Q59 75 48 68Z" fill="#50352b"/>',eyes:"#4b9e65",brow:"#50352b",accessory:'<path d="M34 27Q57 15 82 27" fill="none" stroke="#d8ef72" stroke-width="5"/><circle cx="44" cy="46" r="1.5" fill="#9b5e4a"/><circle cx="73" cy="46" r="1.5" fill="#9b5e4a"/>',emblem:"✚"},
+ Ben:{suit:"#d94b38",shadow:"#70251f",trim:"#ffc34d",skin:"#e2a47f",hair:"#8e2d26",hairPath:"M34 39Q27 23 37 15L43 18L45 3L54 14L62 1L66 17L80 11Q87 28 78 41L72 30Q56 35 42 30Z",beard:'<path d="M39 53Q42 68 58 71Q74 69 78 52L73 68Q59 80 45 68Z" fill="#8e2d26"/>',eyes:"#477caa",brow:"#68251f",accessory:'<path d="M43 19L50 7L57 17L64 5L68 22" fill="none" stroke="#ffc34d" stroke-width="3" stroke-linejoin="round"/>',emblem:"★"},
+ Brandon:{suit:"#db8a24",shadow:"#68401a",trim:"#f7e07a",skin:"#d69a72",hair:"#34251f",hairPath:"M33 38Q27 24 36 16L44 20L42 8L54 16L59 5L66 18L78 12Q87 28 79 40L71 31Q54 35 42 30Z",beard:'<path d="M41 54Q47 61 58 60Q69 61 75 53L70 64Q58 70 46 64Z" fill="#34251f"/>',eyes:"#7d5528",brow:"#34251f",accessory:'<path d="M34 32Q57 25 81 32" fill="none" stroke="#f7e07a" stroke-width="3"/><rect x="34" y="28" width="18" height="10" rx="4" fill="#25364a" stroke="#f7e07a" stroke-width="2"/><rect x="63" y="28" width="18" height="10" rx="4" fill="#25364a" stroke="#f7e07a" stroke-width="2"/><path d="M52 32H63" stroke="#f7e07a" stroke-width="2"/>',emblem:"☀"},
+ Evan:{suit:"#258dba",shadow:"#16445e",trim:"#e9e8f2",skin:"#e9b995",hair:"#332d32",hairPath:"M33 39Q27 21 39 13Q53 4 67 13Q84 15 82 36L75 31Q68 21 59 25Q47 18 38 34Z",beard:'<path d="M40 55Q45 65 58 66Q70 65 76 54L70 66Q58 72 47 66Z" fill="#51434a" opacity=".85"/>',eyes:"#4d9fc0",brow:"#332d32",accessory:'<path d="M33 28Q57 21 82 28" fill="none" stroke="#e9e8f2" stroke-width="3"/><path d="M35 21L30 15M79 21L85 15" stroke="#e9e8f2" stroke-width="2.5" stroke-linecap="round"/>',emblem:"✧"},
+ Pat:{suit:"#b94e9b",shadow:"#5a2854",trim:"#f2d46d",skin:"#d49a78",hair:"#743b4d",hairPath:"M34 38Q27 17 43 11Q59 3 75 15Q87 28 80 48L73 39L72 27Q60 19 51 25Q43 20 37 35Z",beard:"",eyes:"#8f5e9f",brow:"#552b42",accessory:'<path d="M31 32Q57 22 84 32L80 41Q57 34 35 42Z" fill="#5a2854" stroke="#f2d46d" stroke-width="2"/><path d="M36 34L80 34" stroke="#f2d46d" stroke-width="1.5"/>',emblem:"✦"},
+ Joey:{suit:"#d44a36",shadow:"#63231f",trim:"#39d5e6",skin:"#e3ad8b",hair:"#211d2b",hairPath:"M34 38Q27 21 39 13Q54 3 70 13Q84 21 80 40L72 32Q60 30 53 24Q44 35 35 34Z",beard:'<path d="M41 55Q46 66 59 67Q72 66 76 54L71 67Q58 75 46 67Z" fill="#211d2b"/>',eyes:"#39d5e6",brow:"#211d2b",accessory:'<path d="M65 40L82 40L79 49L64 49Z" fill="#39d5e6" opacity=".88"/><path d="M66 44H78" stroke="#fff" stroke-width="1.5"/>',emblem:"◆"},
+ Butta:{suit:"#5c9d35",shadow:"#2b4b22",trim:"#e8cb50",skin:"#a96f53",hair:"#252629",hairPath:"M35 38Q30 24 40 16Q53 8 68 15Q79 19 80 36L72 31Q58 27 44 32Z",beard:'<path d="M40 54Q46 64 58 64Q70 64 76 54L70 65Q58 71 46 65Z" fill="#252629"/>',eyes:"#86b75a",brow:"#252629",accessory:'<path d="M35 50Q57 55 81 50L78 58Q58 64 38 58Z" fill="#2b4b22" stroke="#e8cb50" stroke-width="1.5"/><path d="M43 53L73 53" stroke="#e8cb50" stroke-width="1.5"/>',emblem:"✚"},
+ Lee:{suit:"#596bdb",shadow:"#29346d",trim:"#d5e5ff",skin:"#e4b18d",hair:"#c8cbd5",hairPath:"M33 39Q27 19 43 12Q60 4 76 17Q86 26 80 41L74 32Q60 26 53 31Q43 25 36 37Z",beard:"",eyes:"#5479c9",brow:"#777f99",accessory:'<path d="M33 42Q57 36 82 42" fill="none" stroke="#d5e5ff" stroke-width="2.5"/><circle cx="45" cy="46" r="7" fill="none" stroke="#d5e5ff" stroke-width="2"/><circle cx="70" cy="46" r="7" fill="none" stroke="#d5e5ff" stroke-width="2"/><path d="M52 45H63" stroke="#d5e5ff" stroke-width="2"/>',emblem:"✦"},
+ Ders:{suit:"#c3a12e",shadow:"#66521a",trim:"#f4e5a2",skin:"#d49a76",hair:"#b77b3e",hairPath:"M34 38Q27 22 40 14Q54 6 70 13Q84 20 80 39L73 32Q62 26 52 30Q42 25 36 36Z",beard:'<path d="M42 54Q48 60 59 60Q69 60 75 54L70 64Q58 69 47 64Z" fill="#8a512d"/>',eyes:"#6d8b8a",brow:"#8a512d",accessory:'<path d="M36 24Q57 13 80 25" fill="none" stroke="#f4e5a2" stroke-width="3.5"/><path d="M57 15L62 7L67 16" fill="#f4e5a2" stroke="#8a6b20" stroke-width="1.5"/>',emblem:"★"},
+ Tanz:{suit:"#a64cc4",shadow:"#4b2362",trim:"#f5a7d7",skin:"#e6ad89",hair:"#51244e",hairPath:"M33 40Q26 19 42 11Q59 2 76 16Q88 29 79 47L72 37Q67 26 58 27Q46 33 37 38Z",beard:"",eyes:"#b35bd2",brow:"#51244e",accessory:'<path d="M34 34Q57 24 82 34L78 43Q57 36 37 43Z" fill="#51244e" stroke="#f5a7d7" stroke-width="2"/><path d="M41 36L49 35M67 35L76 36" stroke="#f5a7d7" stroke-width="1.5"/>',emblem:"✧"},
+ Roth:{suit:"#737b8c",shadow:"#343b4c",trim:"#eeeeef",skin:"#c8a28c",hair:"#aeb6c4",hairPath:"M34 38Q28 20 42 12Q59 4 75 16Q85 26 80 40L73 32Q57 26 47 31Q40 29 35 38Z",beard:'<path d="M41 54Q47 65 59 65Q71 65 76 54L70 66Q58 72 47 66Z" fill="#8e929c"/>',eyes:"#8493b2",brow:"#747d8e",accessory:'<path d="M34 25Q57 17 81 26" fill="none" stroke="#eeeeef" stroke-width="3"/>',emblem:"♜"},
+ Sam:{suit:"#65758c",shadow:"#303d51",trim:"#e9eef5",skin:"#c99e83",hair:"#604d43",hairPath:"M34 39Q27 22 40 14Q55 5 70 14Q84 23 79 40L72 31Q61 26 52 30Q43 26 36 37Z",beard:'<path d="M40 54Q45 67 59 68Q72 67 77 54L70 69Q58 76 46 68Z" fill="#604d43"/>',eyes:"#7d9aa8",brow:"#604d43",accessory:'<path d="M34 27Q56 20 81 28" fill="none" stroke="#e9eef5" stroke-width="3"/><path d="M77 29L85 23" stroke="#e9eef5" stroke-width="2"/>',emblem:"♜"},
+ Schmeef:{suit:"#737373",shadow:"#3d3d3d",trim:"#e6e6e6",skin:"#c5a18c",hair:"#686868",hairPath:"M34 39Q27 20 42 13Q59 4 75 17Q85 27 79 40L72 32Q58 27 47 31Q39 29 34 39Z",beard:"",eyes:"#9b9b9b",brow:"#555",accessory:'<path d="M34 25Q57 17 81 26" fill="none" stroke="#e6e6e6" stroke-width="3"/>',emblem:"◇"},
+ Hess:{suit:"#737373",shadow:"#3d3d3d",trim:"#e6e6e6",skin:"#d0a78d",hair:"#423c38",hairPath:"M33 39Q28 22 40 14Q54 6 69 14Q84 22 80 40L73 31Q59 27 49 31Q40 28 35 38Z",beard:'<path d="M40 54Q46 65 59 65Q71 65 76 54L70 66Q58 72 46 66Z" fill="#423c38"/>',eyes:"#999",brow:"#423c38",accessory:'<path d="M35 27Q57 19 81 27" fill="none" stroke="#e6e6e6" stroke-width="3"/>',emblem:"◇"},
+ Campbell:{suit:"#737373",shadow:"#3d3d3d",trim:"#e6e6e6",skin:"#b98368",hair:"#262626",hairPath:"M34 38Q28 22 40 15Q55 6 70 14Q83 21 79 39L72 32Q57 28 47 31Q39 28 35 38Z",beard:'<path d="M40 54Q46 67 59 67Q72 67 77 54L70 68Q58 75 46 68Z" fill="#262626"/>',eyes:"#9b9b9b",brow:"#262626",accessory:'<path d="M34 26Q57 18 81 27" fill="none" stroke="#e6e6e6" stroke-width="3"/>',emblem:"◇"}
 };
-const HALL_SPRITE_DETAILS={
- Kevin:'<path d="M4 7L3 3H6L8 1L10 3H13L12 7" fill="#f4c542" stroke="#101321" stroke-width=".7"/><rect x="7" y="4" width="2" height="2" fill="#fff2a8"/>',
- Marc:'<path d="M5 9L1 11L2 20L5 18L7 12M11 9L15 11L14 20L11 18L9 12" fill="#8a55d8" stroke="#101321" stroke-width=".7"/><rect x="6" y="3" width="4" height="1" fill="#f3b4ff"/>',
- Colby:'<path d="M4 5L3 2H6L8 1L10 2H13L12 5" fill="#d8ef72" stroke="#101321" stroke-width=".7"/><rect x="5" y="4" width="6" height="2" fill="#8ee6b0"/>',
- Ben:'<path d="M4 5L3 2L6 3L8 1L10 3L13 2L12 5" fill="#ffc34d" stroke="#101321" stroke-width=".7"/><rect x="7" y="10" width="2" height="2" fill="#fff1b4"/>',
- Brandon:'<path d="M3 7L2 4L5 4L6 2L8 3L10 2L11 4L14 4L13 7" fill="#f7e07a" stroke="#101321" stroke-width=".7"/><rect x="7" y="14" width="2" height="2" fill="#f7e07a"/>',
- Evan:'<path d="M4 6L2 3L6 3L8 1L10 3L14 3L12 6" fill="#e9e8f2" stroke="#101321" stroke-width=".7"/><path d="M4 9L1 13L4 18L6 12M12 9L15 13L12 18L10 12" fill="#258dba" stroke="#101321" stroke-width=".7"/>',
- Pat:'<path d="M4 6L3 2L6 3L8 1L10 3L13 2L12 6" fill="#f2d46d" stroke="#101321" stroke-width=".7"/><path d="M3 9L1 12L3 16L6 13M13 9L15 12L13 16L10 13" fill="#b94e9b" stroke="#101321" stroke-width=".7"/>',
- Joey:'<path d="M4 6L2 3L6 3L8 1L10 3L14 3L12 6" fill="#39d5e6" stroke="#101321" stroke-width=".7"/><path d="M5 10L2 13L5 17L7 12M11 10L14 13L11 17L9 12" fill="#d44a36" stroke="#101321" stroke-width=".7"/>',
- Butta:'<path d="M4 6L2 3L6 2L8 1L10 2L14 3L12 6" fill="#e8cb50" stroke="#101321" stroke-width=".7"/><path d="M3 9L1 12L4 16L6 12M13 9L15 12L12 16L10 12" fill="#5c9d35" stroke="#101321" stroke-width=".7"/>',
- Lee:'<path d="M4 6L2 3L6 3L8 1L10 3L14 3L12 6" fill="#d5e5ff" stroke="#101321" stroke-width=".7"/><path d="M3 9L1 12L4 15L6 11M13 9L15 12L12 15L10 11" fill="#596bdb" stroke="#101321" stroke-width=".7"/>',
- Ders:'<path d="M4 6L3 2L6 3L8 1L10 3L13 2L12 6" fill="#f4e5a2" stroke="#101321" stroke-width=".7"/><path d="M4 9L1 12L4 16L6 12M12 9L15 12L12 16L10 12" fill="#c3a12e" stroke="#101321" stroke-width=".7"/>',
- Tanz:'<path d="M4 6L2 3L6 2L8 1L10 2L14 3L12 6" fill="#f5a7d7" stroke="#101321" stroke-width=".7"/><path d="M4 9L1 12L4 17L6 12M12 9L15 12L12 17L10 12" fill="#a64cc4" stroke="#101321" stroke-width=".7"/>',
- Roth:'<path d="M4 6L2 3L6 3L8 1L10 3L14 3L12 6" fill="#eeeeef" stroke="#101321" stroke-width=".7"/>',
- Sam:'<path d="M4 6L2 3L6 3L8 1L10 3L14 3L12 6" fill="#e9eef5" stroke="#101321" stroke-width=".7"/>'
-};
-const HALL_SPRITE_BODY=[
-"................",
-"......OOOO......",
-".....ODDDDO.....",
-".....DSSSSD.....",
-".....DSSSSD.....",
-"......DAAD......",
-".......DD.......",
-"....OOOCCOOO....",
-"...ODCCCCCCDO...",
-"...DCCCCCCCCD...",
-"....DCCCCCCD....",
-".....DCCCD......",
-"...OOCCCCCCOO...",
-"..ODCCCCCCCCDO..",
-"..DCCCAACCCCD...",
-"...DCCCCCCCD....",
-".....DD..DD.....",
-".....DD..DD.....",
-".....DD..DD.....",
-"....ODD..DDO....",
-"....DPP..PPD....",
-"....DDD..DDD....",
-"....DDD..DDD....",
-"....OOOOOOOO...."
-];
 function hallPixelAvatar(name){
- const palette=HALL_SPRITE_PALETTES[name]||HALL_SPRITE_PALETTES.Kevin;
- const rows=HALL_SPRITE_BODY;
- const pixels=[];
- const colorFor=ch=>({O:"#101321",D:palette.D,S:palette.S,C:palette.C,A:palette.A,P:palette.P})[ch]||null;
- rows.forEach((line,y)=>[...line].forEach((ch,x)=>{
-  const fill=colorFor(ch);if(fill)pixels.push('<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+fill+'"/>');
- }));
- const accent=name==="Kevin"?"⚡":name==="Marc"?"✦":name==="Colby"?"✚":name==="Ben"?"★":name==="Brandon"?"☀":name==="Evan"?"✧":name==="Pat"?"✦":name==="Joey"?"◆":name==="Butta"?"✚":name==="Lee"?"✦":name==="Ders"?"★":"✧";
- const svg='<svg class="hall-pixel-avatar" viewBox="0 0 16 24" role="img" aria-label="'+escapeHtml(name)+' full-body pixel hero" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="16" height="24" fill="#111426"/><ellipse cx="8" cy="23.4" rx="5" ry=".5" fill="#000" opacity=".5"/>'+pixels.join("")+(HALL_SPRITE_DETAILS[name]||"")+'<rect x="7" y="8" width="2" height="1" fill="'+palette.A+'"/><rect x="7" y="13" width="2" height="1" fill="'+palette.A+'"/><rect x="7" y="20" width="2" height="1" fill="'+palette.A+'"/></svg>';
+ const d=HALL_CHARACTER_DESIGNS[name]||HALL_CHARACTER_DESIGNS.Kevin;
+ const svg='<svg class="hall-character-avatar" viewBox="0 0 116 116" role="img" aria-label="'+escapeHtml(name)+' fantasy video game character" xmlns="http://www.w3.org/2000/svg">'+
+ '<defs><linearGradient id="bg-'+name+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+d.shadow+'"/><stop offset="1" stop-color="#101321"/></linearGradient><linearGradient id="armor-'+name+'" x1="0" y1="0" x2="0" y2="1"><stop stop-color="'+d.suit+'"/><stop offset="1" stop-color="'+d.shadow+'"/></linearGradient><linearGradient id="face-'+name+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+d.skin+'"/><stop offset="1" stop-color="'+d.skin+'" stop-opacity=".72"/></linearGradient></defs>'+
+ '<rect width="116" height="116" rx="12" fill="url(#bg-'+name+')"/><circle cx="58" cy="43" r="48" fill="'+d.suit+'" opacity=".12"/>'+
+ '<path d="M12 116Q15 84 39 78L58 73L78 78Q102 84 105 116Z" fill="url(#armor-'+name+')"/><path d="M13 116Q22 91 42 87L58 100L74 87Q95 91 103 116Z" fill="'+d.shadow+'"/>'+
+ '<path d="M42 72L42 86L58 100L74 86L74 72Z" fill="url(#face-'+name+')"/><path d="M37 41Q37 24 58 23Q79 24 79 42L76 60Q73 76 58 79Q43 76 40 60Z" fill="url(#face-'+name+')"/>'+
+ '<path d="M36 47Q28 44 31 55Q33 62 41 62M80 47Q88 44 85 55Q83 62 75 62" fill="'+d.skin+'" stroke="'+d.shadow+'" stroke-width="1.5"/>'+
+ d.hairPath+'<path d="M43 45Q49 41 54 45M63 45Q69 41 74 45" fill="none" stroke="'+d.brow+'" stroke-width="2.8" stroke-linecap="round"/>'+
+ '<ellipse cx="48" cy="51" rx="4.3" ry="3.2" fill="#fff"/><ellipse cx="68" cy="51" rx="4.3" ry="3.2" fill="#fff"/><circle cx="49" cy="51" r="2.1" fill="'+d.eyes+'"/><circle cx="67" cy="51" r="2.1" fill="'+d.eyes+'"/><circle cx="49.5" cy="50.5" r=".8" fill="#fff"/><circle cx="67.5" cy="50.5" r=".8" fill="#fff"/>'+
+ '<path d="M58 52L55 61L59 62" fill="none" stroke="#a66e58" stroke-width="1.5" stroke-linecap="round"/><path d="M51 68Q58 72 65 68" fill="none" stroke="#713e3c" stroke-width="2" stroke-linecap="round"/>'+
+ (d.beard||"")+'<path d="M41 83L58 100L75 83" fill="none" stroke="'+d.trim+'" stroke-width="3"/><path d="M22 100L42 85L58 100L74 85L94 100" fill="none" stroke="'+d.trim+'" stroke-width="2.5"/>'+
+ '<path d="M44 91L58 108L72 91L66 116H50Z" fill="'+d.suit+'" stroke="'+d.trim+'" stroke-width="1.4"/><path d="M51 93L58 100L65 93" fill="none" stroke="#ffffff" stroke-opacity=".45" stroke-width="2"/>'+
+ d.accessory+'<circle cx="58" cy="104" r="8" fill="'+d.shadow+'" stroke="'+d.trim+'" stroke-width="2"/><text x="58" y="107.5" text-anchor="middle" font-size="10" font-weight="900" fill="'+d.trim+'">'+d.emblem+'</text>'+
+ '<path d="M14 18L23 9M102 18L93 9" stroke="'+d.trim+'" stroke-width="2" opacity=".6"/><path d="M8 58H17M99 58H108" stroke="'+d.trim+'" stroke-width="1.5" opacity=".45"/></svg>';
  return svg;
 }
-
 function hallManagerHonors(name,stat){
  const seasons=[...(stat.seasons||new Set())].sort((a,b)=>a-b);
  const playoffYears=[...(stat.playoffAppearances||new Set())].sort((a,b)=>a-b);
