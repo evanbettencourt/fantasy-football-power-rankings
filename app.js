@@ -1416,7 +1416,7 @@ function hallPixelAvatar(name){
   const fill=colorFor(ch);if(fill)pixels.push('<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+fill+'"/>');
  }));
  const accent=name==="Kevin"?"⚡":name==="Marc"?"✦":name==="Colby"?"✚":name==="Ben"?"★":name==="Brandon"?"☀":name==="Evan"?"✧":name==="Pat"?"✦":name==="Joey"?"◆":name==="Butta"?"✚":name==="Lee"?"✦":name==="Ders"?"★":"✧";
- const svg='<svg class="hall-pixel-avatar" viewBox="0 0 16 24" role="img" aria-label="'+escapeHtml(name)+' full-body pixel hero" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="16" height="24" fill="#111426"/><ellipse cx="8" cy="23.4" rx="5" ry=".5" fill="#000" opacity=".5"/>'+(HALL_SPRITE_DETAILS[name]||"")+pixels.join("")+'<rect x="7" y="8" width="2" height="1" fill="'+palette.A+'"/><rect x="7" y="13" width="2" height="1" fill="'+palette.A+'"/><rect x="7" y="20" width="2" height="1" fill="'+palette.A+'"/></svg>';
+ const svg='<svg class="hall-pixel-avatar" viewBox="0 0 16 24" role="img" aria-label="'+escapeHtml(name)+' full-body pixel hero" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="16" height="24" fill="#111426"/><ellipse cx="8" cy="23.4" rx="5" ry=".5" fill="#000" opacity=".5"/>'+pixels.join("")+(HALL_SPRITE_DETAILS[name]||"")+'<rect x="7" y="8" width="2" height="1" fill="'+palette.A+'"/><rect x="7" y="13" width="2" height="1" fill="'+palette.A+'"/><rect x="7" y="20" width="2" height="1" fill="'+palette.A+'"/></svg>';
  return svg;
 }
 
