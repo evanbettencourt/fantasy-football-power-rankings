@@ -968,6 +968,18 @@ const PARLAY_TEAM_ALIASES = {
  "eagles":"Philadelphia Eagles","bengals":"Cincinnati Bengals","giants":"New York Giants","cardinals":"Arizona Cardinals","patriots":"New England Patriots","pats":"New England Patriots","chiefs":"Kansas City Chiefs","bills":"Buffalo Bills","lions":"Detroit Lions"
 };
 const PARLAY_PLAYER_INDEX = new WeakMap();
+const PARLAY_TEAM_ABBR = {eagles:"PHI",bengals:"CIN",giants:"NYG",cardinals:"ARI",patriots:"NE",pats:"NE",chiefs:"KC",bills:"BUF",lions:"DET"};
+function normalizeParlayStats(value){
+ const rows=Array.isArray(value)?value:value&&typeof value==="object"?Object.entries(value).map(([id,row])=>({player_id:row?.player_id??row?.id??id,...(row&&typeof row==="object"?row:{})})):[];
+ const normalized={};
+ for(const row of rows){
+  const id=String(row?.player_id??row?.id??"");
+  if(!id)continue;
+  const nested=row?.stats&&typeof row.stats==="object"?row.stats:{};
+  normalized[id]={...row,...nested};
+ }
+ return normalized;
+}
 function parlayPlayerEntry(players, fullName){
  if(!players||typeof players!=="object")return null;
  let index=PARLAY_PLAYER_INDEX.get(players);
@@ -1027,11 +1039,12 @@ function gradeParlayPick(pick,stats,players,schedule){
  const lower=raw.toLowerCase(),identity=parlayPickIdentity(raw);
  if(identity.team){
   const teamAlias=Object.keys(PARLAY_TEAM_ALIASES).find(name=>lower.includes(name));
-  const abbr=PARLAY_TEAM_ALIASES[teamAlias];
+  const abbr=PARLAY_TEAM_ABBR[teamAlias];
   const event=(schedule?.events||[]).find(ev=>(ev.competitions?.[0]?.competitors||[]).some(c=>String(c.team?.abbreviation||"").toUpperCase()===abbr));
   const comp=event?.competitions?.[0],teams=comp?.competitors||[];
   const team=teams.find(c=>String(c.team?.abbreviation||"").toUpperCase()===abbr),opp=teams.find(c=>c!==team);
-  if(!comp||!team||!opp||!(comp.status?.type?.completed??event.status?.type?.completed??false))return {status:"PENDING",detail:"Game not final"};
+  const finalStatus=comp?.status?.type||event?.status?.type||{};
+  if(!comp||!team||!opp||!(finalStatus.completed===true||finalStatus.state==="post"||finalStatus.name==="STATUS_FINAL"||event?.status?.type?.completed===true||event?.status?.type?.state==="post"))return {status:"PENDING",detail:"Game not final"};
   const margin=Number(team.score)-Number(opp.score),spread=raw.match(/([+-]\d+(?:\.\d+)?)/),adjusted=margin+(spread?Number(spread[1]):0);
   return {status:adjusted===0?"PUSH":adjusted>0?"HIT":"MISS",detail:team.score+"–"+opp.score+(spread?" · "+(adjusted>0?"covered":"did not cover"):"")};
  }
@@ -1042,7 +1055,7 @@ function gradeParlayPick(pick,stats,players,schedule){
  if(!stat)return {status:"PENDING",detail:"Sleeper stats unavailable"};
  const playerTeam=({JAC:"JAX",WAS:"WSH",LA:"LAR"}[String(player.team||"").toUpperCase()]||String(player.team||"").toUpperCase());
  const game=(schedule?.events||[]).find(ev=>(ev.competitions?.[0]?.competitors||[]).some(c=>String(c.team?.abbreviation||"").toUpperCase()===playerTeam));
- const competition=game?.competitions?.[0],finished=Boolean(competition?.status?.type?.completed??game?.status?.type?.completed??competition?.status?.type?.state==="post");
+ const competition=game?.competitions?.[0],competitionStatus=competition?.status?.type||{},eventStatus=game?.status?.type||{},finished=Boolean(competitionStatus.completed===true||eventStatus.completed===true||competitionStatus.state==="post"||eventStatus.state==="post"||competitionStatus.name==="STATUS_FINAL"||eventStatus.name==="STATUS_FINAL");
  if(!finished)return {status:"PENDING",detail:"Player's NFL game not final"};
  if(/yards?\s*\+\s*TD/i.test(raw)){
   const yards=parlayStatNumber(stat,"rush_yd"),td=["rush_td","rec_td","def_td","st_td","fum_rec_td"].reduce((sum,key)=>sum+(parlayStatNumber(stat,key)||0),0);
@@ -1098,7 +1111,7 @@ async function loadParlayWeek(week){
   fetchJson("/api/nfl-schedule?seasontype=2&week="+week+"&year="+encodeURIComponent(season),{attempts:1,timeoutMs:18000}).catch(()=>null),
   state.players?Promise.resolve(state.players):(state.playersPromise||=fetchJson("/players/nfl?active=true",{attempts:1,timeoutMs:25000}).then(v=>{state.players=v||{};return state.players}).catch(()=>({})))
  ]);
- state.parlayDataByWeek[week]={loaded:true,stats:stats||{},schedule:schedule||null,players:players||{}};
+ state.parlayDataByWeek[week]={loaded:true,stats:normalizeParlayStats(stats),schedule:schedule||null,players:players||{}};
 }
 function renderParlays(){
  const target=$("parlays-content");if(!target)return;
