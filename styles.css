@@ -1151,3 +1151,75 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .sch-nm.selected {
   color: #A8D8EA;
 }
+
+
+/* Matchups page — compact head-to-head cards in the Monkey Boys theme. */
+.matchups-page{padding-top:28px}
+.mu-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:8px 0 18px;border-bottom:2px solid var(--line)}
+.mu-eyebrow{margin:0 0 9px;color:var(--pink);font:600 10px var(--mono);letter-spacing:.18em;text-transform:uppercase}
+.mu-hero h1{margin:0;color:var(--text);font-size:clamp(34px,6vw,48px);font-weight:900;letter-spacing:-.055em;line-height:1}
+.mu-intro{margin:9px 0 0;color:var(--muted);font-size:13px}
+.mu-week-control{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.mu-week-control label{color:var(--muted);font:600 10px var(--mono);letter-spacing:.12em}
+.mu-week-control select{min-width:112px;padding:10px 12px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--text);font:600 11px var(--mono)}
+.mu-method-note{margin:13px 0 18px;color:var(--muted);font-size:10px;line-height:1.5}
+.mu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.mu-card{min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.012))}
+.mu-card-head{display:flex;justify-content:space-between;align-items:center;padding:10px 13px;border-bottom:1px solid var(--line);color:var(--muted);font:600 9px var(--mono);letter-spacing:.13em}
+.mu-live-tag{padding:4px 7px;border-radius:4px;background:rgba(255,255,255,.06);color:var(--muted);font-size:8px}
+.mu-live-tag.live{background:rgba(34,184,213,.12);color:#63D6E8}
+.mu-live-tag.final{background:rgba(168,230,207,.1);color:#A8E6CF}
+.mu-faceoff{display:grid;grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr);align-items:stretch;padding:14px 12px 10px;gap:5px}
+.mu-side{min-width:0}
+.mu-manager{display:flex;align-items:center;gap:8px;min-height:36px}
+.mu-rank{display:flex;align-items:center;justify-content:center;flex:0 0 30px;height:30px;border-radius:7px;background:var(--panel2);color:var(--muted);font:700 11px var(--mono)}
+.mu-manager-copy{min-width:0;display:flex;flex-direction:column;gap:3px}
+.mu-manager-copy strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;font-weight:800}
+.mu-manager-copy small{color:var(--muted);font:500 8px var(--mono);letter-spacing:.03em}
+.mu-versus{display:flex;align-items:center;justify-content:center;color:var(--muted);font:700 9px var(--mono)}
+.mu-score-line{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:14px}
+.mu-score-line>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.mu-score-line strong{color:var(--text);font:700 20px var(--mono);letter-spacing:-.05em}
+.mu-score-line span{color:var(--muted);font:500 8px var(--mono);letter-spacing:.06em}
+.mu-win-line{display:flex;justify-content:space-between;gap:5px;margin-top:12px;color:var(--muted);font:600 8px var(--mono);letter-spacing:.05em}
+.mu-win-line b{color:var(--text);font-size:10px}
+.mu-prob-wrap{padding:0 13px 12px}
+.mu-prob-track{height:6px;overflow:hidden;border-radius:8px;background:rgba(255,79,145,.72)}
+.mu-prob-track i{display:block;height:100%;border-radius:8px;background:#22B8D5}
+.mu-prob-track.unavailable{background:var(--panel2)}
+.mu-rosters{border-top:1px solid var(--line)}
+.mu-rosters summary{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;cursor:pointer;list-style:none;color:var(--lime);font:600 9px var(--mono);letter-spacing:.12em}
+.mu-rosters summary::-webkit-details-marker{display:none}
+.mu-expand-mark{font-size:16px;line-height:1;transition:transform .15s}
+.mu-rosters[open] .mu-expand-mark{transform:rotate(45deg)}
+.mu-roster-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0 12px 13px}
+.mu-roster-team{min-width:0;padding:10px;border:1px solid var(--line);border-radius:8px;background:rgba(0,0,0,.08)}
+.mu-roster-team h4{margin:0 0 10px;font-size:13px}
+.mu-roster-label{margin:9px 0 5px;color:var(--muted);font:600 8px var(--mono);letter-spacing:.13em}
+.mu-bench-label{padding-top:8px;border-top:1px solid var(--line)}
+.mu-player-head,.mu-player-row{display:grid;grid-template-columns:30px minmax(0,1fr) 36px 40px;gap:5px;align-items:center}
+.mu-player-head{padding:0 0 5px;color:var(--muted);font:500 7px var(--mono);letter-spacing:.06em}
+.mu-player-row{min-height:26px;border-top:1px solid rgba(255,255,255,.045);font-size:9px}
+.mu-player-pos{color:var(--muted);font:600 8px var(--mono)}
+.mu-player-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-weight:600}
+.mu-player-name small{margin-left:5px;color:var(--muted);font:500 7px var(--mono)}
+.mu-player-points,.mu-player-proj{text-align:right;color:var(--muted);font:500 8px var(--mono);font-variant-numeric:tabular-nums}
+.mu-player-proj{color:var(--text)}
+.mu-empty{grid-column:1/-1;margin:0;padding:18px;border:1px dashed var(--line);border-radius:9px;color:var(--muted);font-size:12px}
+@media(max-width:760px){
+  .mu-grid{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  .matchups-page{padding-top:20px}
+  .mu-hero{align-items:flex-start;flex-direction:column;gap:15px}
+  .mu-week-control{width:100%;justify-content:space-between}
+  .mu-week-control select{flex:1}
+  .mu-faceoff{padding:12px 9px 9px;grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);gap:3px}
+  .mu-manager{gap:5px}
+  .mu-rank{flex-basis:25px;height:25px;font-size:9px}
+  .mu-manager-copy strong{font-size:12px}
+  .mu-manager-copy small{font-size:7px}
+  .mu-score-line strong{font-size:17px}
+  .mu-score-line span,.mu-win-line{font-size:7px}
+  .mu-roster-grid{grid-template-columns:1fr}
+}
