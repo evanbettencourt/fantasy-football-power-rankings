@@ -2268,3 +2268,28 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 @media(max-width:1000px){.hall-champion-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:720px){.hall-champion-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hall-bracket-dialog{padding:22px 16px}}
 @media(max-width:480px){.hall-champion-grid{grid-template-columns:1fr}.hall-champion-card{min-height:145px}.hall-bracket-tree{min-width:720px;gap:22px}.hall-tree-column:not(:last-child):before{right:-22px;width:22px}}
+
+
+/* Hall of Fame — compact JFL-style manager grid */
+.hall-manager-grid{width:100%;max-width:1040px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.hall-flip-card{height:244px;border-radius:10px}
+.hall-card-face{padding:11px 10px 9px;border-radius:9px}
+.hall-avatar-line{width:82px;height:82px;margin:8px auto 6px;border-width:1px;border-radius:8px}
+.hall-manager-name{font-size:17px}
+.hall-manager-years{font-size:7px}
+.hall-front-honors{gap:5px;min-height:21px;margin-top:7px}
+.hall-honor-icon{width:20px;height:20px;font-size:11px}
+.hall-flip-hint{font-size:6px}
+.hall-back-stats{gap:6px 4px;padding:9px 0}
+.hall-back-stats b{font-size:15px}
+.hall-back-honors ul{max-height:82px;gap:5px}
+.hall-flip-card.retired{filter:grayscale(1);opacity:.62}
+.hall-flip-card.retired:hover{opacity:.82}
+.hall-flip-card.retired .hall-card-front{background:linear-gradient(145deg,#292936,#1c1c27)}
+.hall-flip-card.retired .hall-card-back{background:linear-gradient(145deg,#292936,#1c1c27)}
+.hall-flip-card.retired .hall-status{color:#aaa}
+.hall-data-summary{max-width:1040px;margin:0 auto 12px;color:#8f89a9;font:700 8px var(--mono);letter-spacing:.08em;line-height:1.6}
+.hall-manager-grid .hall-flip-card{min-width:0}
+@media(max-width:1000px){.hall-manager-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hall-flip-card{height:244px}}
+@media(max-width:720px){.hall-manager-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hall-flip-card{height:238px}}
+@media(max-width:440px){.hall-manager-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.hall-flip-card{height:226px}.hall-avatar-line{width:72px;height:72px}.hall-manager-name{font-size:15px}}
