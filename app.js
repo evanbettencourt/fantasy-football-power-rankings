@@ -481,7 +481,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const competition = event.competitions?.[0];
     const competitors = competition?.competitors || [];
     if (competitors.length !== 2 || !event.date) return [];
-    return [{ date: event.date, competitors }];
+    return [{ date: event.date, competitors, completed: Boolean(competition.status?.type?.completed ?? event.status?.type?.completed ?? competition.status?.type?.state === "post") }];
   });
   const teamCode = code => ({ JAC:"JAX", WAS:"WSH", LA:"LAR" }[String(code || "").toUpperCase()] || String(code || "").toUpperCase());
   const teamSchedules = new Map();
@@ -496,7 +496,8 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
       opponent: opponent.team,
       kickoffLabel,
       logo: opponent.team.logo || "",
-      opponentName: opponent.team.displayName || opponent.team.name || opponent.team.abbreviation
+      opponentName: opponent.team.displayName || opponent.team.name || opponent.team.abbreviation,
+      completed: game.completed
     });
     addTeam(home, away);
     addTeam(away, home);
@@ -538,6 +539,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const label = positionLabel(position);
     const playerTeam = teamCode(player.team);
     const game = teamSchedules.get(playerTeam);
+    const gameCompleted = Boolean(game?.completed);
     const playerLogo = player.team ? (game?.teamLogo || teamLogo(player.team)) : "";
     const opponentLogo = game?.logo || (game?.opponent?.abbreviation ? teamLogo(game.opponent.abbreviation) : "");
     const gameMeta = game
@@ -548,10 +550,13 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const actual = actualStat?.pts_half_ppr != null ? num(actualStat.pts_half_ppr) : num(matchupPoints);
     const projection = num(projections.get(id)?.stats?.pts_half_ppr);
     const hasProjection = projections.get(id)?.stats?.pts_half_ppr != null;
+    const pointsClass = gameCompleted && hasProjection
+      ? actual > projection + 0.005 ? "up" : actual < projection - 0.005 ? "down" : "even"
+      : "";
     return '<div class="mu-player-row ' + (isStarter ? "starter" : "bench") + '">' +
       '<span class="mu-player-pos ' + positionClass(position) + '">' + escapeHtml(label) + '</span>' +
       '<span class="mu-player-name"><span class="mu-player-primary"><span>' + escapeHtml(name) + '</span>' + (playerLogo ? '<img src="' + escapeHtml(playerLogo) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : '') + '</span>' + gameMeta + '</span>' +
-      '<span class="mu-player-points">' + (actualStat || num(matchupPoints) > 0 ? fmt(actual) : "—") + '</span>' +
+      '<span class="mu-player-points ' + pointsClass + '">' + (actualStat || num(matchupPoints) > 0 || gameCompleted ? fmt(actual) : "—") + '</span>' +
       '<span class="mu-player-proj">' + (hasProjection ? fmt(projection) : "—") + '</span>' +
     '</div>';
   };
@@ -609,7 +614,24 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const record = recordById.get(team.id);
     const powerRank = powerRanks.get(team.name);
     const projected = projectionFor(team, matchup);
-    return { record: record?.record || "0-0", seed: seeds.get(team.id), powerRank, projected, score: num(matchup.points), color: lotteryColor(team.name) };
+    const starters = Array.isArray(matchup.starters) ? matchup.starters.map(String).filter(id => id && id !== "0") : [];
+    let teamFinished = scheduleGames.length > 0 && starters.length > 0;
+    let originalTotal = 0;
+    for (const id of starters) {
+      const player = players[id] || {};
+      const playerTeam = teamCode(player.team);
+      const game = teamSchedules.get(playerTeam);
+      const hasBye = Boolean(playerTeam) && !game && scheduleGames.length > 0;
+      if (!playerTeam || (!hasBye && !game?.completed)) teamFinished = false;
+      const original = projections.get(id)?.stats?.pts_half_ppr;
+      if (original == null || !Number.isFinite(Number(original))) teamFinished = false;
+      else originalTotal += Number(original);
+    }
+    const score = num(matchup.points);
+    const scoreClass = teamFinished
+      ? score > originalTotal + 0.005 ? "up" : score < originalTotal - 0.005 ? "down" : "even"
+      : "";
+    return { record: record?.record || "0-0", seed: seeds.get(team.id), powerRank, projected, score, scoreClass, color: lotteryColor(team.name) };
   };
   const probability = (a, b) => {
     if (isPast) {
@@ -629,7 +651,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
       const projectionClass = projectionDelta > 0.005 ? "up" : projectionDelta < -0.005 ? "down" : "even";
       const probabilityClass = winChance == null ? "" : winChance > 50 ? "favored" : winChance < 50 ? "underdog" : "even";
       return '<div class="mu-side ' + (team === game.teamA ? 'side-a' : 'side-b') + '">' +
-        '<div class="mu-score-stack"><div class="mu-score-line"><strong>' + fmt(summary.score) + '</strong></div>' +
+        '<div class="mu-score-stack"><div class="mu-score-line"><strong class="' + summary.scoreClass + '">' + fmt(summary.score) + '</strong></div>' +
           '<div class="mu-projection-line ' + projectionClass + '">' + (summary.projected.available ? '<b>' + fmt(summary.projected.value) + '</b>' : '<b>—</b>') + '<span>LIVE PROJ.</span></div></div>' +
         '<div class="mu-manager-copy"><strong style="color:' + summary.color + '">' + escapeHtml(team.name) + '</strong>' +
           '<small>' + escapeHtml(summary.record) + '</small></div>' +
