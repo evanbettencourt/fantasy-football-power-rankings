@@ -1107,7 +1107,7 @@ async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,
 }
 function hallDraftMarkup(row){
  const drafts=row?.drafts||[];
- if(!drafts.length)return "";
+ if(!drafts.length)return '<section class="hall-season-draft"><h3>LEAGUE DRAFT</h3><div class="hall-bracket-empty">SLEEPER DRAFT BOARD NOT AVAILABLE FOR THIS SEASON.</div></section>';
  return drafts.map((draft,index)=>{
   const picks=[...draft.picks].sort((a,b)=>a.pick-b.pick);
   const columns=Array.from({length:draft.slots},(_,i)=>i+1);
