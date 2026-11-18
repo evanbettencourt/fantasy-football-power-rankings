@@ -1063,7 +1063,7 @@ function hallScoringPoints(stats,settings){
  }
  return matched?total:null;
 }
-async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,regularWeeks){
+async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,regularWeeks,isCurrentSeason){
  const leagueId=league.league_id,errors=[];
  const playersPromise=state.hallPlayers?Promise.resolve(state.hallPlayers):(state.hallPlayersPromise||=fetchJson("/players/nfl",{attempts:2,timeoutMs:30000}).then(value=>(state.hallPlayers=value&&typeof value==="object"?value:{},state.hallPlayers)).catch(()=>({})));
  const [drafts,players]=await Promise.all([
@@ -1096,7 +1096,7 @@ async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,
  // only the fantasy league's Weeks 1 through playoff_week_start - 1.
  // Historical seasons include NFL regular-season Weeks 1-18; the current
  // season is limited to completed weeks passed in by the caller.
- const statsWeeks=year<Number(league.season)?18:regularWeeks;
+ const statsWeeks=isCurrentSeason?regularWeeks:18;
  const weeks=Array.from({length:statsWeeks},(_,i)=>i+1);
  const statsByPlayer=new Map();
  await Promise.all(weeks.map(async week=>{
@@ -1192,7 +1192,7 @@ async function loadSleeperHallHistory(){
     // provide a second safeguard against incomplete or placeholder matchup data.
     const latestCompletedWeek=year===currentYear?Math.max(0,Math.min(regularWeeks,nflCurrentWeek-1)):regularWeeks;
     const regularWeeksToLoad=latestCompletedWeek;
-    const seasonExtras=await loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,regularWeeksToLoad);
+    const seasonExtras=await loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,regularWeeksToLoad,year===currentYear);
     const weekData=[];
     const regularGamesBefore=recordGames.length;
     for(let batchStart=1;batchStart<=regularWeeksToLoad;batchStart+=4){
