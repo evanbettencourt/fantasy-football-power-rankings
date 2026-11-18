@@ -202,9 +202,9 @@ function renderPowerRankings(week) {
   $("pr-week-title").textContent="Week "+week;
   $("pr-edition-label").textContent=edition?.date||"EDITION PENDING";
   const stats=computeRankings(week),byName=new Map(stats.map(t=>[t.name,t])),previous=EDITORIAL_EDITIONS[week-1]?.rankings||[],priorRanks=new Map(previous.map((r,i)=>[r.manager,i+1])),hasEdition=Boolean(edition?.rankings?.length);
-  const palette=["#5B21B6","#F4C13E","#F74193","#39A7E3","#E4002B","#EE6A5B","#17B8A6","#034694","#6FC24A","#EF8E3C","#B499D3","#909090"];
+  const palette=["#9FE7F5","#FFB7D5","#C9B6FF","#FFE29A","#A9E8C5","#FFC1A8","#D6C7FF","#A9DFF5","#F3B9D2","#D2E9A4","#FFD0A1","#BFCBFF"];
   const teamOrder=[...state.teams.keys()];
-  const colorFor=t=>t?.color||palette[Math.max(0,teamOrder.indexOf(t?.id))%palette.length];
+  const colorFor=t=>palette[Math.max(0,teamOrder.indexOf(t?.id))%palette.length];
   const ordinal=n=>n%100>=11&&n%100<=13?n+"th":n%10===1?n+"st":n%10===2?n+"nd":n%10===3?n+"rd":n+"th";
   const pfRanks=new Map([...stats].sort((a,b)=>b.pf-a.pf).map((t,i)=>[t.name,i+1]));
   const paRanks=new Map([...stats].sort((a,b)=>b.pa-a.pa).map((t,i)=>[t.name,i+1]));
@@ -233,13 +233,19 @@ function renderPowerRankings(week) {
     return '<div class="pr-chart-bar-item" title="'+escapeHtml(t?.name||"Manager")+': '+fmt(score)+' · '+(result==="win"?"WIN":result==="loss"?"LOSS":"TIE")+'"><span>'+fmt(score)+'</span><i class="'+result+'" style="height:'+height+'px"></i><b>'+escapeHtml(t?.name||"—")+'</b></div>'+(index===5?'<div class="pr-chart-median-divider" aria-label="Median cutoff"></div>':"");
   }).join(""):'<div class="pr-empty">No completed scoring data for this week.</div>';
   const standings=[...stats].sort((a,b)=>b.wins-a.wins||b.pf-a.pf),editorialRanks=new Map((edition?.rankings||[]).map((r,i)=>[r.manager,i+1]));
-  $("pr-standings-body").innerHTML=standings.map((t,i)=>{
+  const playoffStart=num(state.league?.settings?.playoff_week_start)||15;
+  const remainingWeeks=Math.max(0,playoffStart-week-1);
+  const cutoffWins=standings[5]?.wins??Infinity;
+  const standingRows=standings.map((t,i)=>{
     const color=colorFor(t),rank=editorialRanks.get(t.name),record=t.record.split("-");
-    return '<tr class="'+(i===6?"pr-cut":"")+'"><th scope="row" class="c-team"><span class="sd">'+(i+1)+'</span><span class="nm" style="color:'+color+'">'+escapeHtml(t.name)+'</span></th>'+
+    const eliminated=i>=6&&t.wins+(2*remainingWeeks)<cutoffWins;
+    return '<tr><th scope="row" class="c-team"><span class="sd">'+(i+1)+'</span><span class="nm" style="color:'+color+'">'+escapeHtml(t.name)+(eliminated?'<span class="pr-eliminated">ELIMINATED</span>':'')+'</span></th>'+
       '<td class="c-rec"><span class="w">'+(record[0]||0)+'</span><span class="dash">-</span><span class="l">'+(record[1]||0)+'</span>'+(record[2]?'<span class="dash">-</span><span>'+record[2]+'</span>':'')+'</td>'+
       '<td class="num">'+fmt(t.pf)+'</td><td class="num">'+fmt(t.pa)+'</td><td class="num">'+escapeHtml(t.allPlayRecord)+'</td>'+
       '<td><span class="pr-pr">'+(rank||"—")+'</span></td></tr>';
-  }).join("");
+  });
+  const playoffLine='<tr class="pr-cut" aria-label="Playoff cutoff"><td colspan="6"></td></tr>';
+  $("pr-standings-body").innerHTML=standingRows.slice(0,6).join("")+playoffLine+standingRows.slice(6).join("");
 }
 
 function renderScoreboard(week) {
