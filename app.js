@@ -968,6 +968,46 @@ const AWARD_TEAM_MANAGERS={
 const PARLAY_MANAGERS=["Evan","Tanz","Ben","Brandon","Colby","Joey","Marc","Butta","Lee","Ders","Pat","Kevin"];
 const PARLAY_WEEKS=[["Loveland O4.5 REC","Lamar O215.5 pass yards","Saquon TD","Ja'marr Chase TD","Amon Ra TD","Omarion Hampton TD","Kenneth Walker 70+ rushing yards","Javonte Williams TD","Jayden Daniels TD","Josh Allen TD","Zay Flowers O66.5 receiving yards","Bucky Irving O60.5 rush yards"],["Mike Evans TD","Lamar O224.5 passing yards","Bucky TD","Derrick Henry 90+ rushing yards + TD","Jeanty TD","Eagles -6.5","Kenneth Walker O82.5 rushing yards","Drake Maye O1.5 passing TD","Bijan O95 rushing yards","Etienne O1.5 receptions","CMC TD","Ceedee O76.5 yards"],["Terrance Ferguson O3.5 rec","Lamar 230+ passing yards","Bengals ML","David Montgomery TD","Kyren Williams TD","Omarion Hampton TD","Stafford O1.5 pass TD","Jaylen Warren O86.5 rushing yards","Giants ML","Etienne TD","Chase Brown O63.5 rush yards","Breece Hall TD"],["Wicks O3.5 rec","N/A","Cardinals -2.5","CMC O4.5 rec","Chuba TD","Nabers O55.5 receiving yards","Goff O1.5 passing TD","Josh Downs TD","Aaron Jones TD","N/A","Jordan Addison O62.5 yards","Chiefs -4.5"],["Jacoby Brissett O1.5 passing TD","Monty U43.5 rushing yards","Amon Ra O81.5 receiving yards","Michael Wilson O71.5 receiving yards","Kyren TD","Pats ML","Trey McBride TD","LaPorta O51.5 receiving yards","Bills +3.5","Deshaun Watson O190.5 passing yards","Chase Brown TD","Lions -5.5"],["Tyler Higbee O32.5 receiving yards","Tucker Kraft 4+ receptions","Bijan 2+ TD","Omarion Hampton O32.5 rushing yards","Christian Watson TD","Jaylen Warren TD","Xavier Worthy O48.5 receiving yards","Dallas Goedert TD","Cam Skattebo U39.5 rushing yards","Drake London TD","Bryce Young 2+ Passing TD","Bills -5.5"],["Jordan Mason O12.5 rush attempts","Jalen Coker 6+ receptions","DK Metcalf TD","Brock Bowers TD","JJ McCarthy O0.5 passing TD","Bengals -2.5","N/A","Joe Burrow O1.5 passing TD","Bijan TD","N/A","CMC O53.5 rushing yards","George Kittle O69.5 receiving yards"],["Derrick Henry 80+ rush yards","Diggs O4.5 rec","Jonah Coleman O44.5 rush yards","Brock Bowers O68.5 rec yards","Kyren TD","Bills -3","Ken Walker TD","Javonte TD","Omar Cooper U41.5 rec yards","DK O4.5 receptions","Zay Flowers 80+ rec yards","Bucky Irving O70.5 rush yards"],["Keenan Allen O4.5 rec","Jayden Daniels O38.5 rush yards","Rashee TD","Ollie Gordon TD","Kyren TD","Jonah Coleman TD","Ken Walker O93.5 rush yards","Javonte TD","Antonio Williams O49.5 rec yards","Rome Odunze U50.5 rec yards","CMC TD","Puka O92.5 rec yards"],["George Kittle TD","Justin Herbert O0.5 INT","Emmett Johnson TD","Tuten TD","Chuba TD","Tee Higgins TD","Jonathan Taylor TD","Drake Maye O1.5 passing TD","Justin Jefferson TD","N/A","Zay Flowers O70.5 rec yards","Kyle McCord O0.5 INT"]];
 const PARLAY_PLACERS=["Ben (random spin)","Ben","Tanz","Tanz","Tanz","Tanz","Joey","Lee","Marc","Tanz","Butta","","",""];
+
+const PRE_SLEEPER_PLAYOFFS=[
+ {year:2017,rounds:[{winner:"Evan",losers:["Ben"]},{winner:"Roth",losers:["Sam"]},{winner:"Roth",losers:["Evan"]}]},
+ {year:2018,rounds:[{winner:"Joey",losers:["Colby","Tanz"]},{winner:"Roth",losers:["Evan"]},{winner:"Ben",losers:["Roth"]},{winner:"Sam",losers:["Joey"]},{winner:"Ben",losers:["Sam"]}]},
+ {year:2019,rounds:[{winner:"Colby",losers:["Kevin"]},{winner:"Marc",losers:["Lee"]},{winner:"Marc",losers:["Sam"]},{winner:"Ben",losers:["Colby"]},{winner:"Ben",losers:["Marc"]}]},
+ {year:2020,rounds:[{winner:"Evan",losers:["Tanz"]},{winner:"Pat",losers:["Ben"]},{winner:"Joey",losers:["Evan"]},{winner:"Marc",losers:["Pat"]},{winner:"Joey",losers:["Marc"]}]}
+];
+const PRE_SLEEPER_CHAMPIONS=[
+ {year:2017,champion:"Roth",runnerUp:"Evan"},
+ {year:2018,champion:"Ben",runnerUp:"Sam"},
+ {year:2019,champion:"Ben",runnerUp:"Marc"},
+ {year:2020,champion:"Joey",runnerUp:"Marc"}
+];
+const RETIRED_MANAGERS=["Roth","Sam"];
+function getPreSleeperManagerStats(){
+ const stats=new Map();
+ const get=name=>{if(!stats.has(name))stats.set(name,{name,playoffWins:0,playoffAppearances:new Set(),championships:0,runnerUps:0});return stats.get(name);};
+ PRE_SLEEPER_PLAYOFFS.forEach(season=>season.rounds.forEach(game=>{
+  get(game.winner).playoffAppearances.add(season.year);
+  game.losers.forEach(name=>get(name).playoffAppearances.add(season.year));
+  get(game.winner).playoffWins++;
+ }));
+ PRE_SLEEPER_CHAMPIONS.forEach(row=>{get(row.champion).championships++;get(row.runnerUp).runnerUps++;});
+ return stats;
+}
+function renderHallOfFame(){
+ const target=$("hall-content");if(!target)return;
+ const historical=getPreSleeperManagerStats();
+ const active=[...new Set(Object.values(MANAGERS))];
+ const retired=[...RETIRED_MANAGERS];
+ const makeCard=(name,index,isRetired)=>{
+  const stat=historical.get(name)||{playoffWins:0,playoffAppearances:new Set(),championships:0,runnerUps:0};
+  const years=[...stat.playoffAppearances].sort((a,b)=>a-b).join(" · ")||"—";
+  return '<article class="hall-manager-card '+(isRetired?'retired':'active')+'"><div class="hall-card-top"><span class="hall-card-number">'+String(index+1).padStart(2,"0")+'</span><span class="hall-status">'+(isRetired?'RETIRED':'ACTIVE')+'</span></div><div class="hall-manager-identity"><span class="hall-avatar">'+escapeHtml(initials(name))+'</span><div><h3>'+escapeHtml(name)+'</h3><span class="hall-manager-years">'+(isRetired?'FORMER MANAGER':'CURRENT MANAGER')+'</span></div></div><div class="hall-card-stats"><div><b>'+stat.championships+'</b><span>CHAMPIONSHIPS</span></div><div><b>'+stat.playoffWins+'</b><span>PLAYOFF WINS*</span></div><div><b>'+stat.playoffAppearances.size+'</b><span>PLAYOFF YEARS*</span></div></div><div class="hall-card-foot">'+(years==='—'?'No pre-2021 playoff result recorded': 'Playoff seasons: '+years)+'</div></article>';
+ };
+ const championRows=PRE_SLEEPER_CHAMPIONS.slice().reverse().map(row=>'<tr><td>'+row.year+'</td><td><strong>'+escapeHtml(row.champion)+'</strong></td><td>'+escapeHtml(row.runnerUp)+'</td></tr>').join("");
+ const playoffs=[...historical.values()].sort((a,b)=>b.playoffWins-a.playoffWins||a.name.localeCompare(b.name));
+ target.innerHTML='<section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE PEOPLE</span><h2>Current Managers</h2></div><span class="hall-count">'+active.length+' MEMBERS</span></div><div class="hall-manager-grid">'+active.map((name,i)=>makeCard(name,i,false)).join("")+'</div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE LEGACY</span><h2>Retired Managers</h2></div><span class="hall-count">'+retired.length+' MEMBERS</span></div><div class="hall-manager-grid hall-retired-grid">'+retired.map((name,i)=>makeCard(name,i,true)).join("")+'</div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE HARDWARE</span><h2>League Champions</h2></div><span class="hall-count">2017–2020 ARCHIVE</span></div><div class="hall-record-table-wrap"><table class="hall-record-table"><thead><tr><th>SEASON</th><th>CHAMPION</th><th>RUNNER-UP</th></tr></thead><tbody>'+championRows+'</tbody></table></div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE POSTSEASON</span><h2>Historical Playoff Wins</h2></div><span class="hall-count">2017–2020 ARCHIVE</span></div><div class="hall-record-table-wrap"><table class="hall-record-table"><thead><tr><th>RANK</th><th>MANAGER</th><th>PLAYOFF WINS</th><th>APPEARANCES</th></tr></thead><tbody>'+playoffs.map((row,i)=>'<tr><td>'+String(i+1).padStart(2,"0")+'</td><td><strong>'+escapeHtml(row.name)+'</strong></td><td>'+row.playoffWins+'</td><td>'+row.playoffAppearances.size+'</td></tr>').join("")+'</tbody></table></div><p class="hall-footnote">* Playoff wins and appearances shown here cover the manually reconstructed 2017–2020 seasons only. Sleeper-era career totals will be added from the 2021–2026 league history.</p></section>';
+}
+
 function renderAwards(){
  const target=$("awards-content");if(!target||target.dataset.ready==="yes")return;
  const count=AWARDS_2025.reduce((n,a)=>n+a.nominees.length,0);
@@ -1259,6 +1299,7 @@ function setupNavigation() {
     if (target === "schedule") renderSchedule();
     if (target === "matchups") renderMatchups(state.matchupWeek);
     if (target === "awards") renderAwards();
+    if (target === "hall") renderHallOfFame();
     if (target === "parlays") renderParlays();
     if (target === "lottery") renderLotteryHistory();
     if (target === "rankings") renderPowerRankings(state.selectedWeek);
