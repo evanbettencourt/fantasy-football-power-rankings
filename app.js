@@ -1121,8 +1121,8 @@ async function loadSleeperHallHistory(){
      team2:managerByRoster.get(Number(game.t2))||null,
      winner:managerByRoster.get(Number(game.w))||null,
      loser:managerByRoster.get(Number(game.l))||null,
-     score1:Number.isFinite(Number(game.p1))?Number(game.p1):null,
-     score2:Number.isFinite(Number(game.p2))?Number(game.p2):null,
+     score1:game.p1!=null&&Number.isFinite(Number(game.p1))?Number(game.p1):null,
+     score2:game.p2!=null&&Number.isFinite(Number(game.p2))?Number(game.p2):null,
      bye:game.t2==null
     })).filter(game=>game.team1||game.team2||game.winner);
     seasons.push({year,champion,runnerUp:runnerUp||"—",bracket:bracketGames,leagueId:league.league_id,regularWeeks,completedRegularWeeks:weekData.filter(({rows})=>rows.filter(row=>Number(row.points)>0).length===rosters.length).length,managerCount:managerByRoster.size});
@@ -1148,14 +1148,20 @@ function hallPixelAvatar(name){
  let seed=Array.from(name).reduce((value,char)=>((value*31)+char.charCodeAt(0))>>>0,7);
  const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
  const palette=palettes[Math.floor(random()*palettes.length)];
- const skin=palette[0],hair=palette[1],shirt=palette[2],accent=palette[3];
+ const skinTones=["#f1c7a3","#d99b72","#ad704f","#f0d1b1","#85543f"];
+ const skin=skinTones[Math.floor(random()*skinTones.length)],hair=palette[1],shirt=palette[2],accent=palette[3];
+ const hairStyle=Math.floor(random()*4),beard=random()<.32,glasses=random()<.28;
+ const hairRows=[
+  ["....HHHH....","...HHHHHH...","..HHHHHHHH.."],
+  ["..HHHHHHHH..","..HHHHHHHH..","...HHHHHH..."],
+  ["...HHHHHH...","..HHHHHHHH..","..HHHHHHHH.."],
+  ["....HHHH....","..HHHHHHHH..","..HHHHHHHH.."]
+ ][hairStyle];
  const rows=[
-  "....HHHH....",
-  "...HHHHHH...",
-  "..HHSSSSHH..",
+  hairRows[0],hairRows[1],hairRows[2],
   "..HSSSSSSHH.",
-  "..HSESSSEHH.",
-  "..HSSMSSSHH.",
+  "..HSSSSSSHH.",
+  "..HSSSSSSHH.",
   "...SSSSSS...",
   "...SSSSSS...",
   "..AAA..AAA..",
@@ -1173,6 +1179,8 @@ function hallPixelAvatar(name){
  rows.forEach((row,y)=>Array.from(row).forEach((cell,x)=>{
   if(cell!==".")rects+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+(colors[cell]||hair)+'"/>';
  }));
+ if(glasses){rects+='<rect x="3" y="5" width="2" height="1" fill="#202033"/><rect x="7" y="5" width="2" height="1" fill="#202033"/><rect x="5" y="5" width="2" height="1" fill="#202033"/>';}
+ if(beard){rects+='<rect x="4" y="8" width="4" height="1" fill="'+hair+'"/><rect x="5" y="9" width="2" height="1" fill="'+hair+'"/>';}
  const shine='<rect x="1" y="1" width="2" height="1" fill="#ffffff" opacity=".2"/>';
  return '<svg class="hall-pixel-avatar" viewBox="0 0 12 16" role="img" aria-label="'+escapeHtml(name)+' pixel avatar" shape-rendering="crispEdges">'+rects+shine+'</svg>';
 }
@@ -1180,6 +1188,7 @@ function hallManagerHonors(name,stat){
  const honors=[];
  if(stat.championships)honors.push({icon:"🏆",label:stat.championships+"× League Champion",detail:[...PRE_SLEEPER_CHAMPIONS.filter(row=>row.champion===name).map(row=>row.year),...(state.hallHistory?.seasons||[]).filter(row=>row.champion===name).map(row=>row.year)].sort((a,b)=>a-b).join(", ")});
  if(stat.playoffAppearances.size)honors.push({icon:"⭐",label:stat.playoffAppearances.size+" Playoff Appearances",detail:[...stat.playoffAppearances].sort((a,b)=>a-b).join(", ")});
+ if(stat.playoffWins)honors.push({icon:"🏈",label:stat.playoffWins+" Playoff Wins",detail:"Career postseason wins"});
  const teamAwards=typeof AWARD_TEAM_MANAGERS!=="undefined"?AWARD_TEAM_MANAGERS:{};
  for(const award of (typeof AWARDS_2025!=="undefined"?AWARDS_2025:[])){
   const manager=teamAwards[award.winner]||award.winner;
