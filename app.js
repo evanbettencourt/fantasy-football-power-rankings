@@ -1173,12 +1173,12 @@ function renderParlays(){
 function setupNavigation() {
   const tabs = [...document.querySelectorAll(".nav-tab")];
   const panels = [...document.querySelectorAll(".tab-panel")];
-  tabs.forEach(tab => tab.addEventListener("click", () => {
-    const target = tab.dataset.tab;
+  function activateTab(target, options = {}) {
+    const tab = tabs.find(item => item.dataset.tab === target);
+    if (!tab) return;
     tabs.forEach(item => item.classList.toggle("active", item === tab));
     panels.forEach(panel => {
-      const visible = panel.dataset.panel === target;
-      panel.hidden = !visible;
+      panel.hidden = panel.dataset.panel !== target;
     });
     if (target === "rules") renderRules();
     if (target === "schedule") renderSchedule();
@@ -1187,8 +1187,17 @@ function setupNavigation() {
     if (target === "parlays") renderParlays();
     if (target === "lottery") renderLotteryHistory();
     if (target === "rankings") renderPowerRankings(state.selectedWeek);
-    window.scrollTo({top:0,behavior:"smooth"});
+    if (options.updateUrl) {
+      const nextHash = "#" + target;
+      if (window.location.hash !== nextHash) history.replaceState(null, "", nextHash);
+    }
+    if (options.scroll) window.scrollTo({top:0,behavior:"smooth"});
+  }
+  tabs.forEach(tab => tab.addEventListener("click", () => {
+    activateTab(tab.dataset.tab, { updateUrl: true, scroll: true });
   }));
+  const initialTab = window.location.hash.replace(/^#/, "");
+  activateTab(tabs.some(tab => tab.dataset.tab === initialTab) ? initialTab : "league");
 }
 setupNavigation();
 
