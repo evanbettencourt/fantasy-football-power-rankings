@@ -1179,6 +1179,7 @@ function hallPixelAvatar(name){
  rows.forEach((row,y)=>Array.from(row).forEach((cell,x)=>{
   if(cell!==".")rects+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+(colors[cell]||hair)+'"/>';
  }));
+ rects+='<rect x="4" y="5" width="1" height="1" fill="#201c35"/><rect x="7" y="5" width="1" height="1" fill="#201c35"/><rect x="5" y="7" width="2" height="1" fill="#8d4c54"/>';
  if(glasses){rects+='<rect x="3" y="5" width="2" height="1" fill="#202033"/><rect x="7" y="5" width="2" height="1" fill="#202033"/><rect x="5" y="5" width="2" height="1" fill="#202033"/>';}
  if(beard){rects+='<rect x="4" y="8" width="4" height="1" fill="'+hair+'"/><rect x="5" y="9" width="2" height="1" fill="'+hair+'"/>';}
  const shine='<rect x="1" y="1" width="2" height="1" fill="#ffffff" opacity=".2"/>';
