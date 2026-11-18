@@ -1238,3 +1238,24 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .mu-win-line b.even{color:var(--text)}
 .mu-prob-track{height:7px;border-radius:8px}
 .mu-prob-track i{display:none}
+
+
+/* Matchups: one full-width matchup per row. */
+.mu-grid{grid-template-columns:minmax(0,1fr)}
+.mu-card{width:100%}
+.mu-roster-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mu-player-pos{display:inline-flex;align-items:center;justify-content:center;min-width:30px;min-height:18px;padding:2px 4px;border-radius:4px;font:800 8px var(--mono);color:#222}
+.mu-player-pos.qb{background:#F3A6A6}
+.mu-player-pos.rb{background:#A9D8B0}
+.mu-player-pos.wr{background:#A9D4F2}
+.mu-player-pos.te{background:#F3E2A0}
+.mu-player-pos.flex{background:#C9B4F0}
+.mu-player-pos.sflx{background:#F2B5D5}
+.mu-player-pos.other{background:#D5D0DF}
+.mu-bench-details{border-top:1px solid var(--line);margin-top:12px}
+.mu-bench-details>summary{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;cursor:pointer;list-style:none;color:var(--muted);font:600 9px var(--mono);letter-spacing:.12em}
+.mu-bench-details>summary::-webkit-details-marker{display:none}
+.mu-bench-details[open]>.mu-roster-grid{padding-top:0}
+@media(max-width:520px){
+  .mu-roster-grid{grid-template-columns:1fr}
+}
