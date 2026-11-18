@@ -1057,7 +1057,7 @@ function hallScoringPoints(stats,settings){
 }
 async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,regularWeeks){
  const leagueId=league.league_id,errors=[];
- const playersPromise=state.players?Promise.resolve(state.players):(state.playersPromise||=fetchJson("/players/nfl?active=true",{attempts:2,timeoutMs:25000}).then(value=>(state.players=value&&typeof value==="object"?value:{},state.players)).catch(()=>({})));
+ const playersPromise=state.hallPlayers?Promise.resolve(state.hallPlayers):(state.hallPlayersPromise||=fetchJson("/players/nfl",{attempts:2,timeoutMs:30000}).then(value=>(state.hallPlayers=value&&typeof value==="object"?value:{},state.hallPlayers)).catch(()=>({})));
  const [drafts,players]=await Promise.all([
   fetchJson("/league/"+leagueId+"/drafts",{attempts:2,timeoutMs:15000}).catch(error=>{errors.push("Draft list unavailable");return[];}),
   playersPromise
