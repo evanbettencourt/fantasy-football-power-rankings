@@ -1550,6 +1550,8 @@ function renderHallOfFame(){
   return;
  }
  const active=[...new Set(Object.values(MANAGERS))],retired=[...RETIRED_MANAGERS],historical=["Hess","Campbell"],managers=[...new Set([...active,...retired,...historical])];
+  const managerOrderStats=name=>{const stat=allStats.get(name)||newHallStat(name),games=stat.regularWins+stat.regularLosses+stat.regularTies;return {championships:stat.championships||0,winPct:games?stat.regularWins/games:0,runnerUps:stat.runnerUps||0,regularTitles:stat.regularSeasonChampionships?.size||0,points:stat.pf||0};};
+  managers.sort((a,b)=>{const x=managerOrderStats(a),y=managerOrderStats(b);return y.championships-x.championships||y.winPct-x.winPct||y.runnerUps-x.runnerUps||y.regularTitles-x.regularTitles||y.points-x.points;});
  const statFor=name=>allStats.get(name)||newHallStat(name);
  const makeCard=(name,index,isRetired)=>{
   const stat=statFor(name),games=stat.regularWins+stat.regularLosses+stat.regularTies;
