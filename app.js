@@ -1053,20 +1053,43 @@ async function loadParlayWeek(week){
 }
 function renderParlays(){
  const target=$("parlays-content");if(!target)return;
- const count=PARLAY_WEEKS.reduce((n,w)=>n+w.filter(p=>p&&p!=="N/A").length,0);
- const graded=PARLAY_WEEKS.reduce((n,row,i)=>{
-  const data=state.parlayDataByWeek[i+1]||{};
-  return n+row.filter(p=>p&&p!=="N/A").filter(p=>["HIT","MISS","PUSH"].includes(gradeParlayPick(p,data.stats,data.players,data.schedule).status)).length;
- },0);
- target.innerHTML='<div class="parlay-summary"><div><span class="parlay-kicker">2026 SEASON</span><strong>10</strong><small>WEEKS WITH PICKS</small></div><div><span class="parlay-kicker">LEAGUE PICKS</span><strong>'+count+'</strong><small>RECORDED SELECTIONS</small></div><div><span class="parlay-kicker">SETTLED PICKS</span><strong>'+graded+'</strong><small>OF '+count+' GRADED</small></div></div><div class="parlay-week-grid">'+Array.from({length:14},(_,i)=>{
-  const w=i+1,row=PARLAY_WEEKS[i]||[],placer=PARLAY_PLACERS[i]||"Not assigned",data=state.parlayDataByWeek[w]||{};
-  const results=row.map(p=>p&&p!=="N/A"?gradeParlayPick(p,data.stats,data.players,data.schedule):{status:"NA"});
-  const weekResult=summarizeParlayResults(results);
-  return '<article class="parlay-week-card"><div class="parlay-week-head"><div><span class="parlay-kicker">WEEK '+String(w).padStart(2,"0")+'</span><h3>'+(row.length?'THE PICKS':'PICKS NOT ENTERED')+'</h3></div><div class="parlay-placer"><span>PLACED BY</span><strong>'+escapeHtml(placer)+'</strong></div></div>'+(row.length?'<div class="parlay-pick-list">'+PARLAY_MANAGERS.map((m,j)=>{
-   const pick=row[j]||"—",result=results[j]||{status:"PENDING"};
-   return '<div class="parlay-pick"><span class="parlay-manager">'+escapeHtml(m)+'</span><span class="parlay-selection"><strong>'+escapeHtml(describeParlayPick(pick))+'</strong></span><span class="parlay-result '+result.status.toLowerCase()+'">'+result.status+(result.detail?'<small>'+escapeHtml(result.detail)+'</small>':"")+'</span></div>';
-  }).join("")+'</div>':'<p class="parlay-empty">Weekly picks and the organizer will be added here.</p>')+'<div class="parlay-week-foot"><span>$5 LEAGUE PARLAY</span><span class="parlay-week-result '+weekResult.toLowerCase()+'">PARLAY: '+weekResult+'</span></div></article>';
- }).join("")+'</div>';
+ const weeks=PARLAY_WEEKS.map((row,i)=>{
+  const week=i+1,data=state.parlayDataByWeek[week]||{};
+  const picks=row.map((pick,j)=>({manager:PARLAY_MANAGERS[j],pick,result:pick&&pick!=="N/A"?gradeParlayPick(pick,data.stats,data.players,data.schedule):{status:"NA"}}))
+    .filter(item=>item.pick&&item.pick!=="N/A");
+  return {week,row,picks,placer:PARLAY_PLACERS[i]||"Not assigned"};
+ }).filter(item=>item.picks.length);
+ const totalPicks=weeks.reduce((n,w)=>n+w.picks.length,0);
+ const settledPicks=weeks.reduce((n,w)=>n+w.picks.filter(p=>["HIT","MISS","PUSH"].includes(p.result.status)).length,0);
+ const totalHits=weeks.reduce((n,w)=>n+w.picks.filter(p=>p.result.status==="HIT").length,0);
+ const memberRecords=PARLAY_MANAGERS.map(manager=>{
+  const picks=weeks.flatMap(w=>w.picks.filter(p=>p.manager===manager));
+  const hits=picks.filter(p=>p.result.status==="HIT").length;
+  const misses=picks.filter(p=>p.result.status==="MISS").length;
+  const pushes=picks.filter(p=>p.result.status==="PUSH").length;
+  const pending=picks.filter(p=>["PENDING","REVIEW"].includes(p.result.status)).length;
+  const graded=hits+misses;
+  return {manager,picks:picks.length,hits,misses,pushes,pending,rate:graded?hits/graded:-1};
+ }).sort((a,b)=>b.rate-a.rate||b.hits-a.hits||a.misses-b.misses||a.manager.localeCompare(b.manager));
+ target.innerHTML=
+  '<div class="parlay-summary"><div><span class="parlay-kicker">2026 SEASON</span><strong>'+weeks.length+'</strong><small>WEEKS WITH PICKS</small></div><div><span class="parlay-kicker">LEAGUE PICKS</span><strong>'+totalPicks+'</strong><small>RECORDED SELECTIONS</small></div><div><span class="parlay-kicker">CORRECT PICKS</span><strong>'+totalHits+'</strong><small>'+settledPicks+' SETTLED</small></div></div>'+
+  '<div class="parlay-dashboard"><section class="parlay-weeks-panel"><div class="parlay-panel-heading"><span class="parlay-kicker">WEEK BY WEEK</span><h2>Parlay History</h2></div>'+
+  '<div class="parlay-week-list">'+weeks.map(({week,picks,placer})=>{
+   const hits=picks.filter(p=>p.result.status==="HIT").length;
+   const misses=picks.filter(p=>p.result.status==="MISS").length;
+   const pushes=picks.filter(p=>p.result.status==="PUSH").length;
+   const pending=picks.filter(p=>["PENDING","REVIEW"].includes(p.result.status)).length;
+   const denominator=picks.length;
+   return '<details class="parlay-week-dropdown"><summary><span class="parlay-week-label"><b>WEEK '+String(week).padStart(2,"0")+'</b><small>'+escapeHtml(placer==='Not assigned'?'':('PLACED BY '+placer.toUpperCase()))+'</small></span><span class="parlay-week-record"><strong>'+hits+'/'+denominator+'</strong><small>CORRECT</small></span><span class="parlay-chevron" aria-hidden="true">⌄</span></summary>'+
+    '<div class="parlay-week-details"><div class="parlay-detail-meta"><span>'+hits+' HIT · '+misses+' MISS'+(pushes?' · '+pushes+' PUSH':'')+(pending?' · '+pending+' PENDING':'')+'</span><span>$5 LEAGUE PARLAY</span></div>'+
+    '<div class="parlay-pick-list">'+picks.map(({manager,pick,result})=>
+     '<div class="parlay-pick"><span class="parlay-manager">'+escapeHtml(manager)+'</span><span class="parlay-selection"><strong>'+escapeHtml(describeParlayPick(pick))+'</strong></span><span class="parlay-result '+result.status.toLowerCase()+'">'+result.status+(result.detail?'<small>'+escapeHtml(result.detail)+'</small>':"")+'</span></div>'
+    ).join("")+'</div></div></details>';
+  }).join("")+'</div></section>'+
+  '<aside class="parlay-members-panel"><div class="parlay-panel-heading"><span class="parlay-kicker">LEAGUE LEADERBOARD</span><h2>Pick Performance</h2><p>Ranked by hit rate on settled picks. Pushes and pending picks are excluded from the rate.</p></div>'+
+  '<div class="parlay-member-list">'+memberRecords.map((m,i)=>
+   '<div class="parlay-member-row"><span class="parlay-member-rank">'+String(i+1).padStart(2,"0")+'</span><span class="parlay-member-name"><strong>'+escapeHtml(m.manager)+'</strong><small>'+m.hits+' HIT · '+m.misses+' MISS'+(m.pushes?' · '+m.pushes+' PUSH':'')+(m.pending?' · '+m.pending+' PENDING':'')+'</small></span><span class="parlay-member-record"><strong>'+m.hits+'/'+m.picks+'</strong><small>'+ (m.rate>=0?Math.round(m.rate*100)+'%':'—')+'</small></span></div>'
+  ).join("")+'</div></aside></div>';
  if(!state.parlayHistoryLoading){
   state.parlayHistoryLoading=true;
   (async()=>{
