@@ -1090,7 +1090,7 @@ async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,
  const statsByPlayer=new Map();
  await Promise.all(weeks.map(async week=>{
   try{
-   const data=await fetchJson("/api/sleeper-stats/regular/"+year+"/"+week,{attempts:2,timeoutMs:20000});
+   const data=await fetchJson("/stats/nfl/regular/"+year+"/"+week,{attempts:2,timeoutMs:20000});
    for(const [playerId,row] of Object.entries(data||{})){
     const pos=players?.[playerId]?.position;
     if(!["QB","RB","WR","TE"].includes(pos))continue;
@@ -1275,7 +1275,8 @@ async function loadSleeperHallHistory(){
     }));
     const rosterByManager=new Map([...managerByRoster.entries()].map(([rosterId,manager])=>[manager,Number(rosterId)]));
     const seedByRoster=new Map(seasonStandings.map((standing,index)=>[rosterByManager.get(standing.manager),index+1]).filter(([rosterId])=>rosterId!=null));
-    const byeTeams=playoffTeams>=6?seasonStandings.slice(0,2).map((standing,index)=>({seed:index+1,manager:standing.manager})):[];
+    const hasFirstRoundByes=playoffTeams>=6||bracket.filter(game=>Number(game.r)===1&&!game.p).length===2;
+    const byeTeams=hasFirstRoundByes?seasonStandings.slice(0,2).map((standing,index)=>({seed:index+1,manager:standing.manager})):[];
     const seasonBracketGames=bracket.map(game=>({
      matchId:Number(game.m)||0,round:Number(game.r)||1,placement:Number(game.p)||null,
      team1:resolveBracketSlot(game.t1,game.t1_from),team2:resolveBracketSlot(game.t2,game.t2_from),
