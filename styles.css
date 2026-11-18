@@ -2639,3 +2639,26 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 }
 .hall-card-back .hall-back-honors ul::-webkit-scrollbar{width:4px}
 .hall-card-back .hall-back-honors ul::-webkit-scrollbar-thumb{border-radius:4px;background:#71648f}
+
+
+/* Make the draft board manager headers easier to read. */
+.hall-draft-table th.hall-draft-slot-manager{font-size:12px;line-height:1.25;padding:12px 5px}
+.hall-draft-table th.hall-draft-slot-manager b{font-size:11px;line-height:1.25}
+
+/* Compact, vertically balanced playoff rounds while retaining the current card width. */
+.hall-bracket-playoff{min-height:350px;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px}
+.hall-bracket-playoff .hall-tree-column{grid-template-rows:48px minmax(0,1fr);min-height:0}
+.hall-bracket-playoff .hall-round-games{min-height:285px;gap:8px}
+.hall-bracket-playoff .hall-tree-round-one .hall-round-games{justify-content:space-around}
+.hall-bracket-playoff .hall-tree-round-two .hall-round-games{justify-content:center;gap:58px}
+.hall-bracket-playoff .hall-tree-finals .hall-round-games{display:flex;align-items:center;justify-content:center;min-height:285px}
+.hall-bracket-playoff .hall-tree-finals .hall-tree-final{flex:0 0 auto;width:100%;display:flex;align-items:center;justify-content:center}
+.hall-bracket-playoff .hall-tree-finals .hall-placement-games{position:static;transform:none;width:100%;margin:14px auto 0;padding:0;border:0;display:flex;flex-direction:column;align-items:center;gap:10px}
+.hall-bracket-playoff .hall-tree-finals .hall-placement-game{width:100%;max-width:205px;min-width:0;padding:0;border:0;background:transparent}
+.hall-bracket-playoff .hall-tree-finals .hall-placement-game .hall-tree-game{width:100%;max-width:205px}
+@media(max-width:720px){
+ .hall-bracket-playoff{min-height:320px;gap:9px}
+ .hall-bracket-playoff .hall-round-games{min-height:255px}
+ .hall-bracket-playoff .hall-tree-round-two .hall-round-games{gap:38px}
+ .hall-bracket-playoff .hall-tree-finals .hall-round-games{min-height:255px}
+}
