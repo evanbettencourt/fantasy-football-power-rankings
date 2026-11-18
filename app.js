@@ -967,6 +967,14 @@ const PARLAY_PLAYER_ALIASES = {
 const PARLAY_TEAM_ALIASES = {
  "eagles":"Philadelphia Eagles","bengals":"Cincinnati Bengals","giants":"New York Giants","cardinals":"Arizona Cardinals","patriots":"New England Patriots","pats":"New England Patriots","chiefs":"Kansas City Chiefs","bills":"Buffalo Bills","lions":"Detroit Lions"
 };
+const PARLAY_PLAYER_ID_OVERRIDES = { "Lamar Jackson": "4881" };
+function normalizeParlayPlayerName(value){
+ return String(value||"").toLowerCase()
+  .replace(/\\b(jr|sr|ii|iii|iv|v)\\.?\\b/g,"")
+  .replace(/[^a-z0-9]+/g," ")
+  .trim()
+  .replace(/\\s+/g," ");
+}
 const PARLAY_PLAYER_INDEX = new WeakMap();
 const PARLAY_TEAM_ABBR = {eagles:"PHI",bengals:"CIN",giants:"NYG",cardinals:"ARI",patriots:"NE",pats:"NE",chiefs:"KC",bills:"BUF",lions:"DET"};
 function normalizeParlayStats(value){
@@ -995,12 +1003,12 @@ function parlayPlayerEntry(players, fullName){
  if(!index){
   index=new Map();
   for(const [id,p] of Object.entries(players)){
-   const name=String(p.full_name||[p.first_name,p.last_name].filter(Boolean).join(" ")).trim().toLowerCase();
-   if(name)index.set(name,[String(p.player_id||id),p]);
+   const name=normalizeParlayPlayerName(p.full_name||[p.first_name,p.last_name].filter(Boolean).join(" "));
+   if(name)index.set(name,[String(PARLAY_PLAYER_ID_OVERRIDES[p.full_name]||p.player_id||id),p]);
   }
   PARLAY_PLAYER_INDEX.set(players,index);
  }
- return index.get(fullName.toLowerCase())||null;
+ return index.get(normalizeParlayPlayerName(fullName))||null;
 }
 function parlayStatNumber(stat,key){const value=stat?.[key];return value==null||!Number.isFinite(Number(value))?null:Number(value);}
 function parlayPickIdentity(raw){
@@ -1084,8 +1092,8 @@ function gradeParlayPick(pick,stats,players,schedule,diagnostics={}){
  if(passingTd){
   const overUnder=raw.match(/\b(O|U)\s*(\d+(?:\.\d+)?)/i),plus=raw.match(/\b(\d+(?:\.\d+)?)\s*\+/),threshold=overUnder?Number(overUnder[2]):plus?Number(plus[1]):null;
   if(threshold==null)return {status:"REVIEW",detail:"Passing TD threshold unclear"};
-  const value=parlayStatNumber(stat,"pass_td");
-  if(value==null)return {status:"PENDING",detail:"Passing TD stat unavailable"};
+  // Sleeper omits zero-valued counting stats from some player rows.
+  const value=parlayStatNumber(stat,"pass_td")??0;
   const push=!plus&&value===threshold,hit=plus?value>=threshold:overUnder[1].toUpperCase()==="U"?value<threshold:value>threshold;
   return {status:push?"PUSH":hit?"HIT":"MISS",detail:value+" pass TD / "+(plus?"at least ":"")+threshold};
  }
@@ -1104,6 +1112,13 @@ function gradeParlayPick(pick,stats,players,schedule,diagnostics={}){
  else if(/\brec(?:eptions?)?\b/i.test(raw)){key="rec";label="REC"}
  else if(/rush attempts?/i.test(raw)){key="rush_att";label="RUSH ATT"}
  else if(/\bint(?:erceptions?)?\b/i.test(raw)){key="pass_int";label="INT"}
+ else if(/\\byards?\\b/i.test(raw)){
+  const position=String(player.position||"").toUpperCase();
+  if(position==="QB"){key="pass_yd";label="PASS YDS"}
+  else if(position==="RB"){key="rush_yd";label="RUSH YDS"}
+  else if(position==="WR"||position==="TE"){key="rec_yd";label="REC YDS"}
+  else return {status:"REVIEW",detail:"Yardage type unclear for "+(position||"unknown")+" position"};
+ }
  else return {status:"REVIEW",detail:"Prop type not recognized"};
  // Sleeper omits zero-valued counting stats from some player rows.
  // Once the player's game is final, an omitted prop stat is a recorded zero.
