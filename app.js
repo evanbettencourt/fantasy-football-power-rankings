@@ -1140,6 +1140,10 @@ async function loadSleeperHallHistory(){
   const resolvedAccountCount=state.managerBySleeperUserId.size;
   let league=state.league;
   const currentYear=Number(league?.season)||2026;
+  let nflState=state.nflState;
+  try{nflState=await fetchJson("/state/nfl",{attempts:2,timeoutMs:10000});state.nflState=nflState;}
+  catch(error){nflState=state.nflState||null;}
+  const nflCurrentWeek=Number(nflState?.week)||Number(state.currentWeek)||1;
   for(let year=currentYear;year>=2021;year--){
    if(!league||Number(league.season)!==year){
     const previousId=league?.previous_league_id;
@@ -1165,7 +1169,11 @@ async function loadSleeperHallHistory(){
     }
     const playoffStart=Math.max(2,Number(league.settings?.playoff_week_start)||15);
     const regularWeeks=playoffStart-1;
-    const regularWeeksToLoad=year===currentYear?Math.min(regularWeeks,10):regularWeeks;
+    // Sleeper's NFL state identifies the live scoring week. Only consider weeks
+    // before it eligible for Hall of Fame stats; all-roster final scores below
+    // provide a second safeguard against incomplete or placeholder matchup data.
+    const latestCompletedWeek=year===currentYear?Math.max(0,Math.min(regularWeeks,nflCurrentWeek-1)):regularWeeks;
+    const regularWeeksToLoad=latestCompletedWeek;
     const seasonExtras=await loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,regularWeeksToLoad);
     const weekData=[];
     const regularGamesBefore=recordGames.length;
