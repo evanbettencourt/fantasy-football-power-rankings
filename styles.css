@@ -2440,3 +2440,19 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
  object-fit:unset!important;overflow:hidden!important;
  border:0!important;border-radius:0!important;box-shadow:none!important;filter:none!important;
 }
+
+
+/* Manager sprites are standalone SVG symbol crops; never position a shared sheet in cards. */
+.hall-manager-grid .hall-avatar-line{width:88px!important;height:112px!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;background:transparent!important;margin:6px auto!important}
+.hall-manager-grid .hall-character-avatar.hall-pixel-sprite{display:block!important;width:70px!important;height:104px!important;max-width:70px!important;max-height:104px!important;object-fit:contain!important;image-rendering:pixelated!important;overflow:visible!important;flex:none!important;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;filter:none!important}
+.hall-season-page{max-width:1200px;margin:0 auto;padding:28px 22px 80px}
+.hall-season-page[hidden]{display:none!important}
+.hall-season-back{border:1px solid var(--line,#ffffff24);background:transparent;color:inherit;padding:10px 14px;border-radius:8px;font:600 11px 'DM Mono',monospace;letter-spacing:.08em;cursor:pointer;margin-bottom:24px}
+.hall-season-header{padding:26px 28px;margin-bottom:24px;border:1px solid var(--line,#ffffff20);border-radius:16px;background:linear-gradient(135deg,#28213f,#171426)}
+.hall-season-header h1{font-size:clamp(28px,4vw,42px);margin:8px 0 20px}
+.hall-season-champion{display:flex;flex-direction:column;gap:6px}
+.hall-season-champion>span{font:600 10px 'DM Mono',monospace;color:#e9c76b;letter-spacing:.12em}
+.hall-season-champion strong{font-size:24px}
+.hall-season-champion small{color:#c3bdcf;font-size:12px}
+.hall-season-section{margin:24px 0}
+.hall-season-section h2{font-size:20px;margin:0 0 14px}
