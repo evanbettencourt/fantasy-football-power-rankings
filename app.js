@@ -967,7 +967,7 @@ const PARLAY_PLAYER_ALIASES = {
 const PARLAY_TEAM_ALIASES = {
  "eagles":"Philadelphia Eagles","bengals":"Cincinnati Bengals","giants":"New York Giants","cardinals":"Arizona Cardinals","patriots":"New England Patriots","pats":"New England Patriots","chiefs":"Kansas City Chiefs","bills":"Buffalo Bills","lions":"Detroit Lions"
 };
-const PARLAY_PLAYER_ID_OVERRIDES = { "Lamar Jackson": "4881", "Justin Jefferson": "6794" };
+const PARLAY_PLAYER_ID_OVERRIDES = { "lamar jackson": "4881", "justin jefferson": "6794" };
 function normalizeParlayPlayerName(value){
  return String(value||"").toLowerCase()
   .replace(/\b(jr|sr|ii|iii|iv|v)\.?\b/g,"")
@@ -1002,9 +1002,22 @@ function parlayPlayerEntry(players, fullName){
  let index=PARLAY_PLAYER_INDEX.get(players);
  if(!index){
   index=new Map();
+  const candidatesByName=new Map();
   for(const [id,p] of Object.entries(players)){
    const name=normalizeParlayPlayerName(p.full_name||[p.first_name,p.last_name].filter(Boolean).join(" "));
-   if(name)index.set(name,[String(PARLAY_PLAYER_ID_OVERRIDES[p.full_name]||p.player_id||id),p]);
+   if(!name)continue;
+   if(!candidatesByName.has(name))candidatesByName.set(name,[]);
+   candidatesByName.get(name).push([String(p.player_id||id),p]);
+  }
+  for(const [name,candidates] of candidatesByName){
+   const overrideId=PARLAY_PLAYER_ID_OVERRIDES[name];
+   let selected=overrideId?candidates.find(([id])=>id===overrideId):null;
+   // Duplicate names exist in Sleeper's directory. If an override ID is not
+   // present in this directory snapshot, prefer the known NFL position/team.
+   if(!selected&&name==="justin jefferson")selected=candidates.find(([,p])=>String(p.position||"").toUpperCase()==="WR"&&String(p.team||"").toUpperCase()==="MIN");
+   if(!selected&&name==="lamar jackson")selected=candidates.find(([,p])=>String(p.position||"").toUpperCase()==="QB"&&String(p.team||"").toUpperCase()==="BAL");
+   if(!selected&&!overrideId)selected=candidates[0];
+   if(selected)index.set(name,selected);
   }
   PARLAY_PLAYER_INDEX.set(players,index);
  }
