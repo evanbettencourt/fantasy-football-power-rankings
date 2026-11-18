@@ -879,7 +879,7 @@ function renderLotteryHistory() {
     const luck=lotteryLuck(index+1,fieldSize);
     const slot=draftSlots.get(manager);
     const luckClass=luck>0?"up":luck<0?"dn":"even";
-    const luckLabel=luck>0?"▲ "+Math.round(luck):luck<0?"▼ "+Math.abs(Math.round(luck)):"—";
+    const luckLabel=luck>0?"▲ "+luck.toFixed(1):luck<0?"▼ "+Math.abs(luck).toFixed(1):"—";
     return '<div class="ds-row"><span class="ds-pk">'+(index===0?'🏆':String(index+1))+'</span><span class="ds-tm"><span class="ds-dot" style="background:'+lotteryColor(manager)+'"></span><span style="color:'+lotteryColor(manager)+'">'+escapeHtml(manager)+'</span></span><span class="ds-mv '+luckClass+'">'+luckLabel+'</span><span class="ds-slot"><span class="pill">'+(slot?'#'+slot:'—')+'</span></span></div>';
   }).join("");
   $("lottery-current-results").innerHTML=currentRows;
