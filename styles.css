@@ -3056,8 +3056,8 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   border-radius:10px;
   background:var(--panel2);
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px 8px;
+  grid-template-columns:1fr;
+  gap:9px;
 }
 .rules-scoring-card header{
   grid-column:1/-1;
@@ -3070,11 +3070,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   font:800 10px var(--mono);
   letter-spacing:.09em;
 }
-.rules-scoring-card header span{
-  color:var(--muted);
-  font:700 8px var(--mono);
-}
-.rules-scoring-card>div{display:flex;flex-direction:column;gap:3px}
+.rules-scoring-card>div{display:flex;flex-direction:row;align-items:baseline;justify-content:space-between;gap:12px}
 .rules-scoring-card strong{font:800 23px/1 var(--sans);color:var(--lime)}
 .rules-scoring-card small{color:var(--muted);font:500 9px/1.35 var(--sans)}
 .rules-scoring-card .negative strong{color:#F2685C}
