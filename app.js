@@ -954,7 +954,7 @@ function describeParlayPick(pick){
  else if(/\bint(?:erceptions?)?\b/i.test(raw))type="interceptions thrown";
  else if(/\byards?\b/i.test(raw)){
   if(/bijan|kenneth walker|ken walker|derrick henry|jaylen warren|jonah coleman/i.test(raw))type="rushing yards";
-  else if(/nabers|deshaun watson|lamar|keenan|puka|ceedee|cee dee/i.test(raw))type=/deshaun watson|lamar/i.test(raw)?"passing yards":"receiving yards";
+  else if(/nabers|deshaun watson|lamar|keenan|puka|ceedee|cee dee|jordan addison/i.test(raw))type=/deshaun watson|lamar/i.test(raw)?"passing yards":"receiving yards";
  }
  const line=raw.match(/\b(O|U)\s*(\d+(?:\.\d+)?)/i);
  const plus=raw.match(/\b(\d+(?:\.\d+)?)\s*\+/);
