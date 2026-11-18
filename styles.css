@@ -3152,3 +3152,21 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
  .rules-trade-flow strong{font-size:7px}
  .rules-trade-flow small{font-size:8px}
 }
+
+
+/* Scoring cards: each stat occupies its own full-width row. */
+[data-panel="rules"] .rules-scoring-card{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) !important;
+  grid-auto-flow:row !important;
+}
+[data-panel="rules"] .rules-scoring-card>div{
+  grid-column:1/-1 !important;
+  width:100%;
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+}
+[data-panel="rules"] .rules-scoring-card header{grid-column:1/-1}
