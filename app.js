@@ -1728,7 +1728,6 @@ function setupNavigation() {
     if (target === "rules") renderRules();
     if (target === "schedule") renderSchedule();
     if (target === "matchups") renderMatchups(state.matchupWeek);
-    if (target === "awards") renderAwards();
     if (target === "hall") renderHallOfFame();
     if (target === "parlays") renderParlays();
     if (target === "lottery") renderLotteryHistory();
