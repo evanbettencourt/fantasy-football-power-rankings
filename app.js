@@ -434,9 +434,9 @@ function renderSchedule() {
       '</div>';
     }).join("");
     const empty = state.failedWeeks.includes(week) ? "Sleeper schedule data is unavailable for this week." : "Matchups have not been posted by Sleeper yet.";
-    const tag = rematch ? "Rematch" : "Regular Season";
-    cards.push('<article class="sch-wk '+(rematch?'rematchwk':'')+'">'+
-      '<div class="sch-wk-hd"><span class="sch-wk-n">Week '+week+'</span><span class="sch-wk-tag '+(rematch?'rematch':'regular')+'">'+tag+'</span></div>'+
+    const tag = "Regular Season";
+    cards.push('<article class="sch-wk">'+
+      '<div class="sch-wk-hd"><span class="sch-wk-n">Week '+week+'</span><span class="sch-wk-tag regular">'+tag+'</span></div>'+
       '<div class="sch-games">'+(rows||'<p class="sch-empty">'+empty+'</p>')+'</div>'+
     '</article>');
   }
