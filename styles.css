@@ -2878,8 +2878,8 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
  .hall-bracket-playoff .hall-tree-finals .hall-round-games>.hall-tree-final{top:112px}
 }
 
-/* Keep placement games at their existing vertical position, but align the
-   third-place game with the championship and fifth-place game with semis. */
+/* Keep the placement games at the same vertical offset while placing
+   fifth place under the semifinals and third place under the championship. */
 .hall-bracket-playoff .hall-tree-finals .hall-placement-games{
   position:relative;
   display:flex;
@@ -2899,10 +2899,21 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   max-width:205px;
   margin:0;
 }
+.hall-bracket-playoff .hall-tree-finals .hall-placement-game .hall-tree-team{
+  font-size:10px;
+}
 @media(max-width:720px){
   .hall-bracket-playoff .hall-tree-finals .hall-placement-games{
     width:422px;
     margin-left:-217px;
     gap:12px;
+  }
+  .hall-bracket-playoff .hall-tree-finals .hall-placement-game .hall-tree-team{
+    font-size:8px;
+  }
+}
+@media(max-width:480px){
+  .hall-bracket-playoff .hall-tree-finals .hall-placement-game .hall-tree-team{
+    font-size:7px;
   }
 }
