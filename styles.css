@@ -1348,3 +1348,44 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   .mu-player-game{font-size:9px}
   .mu-player-game img{width:14px;height:14px;flex-basis:14px}
 }
+
+
+/* Matchups roster readability: names first, compact stacked position labels. */
+.mu-player-head,.mu-player-row{
+  grid-template-columns:36px minmax(0,1fr) 40px 44px;
+  column-gap:6px;
+}
+.mu-player-row{min-height:50px}
+.mu-player-pos{
+  display:flex;
+  align-self:stretch;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  min-height:100%;
+  margin:0;
+  padding:0 2px;
+  border-right:1px solid rgba(255,255,255,.12);
+  border-bottom:1px solid rgba(255,255,255,.22);
+  border-radius:0;
+  font-size:9px;
+  line-height:1;
+  box-sizing:border-box;
+}
+.mu-player-name{gap:4px}
+.mu-player-primary{font-size:13px;line-height:1.25;gap:6px}
+.mu-player-primary>img{width:19px;height:19px;flex-basis:19px}
+.mu-player-game{font-size:9px}
+.mu-player-points,.mu-player-proj{font-size:11px}
+@media(max-width:600px){
+  .mu-player-head,.mu-player-row{
+    grid-template-columns:34px minmax(0,1fr) 38px 42px;
+    column-gap:5px;
+  }
+  .mu-player-row{min-height:52px}
+  .mu-player-primary{font-size:12px;gap:5px}
+  .mu-player-primary>img{width:18px;height:18px;flex-basis:18px}
+  .mu-player-game{font-size:9px}
+  .mu-player-points,.mu-player-proj{font-size:10px}
+  .mu-player-pos{font-size:9px}
+}
