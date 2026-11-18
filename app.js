@@ -1559,7 +1559,7 @@ function renderHallOfFame(){
   const winPct=games?(100*stat.regularWins/games).toFixed(1)+"%":"—";
   const avg=stat.regularGames?fmt(stat.pf/stat.regularGames):"—";
   const honors=hallManagerHonors(name,stat);
-  const honorIcons=honors.map(honor=>'<span class="hall-honor-icon '+(honor.tone||"")+'" title="'+escapeHtml(honor.label)+'" aria-label="'+escapeHtml(honor.label)+'">'+honor.icon+'</span>').join("");
+  const honorIcons=honors.map(honor=>Array.from({length:(honor.detail||"").split(",").filter(Boolean).length||1},()=>'<span class="hall-honor-icon '+(honor.tone||"")+'" title="'+escapeHtml(honor.label)+'" aria-label="'+escapeHtml(honor.label)+'">'+honor.icon+'</span>').join("")).join("");
   const honorList=honors.length?honors.map(honor=>'<li><span>'+honor.icon+'</span><div><strong>'+escapeHtml(honor.label)+'</strong><small>'+escapeHtml(honor.detail||"")+'</small></div></li>').join(""):'<li class="hall-no-honors">NO RECORDED HONORS YET</li>';
   const years=isRetired?(MANAGER_TENURES[name]||"FORMER MANAGER"):"YEAR "+Math.max(1,stat.seasons.size);
   const palette=["#67D9F2","#FF8A7A","#C3A0FF","#F4D06F","#7FE0B5","#FF9BCB","#83B5FF","#FFB36B","#C2DF72","#D4B4F0","#63D6C8","#F28FA3"];
