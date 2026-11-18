@@ -1383,7 +1383,7 @@ const HALL_CHARACTER_DESIGNS={
  Campbell:{suit:"#737373",shadow:"#3d3d3d",trim:"#e6e6e6",skin:"#b98368",hair:"#262626",hairPath:"M34 38Q28 22 40 15Q55 6 70 14Q83 21 79 39L72 32Q57 28 47 31Q39 28 35 38Z",beard:'<path d="M40 54Q46 67 59 67Q72 67 77 54L70 68Q58 75 46 68Z" fill="#262626"/>',eyes:"#9b9b9b",brow:"#262626",accessory:'<path d="M34 26Q57 18 81 27" fill="none" stroke="#e6e6e6" stroke-width="3"/>',emblem:"◇"}
 };
 function hallPixelAvatar(name){
- const crop={"Kevin":[0,40,32,54],"Marc":[38,36,30,60],"Colby":[78,18,40,76],"Ben":[136,18,40,76],"Brandon":[188,0,64,102],"Evan":[268,54,30,40],"Pat":[314,54,38,40],"Joey":[370,30,52,64],"Butta":[436,8,54,94],"Ders":[504,32,36,64],"Tanz":[556,22,40,72],"Roth":[0,170,32,54],"Sam":[40,148,40,76],"Schmeef":[98,178,26,46],"Hess":[152,160,32,48],"Campbell":[204,178,26,46],"Lee":[258,168,20,22]}[name];
+ const crop={"Kevin":[0,40,32,54],"Marc":[38,36,30,60],"Colby":[78,18,40,76],"Ben":[136,18,40,76],"Brandon":[188,0,64,102],"Evan":[268,54,30,40],"Pat":[314,54,38,40],"Joey":[370,30,52,64],"Butta":[436,8,54,94],"Ders":[504,32,36,64],"Tanz":[556,22,40,72],"Roth":[0,170,32,54],"Sam":[40,148,40,76],"Schmeef":[98,178,26,46],"Hess":[152,160,32,48],"Campbell":[204,178,26,46],"Lee":[302,184,28,34]}[name];
  if(!crop)return '<span class="hall-character-avatar hall-pixel-sprite" aria-hidden="true"></span>';
  const [x,y,w,h]=crop;
  return '<span class="hall-character-avatar hall-pixel-sprite" role="img" aria-label="'+escapeHtml(name)+' character" style="--sprite-x:'+(-x)+'px;--sprite-y:'+(-y)+'px;--sprite-w:'+w+'px;--sprite-h:'+h+'px"></span>';
