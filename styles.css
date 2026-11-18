@@ -3261,3 +3261,31 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .hall-bracket-legacy-four .hall-tree-finals .hall-round-games{justify-content:center}
 .hall-bracket-legacy-four .hall-tree-final{display:flex;flex:1;align-items:center;justify-content:center;margin:0}
 @media(max-width:720px){.hall-bracket-legacy-four{min-width:600px;gap:22px}}
+
+/* Four-team 2017 bracket: semifinals occupy opposite ends; final spans their midpoint. */
+.hall-bracket-legacy-four{
+ width:max-content;max-width:none;min-width:0;min-height:0;
+ grid-template-columns:repeat(2,205px);column-gap:28px;row-gap:0;
+ align-items:start;overflow:visible;padding:8px 5px;
+}
+.hall-bracket-legacy-four .hall-tree-column{
+ display:grid;grid-template-rows:42px auto;gap:0;min-width:0;
+}
+.hall-bracket-legacy-four .hall-round-games{
+ display:grid;grid-template-columns:minmax(0,1fr);
+ grid-template-rows:repeat(4,76px);row-gap:12px;
+ min-height:0;height:auto;align-content:start;justify-content:stretch;
+}
+.hall-bracket-legacy-four .hall-tree-round-one .hall-round-games>.hall-tree-game{
+ grid-column:1;align-self:center;justify-self:center;
+ width:100%;max-width:205px;margin:0;
+}
+.hall-bracket-legacy-four .hall-tree-round-one .hall-round-games>.hall-tree-game:nth-child(1){grid-row:1}
+.hall-bracket-legacy-four .hall-tree-round-one .hall-round-games>.hall-tree-game:nth-child(2){grid-row:4}
+.hall-bracket-legacy-four .hall-tree-finals .hall-round-games>.hall-tree-final{
+ grid-row:2 / span 2;align-self:center;justify-self:center;
+ display:flex;align-items:center;justify-content:center;
+ width:100%;margin:0;
+}
+.hall-bracket-legacy-four .hall-tree-finals .hall-tree-game{width:100%;max-width:205px}
+@media(max-width:720px){.hall-bracket-legacy-four{min-width:0;grid-template-columns:repeat(2,205px);column-gap:18px}}
