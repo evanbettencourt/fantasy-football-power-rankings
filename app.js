@@ -478,7 +478,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
   const isPast = week < currentWeek;
   const recordRows = week > 1 ? computeRankings(week - 1) : computeRankings(0);
   const recordById = new Map(recordRows.map(team => [team.id, team]));
-  const publishedWeek = Object.keys(EDITORIAL_EDITIONS).map(Number).filter(w => w <= week && EDITORIAL_EDITIONS[w]?.rankings?.length).sort((a,b) => b-a)[0];
+  const publishedWeek = Object.keys(EDITORIAL_EDITIONS).map(Number).filter(w => w < week && EDITORIAL_EDITIONS[w]?.rankings?.length).sort((a,b) => b-a)[0];
   const powerRanks = new Map((publishedWeek ? EDITORIAL_EDITIONS[publishedWeek].rankings : []).map((entry,index) => [entry.manager, index+1]));
   const hasProjectionData = projections.size > 0;
 
@@ -514,22 +514,28 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
   };
   const projectionFor = (team, matchup) => {
     const starters = Array.isArray(matchup.starters) ? matchup.starters.map(String).filter(id => id && id !== "0") : [];
-    let projectedTotal = 0, found = false;
+    let originalTotal = 0, liveTotal = 0, found = false;
     for (const id of starters) {
       const stat = stats[id];
       const matchupPoints = matchup.players_points && matchup.players_points[id];
       const actual = stat?.pts_half_ppr != null ? num(stat.pts_half_ppr) : num(matchupPoints);
-      const projected = projections.get(id)?.stats?.pts_half_ppr;
-      if (projected != null && Number.isFinite(Number(projected))) {
-        projectedTotal += Math.max(actual, Number(projected));
+      const projection = projections.get(id)?.stats?.pts_half_ppr;
+      if (projection != null && Number.isFinite(Number(projection))) {
+        const original = Number(projection);
+        originalTotal += original;
+        liveTotal += stat || matchupPoints != null ? actual : original;
         found = true;
-      } else if (stat || actual > 0) {
-        projectedTotal += actual;
+      } else if (stat || matchupPoints != null) {
+        liveTotal += actual;
       }
     }
     const actualTeamScore = num(matchup.points);
-    if (isPast) return { value: actualTeamScore, available: true };
-    return { value: Math.max(actualTeamScore, projectedTotal), available: hasProjectionData && found };
+    if (isPast) return { value: actualTeamScore, original: null, available: true };
+    return {
+      value: Math.max(actualTeamScore, liveTotal),
+      original: originalTotal,
+      available: hasProjectionData && found
+    };
   };
   const teamSummary = (team, matchup) => {
     const record = recordById.get(team.id);
@@ -549,17 +555,24 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const a = teamSummary(game.teamA, game.a), b = teamSummary(game.teamB, game.b);
     const probA = probability(a,b), probB = probA == null ? null : 100 - probA;
     const status = isPast ? "FINAL" : (a.score > 0 || b.score > 0 ? "LIVE" : "UPCOMING");
-    const side = (team, summary, winChance) =>
-      '<div class="mu-side">' +
+    const side = (team, summary, winChance) => {
+      const projectionDelta = summary.projected.available && summary.projected.original != null
+        ? summary.projected.value - summary.projected.original : 0;
+      const projectionClass = projectionDelta > 0.005 ? "up" : projectionDelta < -0.005 ? "down" : "even";
+      const probabilityClass = winChance == null ? "" : winChance > 50 ? "favored" : winChance < 50 ? "underdog" : "even";
+      return '<div class="mu-side">' +
         '<div class="mu-manager"><span class="mu-rank">' + (summary.powerRank ? "#" + summary.powerRank : "—") + '</span>' +
           '<div class="mu-manager-copy"><strong style="color:' + summary.color + '">' + escapeHtml(team.name) + '</strong>' +
-          '<small>' + escapeHtml(summary.record) + ' · POWER RANK' + '</small></div></div>' +
-        '<div class="mu-score-line"><div><strong>' + fmt(summary.score) + '</strong><span>' + (isPast ? "FINAL SCORE" : "LIVE SCORE") + '</span></div>' +
-          '<div><strong>' + (summary.projected.available ? fmt(summary.projected.value) : "—") + '</strong><span>' + (isPast ? "FINAL" : "LIVE PROJ") + '</span></div></div>' +
-        '<div class="mu-win-line"><span>WIN PROBABILITY</span><b>' + (winChance == null ? "—" : winChance + "%") + '</b></div>' +
+          '<small>' + escapeHtml(summary.record) + ' · POWER RANK</small></div></div>' +
+        '<div class="mu-score-line"><strong>' + fmt(summary.score) + '</strong></div>' +
+        '<div class="mu-projection-line ' + projectionClass + '">' + (summary.projected.available ? '<span>PROJECTION</span><b>' + fmt(summary.projected.value) + '</b>' : '<span>PROJECTION</span><b>—</b>') + '</div>' +
+        '<div class="mu-win-line"><span>WIN PROBABILITY</span><b class="' + probabilityClass + '">' + (winChance == null ? "—" : winChance + "%") + '</b></div>' +
       '</div>';
-    const bar = probA == null ? '<div class="mu-prob-track unavailable"><i></i></div>' :
-      '<div class="mu-prob-track"><i style="width:' + probA + '%"></i></div>';
+    };
+    const bar = probA == null ? '<div class="mu-prob-track unavailable"></div>' :
+      '<div class="mu-prob-track" style="background:linear-gradient(90deg,' +
+        (probA >= 50 ? '#35C878 0%,#35C878 ' + probA + '%,#FF4F91 ' + probA + '%,#FF4F91 100%' :
+          '#FF4F91 0%,#FF4F91 ' + probA + '%,#35C878 ' + probA + '%,#35C878 100%') + ')"></div>';
     return '<article class="mu-card">' +
       '<div class="mu-card-head"><span>MATCHUP ' + String(index+1).padStart(2,"0") + '</span><span class="mu-live-tag ' + status.toLowerCase() + '">' + status + '</span></div>' +
       '<div class="mu-faceoff">' + side(game.teamA,a,probA) + '<div class="mu-versus">VS</div>' + side(game.teamB,b,probB) + '</div>' +
