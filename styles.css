@@ -1013,3 +1013,18 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 }
 .pr-card.moving[data-dir="up"]{box-shadow:0 0 0 1px rgba(87,242,107,.35),0 6px 26px rgba(87,242,107,.12)}
 .pr-card.moving[data-dir="dn"]{box-shadow:0 0 0 1px rgba(255,79,145,.35),0 6px 26px rgba(255,79,145,.12)}
+
+
+/* Power Rankings accent matches the site's pink; shared navigation stays teal. */
+.pr-page{--lime:#ff3297}
+.pr-archive-item.active{background:rgba(255,50,151,.12);border-left-color:#ff3297}
+.pr-mast{border-bottom-color:#ff3297}
+.pr-crest{background:#ff3297;color:#17132b}
+.pr-controls label{color:#ff3297}
+.pr-controls button{border-color:rgba(255,50,151,.55);color:#ff3297}
+.pr-controls button:hover{background:rgba(255,50,151,.12)}
+.pr-chart-bar-item b{color:#ff3297}
+.pr-h2{color:#ff3297;border-bottom-color:#ff3297}
+.pr-tbl .pr-cut td{background:rgba(255,50,151,.12);border-top-color:#ff3297;border-bottom-color:#ff3297}
+.pr-tbl .pr-cut td span{color:#ff3297}
+.pr-stage.armed .pr-reveal{background:#ff3297;box-shadow:0 6px 20px rgba(255,50,151,.22)}
