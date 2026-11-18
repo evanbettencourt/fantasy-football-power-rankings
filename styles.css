@@ -1599,3 +1599,40 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 /* Projection comparisons: completed player and team scores. */
 .mu-score-line>strong.up,.mu-player-points.up{color:#57F26B}
 .mu-score-line>strong.down,.mu-player-points.down{color:#F2685C}
+
+
+/* Matchups: tighten the score cluster and place live projection inline. */
+.mu-side{
+  grid-template-columns:minmax(44px,.72fr) minmax(68px,1fr) minmax(78px,1.12fr);
+  gap:clamp(2px,.45vw,6px);
+}
+.mu-score-stack{
+  justify-self:center;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  padding:0 2px;
+  gap:4px;
+}
+.mu-score-line,.mu-projection-line{
+  align-items:center;
+  justify-content:center;
+}
+.mu-score-line>strong{text-align:center}
+.mu-projection-line{
+  flex-direction:row;
+  gap:5px;
+  white-space:nowrap;
+}
+.mu-projection-line>span{order:0}
+.mu-projection-line>b{order:1;font-size:11px}
+@media(max-width:600px){
+  .mu-side{
+    grid-template-columns:minmax(40px,.72fr) minmax(52px,1fr) minmax(70px,1.15fr);
+    gap:2px;
+  }
+  .mu-score-stack{padding:0 1px;gap:4px}
+  .mu-projection-line{gap:4px}
+  .mu-projection-line>span{font-size:7px}
+  .mu-projection-line>b{font-size:9px}
+}
