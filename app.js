@@ -1466,15 +1466,49 @@ function hallManagerHonors(name,stat){
 function hallPreSleeperBracket(year){
  const season=PRE_SLEEPER_PLAYOFFS.find(row=>row.year===year);
  if(!season)return [];
- return season.rounds.map((game,index)=>{
-  const bracketRound=year===2017?(index<2?1:2):(index<2?1:index<4?2:3);
-  const opposingTeam=game.losers.join(" & ");
-  return {
-   matchId:index+1,round:bracketRound,placement:null,
-   team1:game.winner,team2:opposingTeam,winner:game.winner,loser:opposingTeam,
+ if(Number(year)===2017){
+  return season.rounds.map((game,index)=>({
+   matchId:index+1,round:index<2?1:3,placement:null,
+   team1:game.winner,team2:game.losers.join(" & "),
+   winner:game.winner,loser:game.losers.join(" & "),
    score1:null,score2:null,legacy:true
-  };
+  }));
+ }
+ const standings=hallLegacyStandings(year);
+ const seedByManager=new Map();
+ standings.forEach(row=>seedByManager.set(row.manager,Number(row.rank)));
+ const rank=name=>seedByManager.get(String(name||"").trim())||99;
+ const firstRound=season.rounds.slice(0,2).map(game=>{
+  const loser=game.losers.join(" & ");
+  const participants=[game.winner,loser].sort((a,b)=>rank(a)-rank(b));
+  return {winner:game.winner,loser,team1:participants[0],team2:participants[1],seed1:rank(participants[0]),seed2:rank(participants[1])};
  });
+ const pair=game=>[game.seed1,game.seed2].sort((a,b)=>a-b).join(",");
+ const game45=firstRound.find(game=>pair(game)==="4,5");
+ const game36=firstRound.find(game=>pair(game)==="3,6");
+ const orderedFirst=[game45,game36,...firstRound.filter(game=>game!==game45&&game!==game36)].filter(Boolean);
+ const bracket=orderedFirst.map((game,index)=>({...game,matchId:index+1,round:1,score1:null,score2:null,legacy:false}));
+ const byeTeams=[];
+ season.rounds.slice(2,4).forEach((game,index)=>{
+  const participants=[game.winner,...game.losers];
+  const bye=participants.find(name=>rank(name)<=2);
+  const firstRoundWinner=participants.find(name=>bracket.some(item=>item.winner===name));
+  if(bye)byeTeams.push({seed:rank(bye),manager:bye});
+  const sourceGame=bracket.find(item=>item.winner===firstRoundWinner);
+  bracket.push({
+   matchId:3+index,round:2,team1:bye||"TBD",team2:null,
+   seed1:bye?rank(bye):null,source2:sourceGame?{w:sourceGame.matchId}:null,
+   winner:game.winner,loser:game.losers.join(" & "),
+   score1:null,score2:null,legacy:false
+  });
+ });
+ const final=season.rounds[4];
+ if(final)bracket.push({
+  matchId:5,round:3,team1:final.winner,team2:final.losers.join(" & "),
+  winner:final.winner,loser:final.losers.join(" & "),
+  score1:null,score2:null,legacy:false
+ });
+ return {bracket,byeTeams:byeTeams.sort((a,b)=>a.seed-b.seed)};
 }
 function hallPlayoffTemplateMarkup(){
  const bracket=[
@@ -1490,7 +1524,9 @@ function hallPlayoffTemplateMarkup(){
  return '<div class="hall-bracket-scroll">' + hallBracketMarkup(Number(state.league?.season)||new Date().getFullYear(),row) + '</div>';
 }
 function hallBracketMarkup(year,championRow){
- const games=championRow?.bracket?.length?championRow.bracket:hallPreSleeperBracket(year);
+ const legacyData=championRow?.bracket?.length?null:hallPreSleeperBracket(year);
+ const games=championRow?.bracket?.length?championRow.bracket:(Array.isArray(legacyData)?legacyData:(legacyData?.bracket||[]));
+ if(legacyData&&!Array.isArray(legacyData))championRow={...championRow,byeTeams:legacyData.byeTeams};
  if(!games.length)return '<div class="hall-bracket-empty">PLAYOFF BRACKET NOT AVAILABLE FOR THIS SEASON.</div>';
  const byId=new Map(games.map(game=>[Number(game.matchId),game]));
  const slot=(team,source,seed)=>{
