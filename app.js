@@ -410,7 +410,7 @@ async function init() {
     const cachedCompleted = Array.from({ length: maxWeek }, (_, index) => index + 1)
       .filter(week => (state.weeks[week] || []).filter(match => num(match.points) > 0).length >= state.teams.size);
     const cachedLatest = cachedCompleted.length ? Math.max(...cachedCompleted) : 1;
-    state.currentWeek = Math.max(1, Math.min(14, state.currentWeek || cachedLatest));
+    state.currentWeek = Math.max(1, Math.min(14, num(state.nflState?.week) || cachedLatest));
     state.matchupWeek = state.currentWeek;
     // Allow the independent NFL-state request to update currentWeek when it arrives.
     void nflStatePromise;
