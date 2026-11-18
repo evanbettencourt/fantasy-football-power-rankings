@@ -1594,3 +1594,8 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   .mu-manager-meta{font-size:7px;gap:4px}
   .mu-manager-meta b{font-size:9px}
 }
+
+
+/* Projection comparisons: completed player and team scores. */
+.mu-score-line>strong.up,.mu-player-points.up{color:#57F26B}
+.mu-score-line>strong.down,.mu-player-points.down{color:#F2685C}
