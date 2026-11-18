@@ -2228,3 +2228,43 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 @media(max-width:1000px){.hall-record-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:720px){.hall-record-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:480px){.hall-record-grid{grid-template-columns:1fr}.hall-record-card{min-height:155px}}
+
+
+/* Hall of Fame — six-team postseason tree and medal honors */
+.hall-champions-section{max-width:1120px;margin:3px auto 0}
+.hall-champion-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.hall-champion-card{min-height:170px;padding:14px 15px;background:linear-gradient(145deg,#30264f,#1b1933)}
+.hall-champion-card strong{margin-top:13px;font-size:20px}
+.hall-champion-runner{font-size:8px;line-height:1.4}
+.hall-champion-link{margin-top:auto}
+.hall-honor-icon.gold{border-color:#b28a3e;background:#f3c86b18}
+.hall-honor-icon.silver{border-color:#8994a8;background:#c7d0df12;filter:grayscale(.8)}
+.hall-honor-icon.bronze{border-color:#a56c48;background:#bd7a4b18;filter:sepia(.55) saturate(.8)}
+.hall-bracket-dialog{width:min(1080px,100%)}
+.hall-bracket-scroll{width:100%;overflow-x:auto;padding:4px 2px 14px}
+.hall-bracket-tree{position:relative;display:grid;grid-template-columns:repeat(3,minmax(210px,1fr));gap:30px;min-width:760px;min-height:490px;padding:8px 5px}
+.hall-tree-column{position:relative;display:flex;min-width:0;flex-direction:column;justify-content:space-around;gap:28px}
+.hall-tree-column:not(:last-child):after{position:absolute;z-index:0;top:22%;right:-16px;bottom:22%;width:1px;background:linear-gradient(180deg,transparent,#625783 15%,#625783 85%,transparent);content:""}
+.hall-tree-column:not(:last-child):before{position:absolute;z-index:0;top:50%;right:-30px;width:30px;height:1px;background:#625783;content:""}
+.hall-bracket-round-label{position:relative;z-index:1;margin-bottom:3px;color:#55dff3;font:700 8px var(--mono);letter-spacing:.13em}
+.hall-tree-game{position:relative;z-index:1;overflow:hidden;border:1px solid #514574;border-radius:9px;background:linear-gradient(145deg,#282344,#19182e);box-shadow:0 7px 18px #08071435}
+.hall-tree-team{display:flex;min-height:37px;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;color:#c4bed9;font:700 10px var(--sans)}
+.hall-tree-team+.hall-tree-team{border-top:1px solid #ffffff18}
+.hall-tree-team.winner{background:#f3c86b0c;color:#f5d27b}
+.hall-tree-team>span{display:flex;min-width:0;align-items:center;gap:6px;overflow-wrap:anywhere}
+.hall-bracket-seed{flex:none;color:#55dff3;font:700 8px var(--mono)}
+.hall-bracket-pending{color:#817a9f;font-style:italic;font-weight:500}
+.hall-bracket-score{flex:none;color:#fff;font:700 10px var(--mono);font-variant-numeric:tabular-nums}
+.hall-tree-final{margin-top:auto;margin-bottom:auto}
+.hall-tree-final .hall-tree-game{border-color:#a78a4b;box-shadow:0 0 0 1px #f3c86b15,0 10px 26px #08071455}
+.hall-tree-third{margin-top:32px}
+.hall-tree-third .hall-bracket-round-label{color:#c58c64}
+.hall-tree-third .hall-tree-game{border-color:#8e674f}
+.hall-tree-placement{margin-top:20px}
+.hall-bracket-archive-note{margin:12px 3px 0;color:#918aa9;font:8px var(--mono);letter-spacing:.06em;line-height:1.6}
+.hall-bracket-legacy{grid-template-columns:repeat(3,minmax(210px,1fr));min-height:400px}
+.hall-bracket-legacy .hall-tree-column{justify-content:flex-start}
+.hall-bracket-empty{padding:18px 12px;border:1px dashed #ffffff30;border-radius:9px;color:#aaa4c6;font:9px var(--mono);line-height:1.5}
+@media(max-width:1000px){.hall-champion-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.hall-champion-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hall-bracket-dialog{padding:22px 16px}}
+@media(max-width:480px){.hall-champion-grid{grid-template-columns:1fr}.hall-champion-card{min-height:145px}.hall-bracket-tree{min-width:720px;gap:22px}.hall-tree-column:not(:last-child):before{right:-22px;width:22px}}
