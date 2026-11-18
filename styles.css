@@ -871,3 +871,20 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
  .rules-playoff-visual strong{font-size:25px}
  .rules-playoff-visual span{font-size:7px}
 }
+
+
+/* Rules-page readability and added lineup / waiver visuals. */
+.rules-overview .rule-kicker,.rules-section-body .rule-kicker{color:var(--pink)}
+.rules-index{color:var(--pink)}
+.rules-toc a:hover,.rules-toc a.active{border-left-color:var(--pink);background:color-mix(in srgb,var(--pink) 9%,transparent)}
+.rules-week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.rules-week-grid>div{display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;min-height:66px;padding:8px 3px;background:var(--panel2);border:1px solid var(--line)}
+.rules-week-grid b{font:10px var(--mono);color:var(--muted)}
+.rules-week-grid strong{font:9px var(--mono);color:var(--pink);text-align:center}
+.rules-week-grid .locked strong{color:var(--muted)}
+.rules-week-grid .waiver strong{color:var(--lime)}
+.rules-chart-caption{margin:12px 0 0!important;font-size:11px!important}
+.rules-source-note{font-size:11px!important}
+.rules-source-note a{color:var(--pink);text-decoration-color:color-mix(in srgb,var(--pink) 50%,transparent);text-underline-offset:3px}
+.rules-section-body strong{color:var(--text)}
+@media(max-width:520px){.rules-week-grid{gap:3px}.rules-week-grid>div{min-height:58px;padding:6px 1px}.rules-week-grid strong{font-size:7px}.rules-week-grid b{font-size:9px}}
