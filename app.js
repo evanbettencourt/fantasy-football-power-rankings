@@ -1136,16 +1136,17 @@ async function loadSleeperHallHistory(){
 }
 function renderHallOfFame(){
  const target=$("hall-content");if(!target)return;
- if(!state.hallStats)state.hallStats=new Map();
- const historical=getPreSleeperManagerStats();
- const allStats=new Map();
- for(const [name,stat] of historical){
-  const merged=newHallStat(name);
-  merged.playoffWins=stat.playoffWins;merged.playoffAppearances=new Set(stat.playoffAppearances);
-  merged.championships=stat.championships;merged.runnerUps=stat.runnerUps;
-  allStats.set(name,merged);
+ if(!state.hallStats){
+  state.hallStats=new Map();
+  const historical=getPreSleeperManagerStats();
+  for(const [name,stat] of historical){
+   const merged=newHallStat(name);
+   merged.playoffWins=stat.playoffWins;merged.playoffAppearances=new Set(stat.playoffAppearances);
+   merged.championships=stat.championships;merged.runnerUps=stat.runnerUps;
+   state.hallStats.set(name,merged);
+  }
  }
- state.hallStats=allStats;
+ const allStats=state.hallStats;
  if(!state.hallHistory&&!state.hallHistoryPromise){
   target.innerHTML='<div class="hall-loading">CONNECTING TO SLEEPER · BUILDING 2021–2026 CAREER RECORDS…</div>';
   loadSleeperHallHistory().then(()=>renderHallOfFame());
