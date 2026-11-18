@@ -3,6 +3,8 @@ const API = "/api/sleeper";
 const $ = (id) => document.getElementById(id);
 const setTextIfPresent = (id, value) => { const element = $(id); if (element) element.textContent = value; };
 const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [], recoveredWeeks: [], usingCachedCore: false, draftOrder: null, draftSeason: null, nflState: null, currentWeek: 1, matchupWeek: 1, players: null, playersPromise: null, matchupDataByWeek: {}, parlayDataByWeek: {}, hallHistory: null, hallHistoryPromise: null, hallHistoryError: null };
+let resolveSleeperCoreReady;
+const sleeperCoreReady = new Promise(resolve=>{resolveSleeperCoreReady=resolve;});
 
 const num = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
 const fmt = (v) => num(v).toFixed(2);
@@ -350,6 +352,7 @@ async function init() {
     const core = Object.fromEntries(results.map(item => [item.key, item.value]));
     state.league = core.league; state.users = core.users; state.rosters = core.rosters;
     state.usingCachedCore = results.some(item => item.cached);
+    resolveSleeperCoreReady(true);
     buildTeams();
     renderLotteryHistory();
     loadActualDraftOrder();
@@ -430,6 +433,7 @@ async function init() {
       updateStartupStatus();
     }
   } catch (error) {
+    resolveSleeperCoreReady(false);
     console.error("League startup failed", error);
     $("status").textContent = "LEAGUE DATA ERROR · " + (error?.message || "Unknown startup error");
     $("status").classList.add("error");
@@ -1016,7 +1020,11 @@ async function loadSleeperHallHistory(){
  if(state.hallHistory)return state.hallHistory;
  if(state.hallHistoryPromise)return state.hallHistoryPromise;
  state.hallHistoryPromise=(async()=>{
-  const seasons=[],unresolved=[],errors=[],recordGames=[],seasonTotals=[];
+  if(!state.league){
+   const ready=await sleeperCoreReady;
+   if(!ready||!state.league)throw new Error("Sleeper league data has not loaded. Refresh the page and try again.");
+  }
+  const seasons=[],unresolved=[],errors=[],recordGames=[],seasonTotals=[],seasonDiagnostics=[];
   let league=state.league;
   const currentYear=Number(league?.season)||2026;
   for(let year=currentYear;year>=2021;year--){
@@ -1045,6 +1053,7 @@ async function loadSleeperHallHistory(){
     const playoffStart=Math.max(2,Number(league.settings?.playoff_week_start)||15);
     const regularWeeks=playoffStart-1;
     const weekData=[];
+    const regularGamesBefore=recordGames.length;
     for(let batchStart=1;batchStart<=regularWeeks;batchStart+=4){
      const batch=Array.from({length:Math.min(4,regularWeeks-batchStart+1)},(_,i)=>batchStart+i);
      const loaded=await Promise.all(batch.map(async week=>{
@@ -1170,7 +1179,10 @@ async function loadSleeperHallHistory(){
     if(thirdPlace)hallStatFor(stats,thirdPlace).thirdPlaces++;
     const bracketGames=seasonBracketGames;
     seasonPoints.forEach((points,manager)=>seasonTotals.push({year,manager,points}));
-    seasons.push({year,champion,runnerUp:runnerUp||null,thirdPlace,regularSeasonChampion,bracket:bracketGames,leagueId:league.league_id,regularWeeks,completedRegularWeeks,managerCount:managerByRoster.size});
+    const regularMatchups=recordGames.length-regularGamesBefore;
+    const playoffMatchups=seasonBracketGames.filter(game=>game.team1&&game.team2&&game.score1!=null&&game.score2!=null).length;
+    seasonDiagnostics.push({year,leagueId:league.league_id,rosters:rosters.length,mappedManagers:managerByRoster.size,regularWeeksLoaded:weekData.length,regularMatchups,playoffMatchups,completedRegularWeeks});
+    seasons.push({year,champion,runnerUp:runnerUp||null,thirdPlace,regularSeasonChampion,bracket:bracketGames,leagueId:league.league_id,regularWeeks,completedRegularWeeks,managerCount:managerByRoster.size,mappedManagers:managerByRoster.size,regularMatchups,playoffMatchups});
    }catch(error){errors.push(year+" season failed: "+(error?.message||String(error)));}
    if(year>2021){
     const previousId=league.previous_league_id;
@@ -1179,12 +1191,14 @@ async function loadSleeperHallHistory(){
     catch(error){errors.push("Could not load "+(year-1)+" season metadata");break;}
    }
   }
-  const result={seasons,unresolved,errors,recordBook:buildHallRecordBook(recordGames,seasonTotals)};
+  const result={seasons,unresolved,errors,seasonDiagnostics,recordGamesLoaded:recordGames.length,seasonTotalsLoaded:seasonTotals.length,recordBook:buildHallRecordBook(recordGames,seasonTotals)};
   state.hallHistory=result;
   return result;
  })().catch(error=>{
   state.hallHistoryError=error?.message||String(error);
-  return {seasons:[],unresolved:[],errors:[state.hallHistoryError]};
+  const result={seasons:[],unresolved:[],errors:[state.hallHistoryError],seasonDiagnostics:[],recordGamesLoaded:0,seasonTotalsLoaded:0,recordBook:[]};
+  state.hallHistory=result;
+  return result;
  }).finally(()=>{state.hallHistoryPromise=null;});
  return state.hallHistoryPromise;
 }
@@ -1361,7 +1375,7 @@ function renderHallOfFame(){
   target.innerHTML='<div class="hall-loading">AGGREGATING SEASON RESULTS…</div>';
   return;
  }
- const active=[...new Set(Object.values(MANAGERS))],retired=[...RETIRED_MANAGERS];
+ const active=[...new Set(Object.values(MANAGERS))],retired=[...RETIRED_MANAGERS],managers=[...active,...retired];
  const statFor=name=>allStats.get(name)||newHallStat(name);
  const makeCard=(name,index,isRetired)=>{
   const stat=statFor(name),games=stat.regularWins+stat.regularLosses+stat.regularTies;
@@ -1379,11 +1393,12 @@ function renderHallOfFame(){
  const champions=Array.from({length:archiveEnd-2017+1},(_,index)=>{const year=2017+index;return knownSeasons.get(year)||{year,champion:null,runnerUp:null,thirdPlace:null,regularSeasonChampion:null,bracket:[]};});
  const championCards=champions.map((row,index)=>'<button class="hall-champion-card" type="button" data-hall-year="'+row.year+'"><span class="hall-champion-season">'+row.year+' SEASON</span><span class="hall-champion-crown">🏆</span><strong>'+escapeHtml(row.champion||"IN PROGRESS")+'</strong><span class="hall-champion-runner">RUNNER-UP · '+escapeHtml(row.runnerUp||"TBD")+'</span>'+(row.thirdPlace?'<span class="hall-champion-runner">3RD PLACE · '+escapeHtml(row.thirdPlace)+'</span>':'')+(row.regularSeasonChampion?'<span class="hall-champion-runner">REGULAR SEASON · '+escapeHtml(row.regularSeasonChampion)+'</span>':'')+'<span class="hall-champion-link">VIEW PLAYOFF BRACKET ↗</span></button>').join("");
  const unresolved=state.hallHistory.unresolved||[],errors=state.hallHistory.errors||[];
- const diagnostic=unresolved.length?'<p class="hall-footnote">MANAGER IDENTITY NEEDS REVIEW: '+unresolved.map(row=>row.year+' · '+escapeHtml(row.displayName)+' (@'+escapeHtml(row.username)+')').join(' | ')+'</p>':'';
+ const diagnostic=unresolved.length?'<p class="hall-footnote">MANAGER IDENTITY NEEDS REVIEW: '+unresolved.map(row=>row.year+' · ROSTER '+row.rosterId+' · '+escapeHtml(row.displayName)+' (@'+escapeHtml(row.username)+')').join(' | ')+'</p>':'';
  const errorNote=errors.length?'<p class="hall-footnote">DATA NOTES: '+errors.map(escapeHtml).join(' · ')+'</p>':'';
  const recordBook=state.hallHistory.recordBook||[];
  const recordCards=recordBook.map((record,index)=>'<article class="hall-record-card"><div class="hall-record-card-top"><span class="hall-record-icon">'+record.icon+'</span><span class="hall-record-number">'+String(index+1).padStart(2,"0")+'</span></div><span class="hall-record-title">'+escapeHtml(record.title)+'</span><strong class="hall-record-value">'+escapeHtml(record.value)+'</strong><span class="hall-record-holder">'+escapeHtml(record.holder)+'</span><small class="hall-record-detail">'+escapeHtml(record.detail)+'</small></article>').join("");
- target.innerHTML='<section class="hall-record-section hall-champions-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE HARDWARE</span><h2>Champions by Year</h2></div><span class="hall-count">2017–'+(champions[champions.length-1]?.year||2026)+' ARCHIVE</span></div><div class="hall-champion-grid">'+championCards+'</div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE PEOPLE</span><h2>Current Managers</h2></div><span class="hall-count">12 MEMBERS</span></div><div class="hall-manager-grid">'+active.map((name,i)=>makeCard(name,i,false)).join("")+'</div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE LEGACY</span><h2>Retired Managers</h2></div><span class="hall-count">'+retired.length+' MEMBERS</span></div><div class="hall-manager-grid hall-retired-grid">'+retired.map((name,i)=>makeCard(name,i,true)).join("")+'</div></section><section class="hall-record-section hall-record-book"><div class="hall-section-heading"><div><span class="hall-kicker">THE RECORD BOOK</span><h2>League Records</h2></div><span class="hall-count">ALL-TIME BESTS</span></div><div class="hall-record-grid">'+recordCards+'</div><div class="hall-history-notes">'+diagnostic+errorNote+'<p class="hall-footnote">Records include completed regular-season head-to-head matchups and playoff games with available scores. Highest scoring season uses regular-season points. Median matchups are excluded from matchup records. Pre-Sleeper seasons played are counted only where postseason participation is documented.</p></div></section>';
+ const dataSummary='<p class="hall-data-summary">'+(state.hallHistory.seasons?.length||0)+' SLEEPER SEASONS · '+(state.hallHistory.recordGamesLoaded||0)+' SCORED MATCHUPS · '+(state.hallHistory.seasonTotalsLoaded||0)+' SEASON TOTALS · '+(state.hallHistory.unresolved?.length||0)+' UNMAPPED MANAGERS</p>';
+ target.innerHTML='<section class="hall-record-section hall-champions-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE HARDWARE</span><h2>Champions by Year</h2></div><span class="hall-count">2017–'+(champions[champions.length-1]?.year||2026)+' ARCHIVE</span></div><div class="hall-champion-grid">'+championCards+'</div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE LEAGUE</span><h2>Managers</h2></div><span class="hall-count">'+managers.length+' FRANCHISES</span></div>'+dataSummary+'<div class="hall-manager-grid">'+managers.map((name,i)=>makeCard(name,i,retired.includes(name))).join("")+'</div></section><section class="hall-record-section hall-record-book"><div class="hall-section-heading"><div><span class="hall-kicker">THE RECORD BOOK</span><h2>League Records</h2></div><span class="hall-count">ALL-TIME BESTS</span></div><div class="hall-record-grid">'+recordCards+'</div><div class="hall-history-notes">'+diagnostic+errorNote+'<p class="hall-footnote">Records include completed regular-season head-to-head matchups and playoff games with available scores. Highest scoring season uses regular-season points. Median matchups are excluded from matchup records. Pre-Sleeper seasons played are counted only where postseason participation is documented.</p></div></section>';
  target.querySelectorAll(".hall-flip-card").forEach(card=>card.addEventListener("click",()=>{
   const flipped=card.classList.toggle("is-flipped");
   card.setAttribute("aria-expanded",String(flipped));
