@@ -1496,8 +1496,8 @@ function hallPreSleeperBracket(year){
   if(bye)byeTeams.push({seed:rank(bye),manager:bye});
   const sourceGame=bracket.find(item=>item.winner===firstRoundWinner);
   bracket.push({
-   matchId:3+index,round:2,team1:bye||"TBD",team2:null,
-   seed1:bye?rank(bye):null,source2:sourceGame?{w:sourceGame.matchId}:null,
+   matchId:3+index,round:2,team1:bye||"TBD",team2:firstRoundWinner||null,
+   seed1:bye?rank(bye):null,seed2:firstRoundWinner?rank(firstRoundWinner):null,
    winner:game.winner,loser:game.losers.join(" & "),
    score1:null,score2:null,legacy:false
   });
