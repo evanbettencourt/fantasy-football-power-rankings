@@ -1111,7 +1111,7 @@ function gradeParlayPick(pick,stats,players,schedule,diagnostics={}){
   const yards=parlayStatNumber(stat,"rush_yd"),td=["rush_td","rec_td","def_td","st_td","fum_rec_td"].reduce((sum,key)=>sum+(parlayStatNumber(stat,key)||0),0);
   if(yards==null)return {status:"PENDING",detail:"Rushing yards unavailable"};
   const hit=yards>=90&&td>=1;
-  return {status:hit?"HIT":"MISS",detail:yards+" rush yds + "+td+" TD (90+ yds and 1+ TD)"};
+  return {status:hit?"HIT":"MISS",detail:yards+" rush yds · "+td+" TD"};
  }
  const passingTd=/pass(?:ing)?\s*(?:TD|touchdowns?)/i.test(raw);
  if(passingTd){
@@ -1120,12 +1120,12 @@ function gradeParlayPick(pick,stats,players,schedule,diagnostics={}){
   // Sleeper omits zero-valued counting stats from some player rows.
   const value=parlayStatNumber(stat,"pass_td")??0;
   const push=!plus&&value===threshold,hit=plus?value>=threshold:overUnder[1].toUpperCase()==="U"?value<threshold:value>threshold;
-  return {status:push?"PUSH":hit?"HIT":"MISS",detail:value+" pass TD / "+(plus?"at least ":"")+threshold};
+  return {status:push?"PUSH":hit?"HIT":"MISS",detail:value+" pass TD"};
  }
  if(/\bTD\b/i.test(raw)){
   const total=["rush_td","rec_td","def_td","st_td","fum_rec_td"].reduce((sum,key)=>sum+(parlayStatNumber(stat,key)||0),0);
   const multi=raw.match(/\b(\d+)\s*\+?\s*TD/i),needed=multi?Number(multi[1]):1;
-  return {status:total>=needed?"HIT":"MISS",detail:total+" anytime TD / "+needed+"+"};
+  return {status:total>=needed?"HIT":"MISS",detail:total+" TD"};
  }
  const overUnder=raw.match(/\b(O|U)\s*(\d+(?:\.\d+)?)/i),plus=raw.match(/\b(\d+(?:\.\d+)?)\s*\+/),bare=raw.match(/\b(\d+(?:\.\d+)?)\s+(?:rush|rushing)\s*yards/i);
  const threshold=overUnder?Number(overUnder[2]):plus?Number(plus[1]):bare?Number(bare[1]):null;
@@ -1150,7 +1150,7 @@ function gradeParlayPick(pick,stats,players,schedule,diagnostics={}){
  const value=parlayStatNumber(stat,key)??0;
  const hit=plus||bare?value>=threshold:overUnder?.[1].toUpperCase()==="U"?value<threshold:value>threshold;
  const push=!plus&&!bare&&value===threshold;
- return {status:push?"PUSH":hit?"HIT":"MISS",detail:label+" "+value+" / "+(plus||bare?"at least ":overUnder?.[1].toUpperCase()+" ")+threshold};
+ return {status:push?"PUSH":hit?"HIT":"MISS",detail:value+" "+label};
 }
 function summarizeParlayResults(results){
  const statuses=results.filter(r=>r.status!=="NA").map(r=>r.status);
