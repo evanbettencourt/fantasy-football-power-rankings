@@ -932,6 +932,10 @@ function gradeParlayPick(pick,stats,players,schedule){
  if(!playerEntry)return {status:"REVIEW",detail:"Player not found in Sleeper directory"};
  const stat=stats?.[playerEntry[0]];
  if(!stat)return {status:"PENDING",detail:"Sleeper stats unavailable"};
+ const playerTeam=({JAC:"JAX",WAS:"WSH",LA:"LAR"}[String(playerEntry[1].team||"").toUpperCase()]||String(playerEntry[1].team||"").toUpperCase());
+ const game=(schedule?.events||[]).find(ev=>(ev.competitions?.[0]?.competitors||[]).some(c=>String(c.team?.abbreviation||"").toUpperCase()===playerTeam));
+ const competition=game?.competitions?.[0],finished=Boolean(competition?.status?.type?.completed??game?.status?.type?.completed??competition?.status?.type?.state==="post");
+ if(!finished)return {status:"PENDING",detail:"Player's NFL game not final"};
  if(/\bTD\b/i.test(raw)&&/yards?\s*\+\s*TD/i.test(raw))return {status:"REVIEW",detail:"Combined yards + touchdown prop"};
  if(/pass(?:ing)?\s*(?:TD|touchdowns?)/i.test(raw)){
   const line=raw.match(/\b(O|U)\s*(\d+(?:\.\d+)?)/i);
@@ -959,15 +963,10 @@ function gradeParlayPick(pick,stats,players,schedule){
  else if(/pass(?:ing)?\s*(?:td|touchdowns?)/i.test(raw)){key="pass_td";label="PASS TD"}
  else if(/\bint(?:erceptions?)?\b/i.test(raw)){key="pass_int";label="INT"}
  else return {status:"REVIEW",detail:"Prop type not recognized"};
- if(!Object.keys(PARLAY_PLAYER_ALIASES).some(k=>k===alias))return {status:"REVIEW",detail:"Player alias not verified"};
- const playerTeam=String(playerEntry[1].team||"").toUpperCase();
- const game=(schedule?.events||[]).find(ev=>(ev.competitions?.[0]?.competitors||[]).some(c=>String(c.team?.abbreviation||"").toUpperCase()===playerTeam));
- const competition=game?.competitions?.[0],finished=Boolean(competition?.status?.type?.completed??game?.status?.type?.completed??competition?.status?.type?.state==="post");
- if(!finished)return {status:"PENDING",detail:"Player's NFL game not final"};
  const value=parlayStatNumber(stat,key);
  if(value==null)return {status:"PENDING",detail:"Stat not available"};
- const hit=overUnder?.[1].toUpperCase()==="U"?value<threshold:value>threshold;
- const push=value===threshold;
+ const hit=plus?value>=threshold:overUnder?.[1].toUpperCase()==="U"?value<threshold:value>threshold;
+ const push=!plus&&value===threshold;
  return {status:push?"PUSH":hit?"HIT":"MISS",detail:label+" "+value+" / "+(overUnder?.[1].toUpperCase()||"OVER")+" "+threshold};
 }
 async function loadParlayWeek(week){
