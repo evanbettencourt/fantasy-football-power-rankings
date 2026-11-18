@@ -779,3 +779,8 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .pr-cut td{height:0!important;padding:0!important;border:0!important;border-top:2px solid var(--jfl-sky)!important;background:transparent!important}
 .pr-eliminated{display:inline-block;margin-left:8px;padding:3px 6px;border:1px solid #ff79a9;border-radius:4px;color:#ff9fc2;font:800 8px/1 Inter,Arial,sans-serif;letter-spacing:.12em;vertical-align:middle}
 @media(max-width:600px){.pr-card{grid-template-columns:70px minmax(0,1fr)}}
+
+/* Ensure rank digits inherit the number container's font instead of the legacy 8px rank-label rule. */
+:root{--pr-rank-size:34px}
+.pr-rank .pr-num .v{font-size:inherit;font-weight:inherit;letter-spacing:normal;color:inherit}
+@media(max-width:520px){:root{--pr-rank-size:34px}}
