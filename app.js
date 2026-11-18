@@ -969,6 +969,16 @@ function gradeParlayPick(pick,stats,players,schedule){
  const push=!plus&&value===threshold;
  return {status:push?"PUSH":hit?"HIT":"MISS",detail:label+" "+value+" / "+(overUnder?.[1].toUpperCase()||"OVER")+" "+threshold};
 }
+
+function summarizeParlayWeek(row,data){
+ const results=row.filter(p=>p&&p!=="N/A").map(p=>gradeParlayPick(p,data.stats,data.players,data.schedule).status);
+ if(!results.length)return "PENDING";
+ if(results.includes("MISS"))return "MISS";
+ if(results.includes("REVIEW"))return "REVIEW";
+ if(results.every(status=>status==="HIT"||status==="PUSH"))return "HIT";
+ return "PENDING";
+}
+
 async function loadParlayWeek(week){
  if(state.parlayDataByWeek[week]?.loaded||state.parlayDataByWeek[week]?.loading)return;
  state.parlayDataByWeek[week]={loading:true};
@@ -987,8 +997,11 @@ function renderParlays(){
  const count=PARLAY_WEEKS.reduce((n,w)=>n+w.filter(p=>p&&p!=="N/A").length,0);
  const loaded=PARLAY_WEEKS.map((row,i)=>state.parlayDataByWeek[i+1]?.loaded);
  const graded=PARLAY_WEEKS.reduce((n,row,i)=>n+row.filter(p=>p&&p!=="N/A").filter(p=>["HIT","MISS","PUSH"].includes(gradeParlayPick(p,state.parlayDataByWeek[i+1]?.stats,state.parlayDataByWeek[i+1]?.players,state.parlayDataByWeek[i+1]?.schedule).status)).length,0);
- target.innerHTML='<div class="parlay-summary"><div><span class="parlay-kicker">2026 SEASON</span><strong>10</strong><small>WEEKS WITH PICKS</small></div><div><span class="parlay-kicker">LEAGUE PICKS</span><strong>'+count+'</strong><small>RECORDED SELECTIONS</small></div><div><span class="parlay-kicker">GRADED PICKS</span><strong>'+graded+'</strong><small>OF '+count+' SETTLED</small></div></div><div class="parlay-week-grid">'+Array.from({length:14},(_,i)=>{const w=i+1,row=PARLAY_WEEKS[i]||[],placer=PARLAY_PLACERS[i]||"Not assigned",data=state.parlayDataByWeek[w]||{};return '<article class="parlay-week-card"><div class="parlay-week-head"><div><span class="parlay-kicker">WEEK '+String(w).padStart(2,"0")+'</span><h3>'+(row.length?'THE PICKS':'PICKS NOT ENTERED')+'</h3></div><div class="parlay-placer"><span>PLACED BY</span><strong>'+escapeHtml(placer)+'</strong></div></div>'+(row.length?'<div class="parlay-pick-list">'+PARLAY_MANAGERS.map((m,j)=>{const pick=row[j]||"—",result=pick==="—"?{status:"PENDING"}:gradeParlayPick(pick,data.stats,data.players,data.schedule);return '<div class="parlay-pick"><span class="parlay-manager">'+escapeHtml(m)+'</span><span class="parlay-selection">'+escapeHtml(pick)+'</span><span class="parlay-result '+result.status.toLowerCase()+'">'+result.status+(result.detail?'<small>'+escapeHtml(result.detail)+'</small>':"")+'</span></div>';}).join("")+'</div>':'<p class="parlay-empty">Weekly picks and the organizer will be added here.</p>')+'<div class="parlay-week-foot"><span>$5 LEAGUE PARLAY</span><span>'+(row.length?(data.loaded?"SLEEPER GRADING":"LOADING RESULTS"):"RESULTS TO BE ADDED")+'</span></div></article>';}).join("")+'</div>';
- PARLAY_WEEKS.forEach((row,i)=>{if(row.length&&!state.parlayDataByWeek[i+1]?.loaded&&!state.parlayDataByWeek[i+1]?.loading)loadParlayWeek(i+1);});
+ target.innerHTML='<div class="parlay-summary"><div><span class="parlay-kicker">2026 SEASON</span><strong>10</strong><small>WEEKS WITH PICKS</small></div><div><span class="parlay-kicker">LEAGUE PICKS</span><strong>'+count+'</strong><small>RECORDED SELECTIONS</small></div><div><span class="parlay-kicker">GRADED PICKS</span><strong>'+graded+'</strong><small>OF '+count+' SETTLED</small></div></div><div class="parlay-week-grid">'+Array.from({length:14},(_,i)=>{const w=i+1,row=PARLAY_WEEKS[i]||[],placer=PARLAY_PLACERS[i]||"Not assigned",data=state.parlayDataByWeek[w]||{},weekResult=summarizeParlayWeek(row,data);return '<article class="parlay-week-card"><div class="parlay-week-head"><div><span class="parlay-kicker">WEEK '+String(w).padStart(2,"0")+'</span><h3>'+(row.length?'THE PICKS':'PICKS NOT ENTERED')+'</h3></div><div class="parlay-placer"><span>PLACED BY</span><strong>'+escapeHtml(placer)+'</strong></div></div>'+(row.length?'<div class="parlay-pick-list">'+PARLAY_MANAGERS.map((m,j)=>{const pick=row[j]||"—",result=pick==="—"?{status:"PENDING"}:gradeParlayPick(pick,data.stats,data.players,data.schedule);return '<div class="parlay-pick"><span class="parlay-manager">'+escapeHtml(m)+'</span><span class="parlay-selection">'+escapeHtml(pick)+'</span><span class="parlay-result '+result.status.toLowerCase()+'">'+result.status+(result.detail?'<small>'+escapeHtml(result.detail)+'</small>':"")+'</span></div>';}).join("")+'</div>':'<p class="parlay-empty">Weekly picks and the organizer will be added here.</p>')+'<div class="parlay-week-foot"><span>$5 LEAGUE PARLAY</span><span class="parlay-week-result '+weekResult.toLowerCase()+'">PARLAY: '+weekResult+'</span></div></article>';}).join("")+'</div>';
+ if(!state.parlayHistoryLoading){
+  state.parlayHistoryLoading=true;
+  (async()=>{for(let start=1;start<=10;start+=3){await Promise.all(Array.from({length:Math.min(3,11-start)},(_,j)=>loadParlayWeek(start+j)));}state.parlayHistoryLoading=false;renderParlays();})();
+ }
  target.dataset.ready="yes";
 }
 
