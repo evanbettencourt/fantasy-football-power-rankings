@@ -1374,7 +1374,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 }
 .mu-player-name{gap:4px}
 .mu-player-primary{font-size:13px;line-height:1.25;gap:6px}
-.mu-player-primary>img{width:19px;height:19px;flex-basis:19px}
+.mu-player-primary>img{width:22px;height:22px;flex-basis:22px}
 .mu-player-game{font-size:9px}
 .mu-player-points,.mu-player-proj{font-size:11px}
 @media(max-width:600px){
@@ -1384,7 +1384,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   }
   .mu-player-row{min-height:52px}
   .mu-player-primary{font-size:12px;gap:5px}
-  .mu-player-primary>img{width:18px;height:18px;flex-basis:18px}
+  .mu-player-primary>img{width:20px;height:20px;flex-basis:20px}
   .mu-player-game{font-size:9px}
   .mu-player-points,.mu-player-proj{font-size:10px}
   .mu-player-pos{font-size:9px}
