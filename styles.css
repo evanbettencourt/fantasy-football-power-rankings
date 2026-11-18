@@ -3046,17 +3046,21 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .rules-scoring-board{
   display:grid;
   grid-template-columns:repeat(5,minmax(0,1fr));
+  align-items:stretch;
   gap:10px;
   margin:0 0 25px;
 }
 .rules-scoring-card{
   min-width:0;
+  height:100%;
   padding:14px;
   border:1px solid var(--line);
   border-radius:10px;
   background:var(--panel2);
   display:grid;
   grid-template-columns:1fr;
+  grid-template-rows:auto 1fr;
+  align-content:start;
   gap:9px;
 }
 .rules-scoring-card header{
@@ -3114,7 +3118,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .rules-vote-dots i.yes{background:var(--lime)}
 .rules-vote-card.special .rules-vote-dots i.yes{background:var(--pink)}
 .rules-draft-visual,.rules-faab-visual{padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);margin:0 0 22px}
-.rules-draft-round{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:8px;margin:12px 0}
+.rules-draft-round{display:grid;grid-template-columns:94px 1fr;align-items:center;gap:8px;margin:12px 0}
 .rules-draft-round>b{font:800 9px var(--mono);color:var(--muted)}
 .rules-draft-picks{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px}
 .rules-draft-picks i{display:grid;place-items:center;min-width:0;aspect-ratio:1;border-radius:5px;background:#a9d4f2;color:#24212a;font:800 9px var(--sans);font-style:normal}
@@ -3195,11 +3199,10 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 [data-panel="rules"] .rules-median-visual small{font-size:11px}
 
 [data-panel="rules"] .rules-draft-visual{padding:20px}
-[data-panel="rules"] .rules-draft-round{gap:12px;margin:16px 0}
+[data-panel="rules"] .rules-draft-round{grid-template-columns:108px 1fr;gap:12px;margin:16px 0}
 [data-panel="rules"] .rules-draft-round>b{font-size:11px}
 [data-panel="rules"] .rules-draft-picks{gap:5px}
 [data-panel="rules"] .rules-draft-picks i{font-size:12px;border-radius:6px}
-[data-panel="rules"] .rules-draft-caption{font-size:9px;letter-spacing:.04em}
 
 @media(max-width:620px){
  [data-panel="rules"] .rules-trade-flow{gap:7px;padding:12px}
