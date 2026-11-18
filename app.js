@@ -1019,7 +1019,9 @@ function getPreSleeperManagerStats(){
  PRE_SLEEPER_CHAMPIONS.forEach(row=>{get(row.champion).championships++;get(row.runnerUp).runnerUps++;});
  return stats;
 }
-function hallManagerFromSleeperUser(user){
+function hallManagerFromSleeperUser(user,managerByUserId=state.managerBySleeperUserId){
+ const resolved=managerByUserId?.get(String(user?.user_id||""));
+ if(resolved)return resolved;
  const username=String(user?.username||"").trim().replace(/^@/,"").toLowerCase();
  const display=String(user?.display_name||"").trim().replace(/^@/,"").toLowerCase();
  const userId=String(user?.user_id||"");
@@ -1129,6 +1131,12 @@ async function loadSleeperHallHistory(){
    if(!ready||!state.league)throw new Error("Sleeper league data has not loaded. Refresh the page and try again.");
   }
   const seasons=[],unresolved=[],errors=[],recordGames=[],seasonTotals=[],seasonDiagnostics=[],accountDiagnostics=[];
+  const resolvedAccounts=await Promise.all(Object.entries(MANAGERS).map(async([username,manager])=>{
+   try{const account=await fetchJson("/user/"+encodeURIComponent(username),{attempts:2,timeoutMs:12000});return account?.user_id?{userId:String(account.user_id),manager,username}:null;}
+   catch(error){errors.push("Could not resolve manager account "+manager+" through Sleeper username lookup");return null;}
+  }));
+  state.managerBySleeperUserId=new Map(resolvedAccounts.filter(Boolean).map(row=>[row.userId,row.manager]));
+  const resolvedAccountCount=state.managerBySleeperUserId.size;
   let league=state.league;
   const currentYear=Number(league?.season)||2026;
   for(let year=currentYear;year>=2021;year--){
@@ -1150,7 +1158,7 @@ async function loadSleeperHallHistory(){
     const managerByRoster=new Map();
     for(const roster of rosters){
      const user=userById.get(String(roster.owner_id));
-     const manager=hallManagerFromSleeperUser(user);
+     const manager=hallManagerFromSleeperUser(user,state.managerBySleeperUserId);
      if(manager){managerByRoster.set(Number(roster.roster_id),manager);hallStatFor(state.hallStats,manager).seasons.add(year);}
      else unresolved.push({year,rosterId:roster.roster_id,username:user?.username||"unknown",displayName:user?.display_name||"unknown"});
     }
@@ -1301,7 +1309,7 @@ async function loadSleeperHallHistory(){
     const metadataTeamNamesPresent=users.filter(user=>!!String(user?.metadata?.team_name||"").trim()).length;
     const userObjectKeys=[...new Set(users.flatMap(user=>Object.keys(user||{})))].sort();
     const metadataObjectKeys=[...new Set(users.flatMap(user=>Object.keys(user?.metadata||{})))].sort();
-    seasonDiagnostics.push({year,leagueId:league.league_id,users:users.length,rosters:rosters.length,mappedManagers:managerByRoster.size,unmappedManagers:Math.max(0,rosters.length-managerByRoster.size),mappedNames:[...new Set(managerByRoster.values())].sort(),usernameFieldsPresent,displayNameFieldsPresent,metadataTeamNamesPresent,userObjectKeys,metadataObjectKeys,directUsernameMatches,displayNameMatches,ownerIdMatches,regularWeeksExpected:regularWeeks,regularWeeksLoaded:weekData.length,regularMatchups,playoffMatchups,completedRegularWeeks});
+    seasonDiagnostics.push({year,leagueId:league.league_id,users:users.length,rosters:rosters.length,mappedManagers:managerByRoster.size,unmappedManagers:Math.max(0,rosters.length-managerByRoster.size),mappedNames:[...new Set(managerByRoster.values())].sort(),usernameFieldsPresent,displayNameFieldsPresent,metadataTeamNamesPresent,userObjectKeys,metadataObjectKeys,directUsernameMatches,displayNameMatches,ownerIdMatches,resolvedAccountCount,userIdMatches:rosters.filter(roster=>state.managerBySleeperUserId.has(String(roster.owner_id))).length,regularWeeksExpected:regularWeeks,regularWeeksLoaded:weekData.length,regularMatchups,playoffMatchups,completedRegularWeeks});
     seasons.push({year,champion,runnerUp:runnerUp||null,thirdPlace,regularSeasonChampion,standings:seasonStandings,drafts:seasonExtras.drafts,leaders:seasonExtras.leaders,extraErrors:seasonExtras.errors,bracket:bracketGames,leagueId:league.league_id,regularWeeks,completedRegularWeeks,managerCount:managerByRoster.size,mappedManagers:managerByRoster.size,regularMatchups,playoffMatchups});
    }catch(error){errors.push(year+" season failed: "+(error?.message||String(error)));}
    if(year>2021){
