@@ -6,7 +6,7 @@
   <linearGradient id="cyan"><stop stop-color="#20b9d7"/><stop offset="1" stop-color="#70d9e8"/></linearGradient>
   <linearGradient id="violet"><stop stop-color="#8d6bd1"/><stop offset="1" stop-color="#b99aff"/></linearGradient>
 </defs>
-<rect width="1200" height="790" rx="24" fill="#171b27"/>
+
 <g font-family="Arial,sans-serif">
   <text x="42" y="54" fill="#fff" font-size="29" font-weight="800" letter-spacing="1.8">THE SIX-TEAM PLAYOFF</text>
   <text x="42" y="83" fill="#aeb6c8" font-size="14" letter-spacing="1.7">WEEKS 15–17 · RESEEDING FORMAT</text>
