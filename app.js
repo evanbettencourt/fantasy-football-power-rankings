@@ -550,7 +550,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const hasProjection = projections.get(id)?.stats?.pts_half_ppr != null;
     return '<div class="mu-player-row ' + (isStarter ? "starter" : "bench") + '">' +
       '<span class="mu-player-pos ' + positionClass(position) + '">' + escapeHtml(label) + '</span>' +
-      '<span class="mu-player-name"><span class="mu-player-primary">' + (playerLogo ? '<img src="' + escapeHtml(playerLogo) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : '') + '<span>' + escapeHtml(name) + '</span></span>' + gameMeta + '</span>' +
+      '<span class="mu-player-name"><span class="mu-player-primary"><span>' + escapeHtml(name) + '</span>' + (playerLogo ? '<img src="' + escapeHtml(playerLogo) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : '') + '</span>' + gameMeta + '</span>' +
       '<span class="mu-player-points">' + (actualStat || num(matchupPoints) > 0 ? fmt(actual) : "—") + '</span>' +
       '<span class="mu-player-proj">' + (hasProjection ? fmt(projection) : "—") + '</span>' +
     '</div>';
