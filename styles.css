@@ -2355,3 +2355,6 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 /* Hall of Fame character portraits: smooth, illustrated game-avatar treatment */
 .hall-character-avatar{display:block;width:100%;height:100%;border-radius:7px;overflow:hidden;box-shadow:inset 0 0 0 1px #ffffff22}
 .hall-avatar-line{overflow:hidden;background:#111426}
+
+/* Sleeper history diagnostics */
+.hall-debug-details{margin:12px 0 18px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font:10px var(--mono);letter-spacing:.04em}.hall-debug-details summary{cursor:pointer;padding:12px 14px;color:var(--lime);letter-spacing:.1em}.hall-debug-body{padding:0 14px 12px}.hall-debug-body p{padding:9px 0;margin:0;border-top:1px solid var(--line);line-height:1.7;overflow-wrap:anywhere}.hall-debug-body p b{color:var(--text)}.hall-debug-body small{color:#aab4a4}.hall-debug-body .hall-debug-error{color:var(--red)}
