@@ -1079,7 +1079,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 /* Rules: keep mint focused on the main section titles and their divider. */
 [data-panel="rules"] .rules-section-head {
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(168, 230, 207, .55);
+  border-bottom: 2px solid rgba(168, 230, 207, .55);
   margin-bottom: 17px;
 }
 [data-panel="rules"] .rules-section-head h3 {
