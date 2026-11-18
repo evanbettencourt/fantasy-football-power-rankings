@@ -421,16 +421,19 @@ async function loadMatchupWeekData(week) {
   const projectionsPath = "/api/sleeper-projections/" + season + "/" + week +
     "?season_type=regular&position[]=QB&position[]=RB&position[]=WR&position[]=TE&position[]=K&position[]=DEF&order_by=pts_half_ppr";
   const statsPath = "/api/sleeper-stats/regular/" + season + "/" + week;
-  const [players, projectionsResult, statsResult] = await Promise.all([
+  const schedulePath = "/api/nfl-schedule?seasontype=2&week=" + week + "&year=" + encodeURIComponent(season);
+  const [players, projectionsResult, statsResult, scheduleResult] = await Promise.all([
     playersTask,
     fetchJson(projectionsPath, { attempts: 1, timeoutMs: 18000 }).catch(error => { console.warn("Sleeper projections unavailable for week " + week, error); return null; }),
-    fetchJson(statsPath, { attempts: 1, timeoutMs: 18000 }).catch(error => { console.warn("Sleeper live stats unavailable for week " + week, error); return null; })
+    fetchJson(statsPath, { attempts: 1, timeoutMs: 18000 }).catch(error => { console.warn("Sleeper live stats unavailable for week " + week, error); return null; }),
+    fetchJson(schedulePath, { attempts: 1, timeoutMs: 18000 }).catch(error => { console.warn("NFL schedule unavailable for week " + week, error); return null; })
   ]);
   state.matchupDataByWeek[week] = {
     loaded: true,
     players: players || {},
     projections: normalizeSleeperRows(projectionsResult),
-    stats: statsResult && typeof statsResult === "object" ? statsResult : {}
+    stats: statsResult && typeof statsResult === "object" ? statsResult : {},
+    schedule: scheduleResult && typeof scheduleResult === "object" ? scheduleResult : null
   };
   if (state.matchupWeek === week) renderMatchups(week, true);
 }
@@ -474,6 +477,33 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
   const projectionRows = data.projections || [];
   const projections = new Map(projectionRows.map(row => [String(row.player_id ?? row.player?.player_id ?? ""), row]).filter(([id]) => id));
   const stats = data.stats || {};
+  const scheduleGames = (data.schedule?.events || []).flatMap(event => {
+    const competition = event.competitions?.[0];
+    const competitors = competition?.competitors || [];
+    if (competitors.length !== 2 || !event.date) return [];
+    return [{ date: event.date, competitors }];
+  });
+  const teamCode = code => ({ JAC:"JAX", WAS:"WSH", LA:"LAR" }[String(code || "").toUpperCase()] || String(code || "").toUpperCase());
+  const teamSchedules = new Map();
+  scheduleGames.forEach(game => {
+    const home = game.competitors.find(item => item.homeAway === "home") || game.competitors[0];
+    const away = game.competitors.find(item => item.homeAway === "away") || game.competitors[1];
+    if (!home?.team?.abbreviation || !away?.team?.abbreviation) return;
+    const kickoff = new Date(game.date);
+    const kickoffLabel = new Intl.DateTimeFormat(undefined, { weekday:"short", hour:"numeric", minute:"2-digit" }).format(kickoff);
+    const addTeam = (team, opponent) => teamSchedules.set(teamCode(team.team.abbreviation), {
+      opponent: opponent.team,
+      kickoffLabel,
+      logo: opponent.team.logo || "",
+      opponentName: opponent.team.displayName || opponent.team.name || opponent.team.abbreviation
+    });
+    addTeam(home, away);
+    addTeam(away, home);
+  });
+  const teamLogo = code => {
+    const normalized = teamCode(code);
+    return "https://a.espncdn.com/i/teamlogos/nfl/500/" + normalized.toLowerCase() + ".png";
+  };
   const currentWeek = Math.max(1, Math.min(regularWeeks, num(state.currentWeek) || state.matchupWeek));
   const isPast = week < currentWeek;
   const recordRows = week > 1 ? computeRankings(week - 1) : computeRankings(0);
@@ -505,6 +535,13 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const name = player.full_name || [player.first_name, player.last_name].filter(Boolean).join(" ") || (id ? "Player " + id : "Empty slot");
     const position = slotPosition || player.position || player.fantasy_positions?.[0] || "—";
     const label = positionLabel(position);
+    const playerTeam = teamCode(player.team);
+    const game = teamSchedules.get(playerTeam);
+    const playerLogo = player.team ? teamLogo(player.team) : "";
+    const opponentLogo = game?.logo || (game?.opponent?.abbreviation ? teamLogo(game.opponent.abbreviation) : "");
+    const gameMeta = game
+      ? '<span class="mu-player-game">vs. <img src="' + escapeHtml(opponentLogo) + '" alt="' + escapeHtml(game.opponentName) + '" title="' + escapeHtml(game.opponentName) + '" loading="lazy" onerror="this.style.display=\'none\'"> <span>' + escapeHtml(game.kickoffLabel) + '</span></span>'
+      : '<span class="mu-player-game">' + (player.team ? "BYE WEEK" : "GAME INFO UNAVAILABLE") + '</span>';
     const actualStat = stats[id];
     const matchupPoints = matchup.players_points && matchup.players_points[id];
     const actual = actualStat?.pts_half_ppr != null ? num(actualStat.pts_half_ppr) : num(matchupPoints);
@@ -512,7 +549,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const hasProjection = projections.get(id)?.stats?.pts_half_ppr != null;
     return '<div class="mu-player-row ' + (isStarter ? "starter" : "bench") + '">' +
       '<span class="mu-player-pos ' + positionClass(position) + '">' + escapeHtml(label) + '</span>' +
-      '<span class="mu-player-name">' + escapeHtml(name) + (player.team ? '<small>' + escapeHtml(player.team) + '</small>' : '') + '</span>' +
+      '<span class="mu-player-name"><span class="mu-player-primary">' + (playerLogo ? '<img src="' + escapeHtml(playerLogo) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : '') + '<span>' + escapeHtml(name) + '</span></span>' + gameMeta + '</span>' +
       '<span class="mu-player-points">' + (actualStat || num(matchupPoints) > 0 ? fmt(actual) : "—") + '</span>' +
       '<span class="mu-player-proj">' + (hasProjection ? fmt(projection) : "—") + '</span>' +
     '</div>';
