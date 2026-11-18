@@ -1840,10 +1840,10 @@ function setupNavigation() {
     activateTab(tab.dataset.tab, { updateUrl: true, scroll: true });
   }));
   const initialTab = window.location.hash.replace(/^#/, "");
-  const seasonRoute=initialTab.match(/^season-(\\d{4})$/);
+  const seasonRoute=initialTab.match(/^season-(\d{4})$/);
   if(seasonRoute){activateTab("hall");openHallSeasonPage(Number(seasonRoute[1]),false);}
   else activateTab(tabs.some(tab => tab.dataset.tab === initialTab) ? initialTab : "league");
-  window.addEventListener("popstate",()=>{const route=window.location.hash.replace(/^#/, "").match(/^season-(\\d{4})$/);if(route)openHallSeasonPage(Number(route[1]),false);else if(window.location.hash==="#hall")activateTab("hall");});
+  window.addEventListener("popstate",()=>{const route=window.location.hash.replace(/^#/, "").match(/^season-(\d{4})$/);if(route)openHallSeasonPage(Number(route[1]),false);else if(window.location.hash==="#hall")activateTab("hall");});
 }
 setupNavigation();
 
