@@ -1073,6 +1073,7 @@ async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,
    const draftOrder=draft.draft_order||{},slotMap=draft.slot_to_roster_id||{};
    const managerByUser=new Map(users.map(user=>[String(user.user_id),hallManagerFromSleeperUser(user)]));
    const managerBySlot=new Map();
+   for(const [userId,slotValue] of Object.entries(draftOrder)){const slot=Number(slotValue),manager=managerByUser.get(String(userId));if(slot>0&&manager&&!managerBySlot.has(slot))managerBySlot.set(slot,manager);}
    for(const pick of picks){const slot=Number(pick.draft_slot),manager=managerByRoster.get(Number(pick.roster_id))||managerByUser.get(String(pick.picked_by||pick.metadata?.picked_by||""));if(slot>0&&manager&&!managerBySlot.has(slot))managerBySlot.set(slot,manager);}
    const picksMapped=picks.map(pick=>{
     const player=players?.[pick.player_id]||{};
