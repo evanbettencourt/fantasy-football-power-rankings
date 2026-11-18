@@ -1111,7 +1111,7 @@ async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,
   const candidates=[...statsByPlayer.values()].filter(row=>row.position===position).sort((a,b)=>b.points-a.points);
   const best=candidates[0];if(!best)return {position,player:"Unavailable",points:null};
   const pick=pickByPlayer.get(best.playerId);
-  return {position,player:players?.[best.playerId]?.full_name||best.playerId,playerId:best.playerId,points:best.points,manager:pick?.manager||"Undrafted / not in league draft",round:pick?.round||null,pick:pick?.pick||null,team:players?.[best.playerId]?.team||"—"};
+  return {position,player:players?.[best.playerId]?.full_name||best.playerId,playerId:best.playerId,points:best.points,manager:pick?.manager||"Undrafted / not in league draft",round:pick?.round||null,pick:pick?.pick||null,pickInRound:pick?.pickInRound??(pick?.pick&&pick?.round?pick.pick-(pick.round-1)*(draftRows.find(d=>d.picks.includes(pick))?.slots||rosters.length):null),team:players?.[best.playerId]?.team||"—"};
  });
  return {drafts:draftRows,leaders,errors};
 }
