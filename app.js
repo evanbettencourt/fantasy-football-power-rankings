@@ -1006,7 +1006,7 @@ function hallManagerFromSleeperUser(user){
  return null;
 }
 function newHallStat(name){
- return {name,regularWins:0,regularLosses:0,regularTies:0,pf:0,pa:0,playoffWins:0,playoffAppearances:new Set(),championships:0,runnerUps:0,seasons:new Set()};
+ return {name,regularWins:0,regularLosses:0,regularTies:0,regularGames:0,pf:0,pa:0,playoffWins:0,playoffAppearances:new Set(),championships:0,runnerUps:0,seasons:new Set()};
 }
 function hallStatFor(stats,name){
  if(!stats.has(name))stats.set(name,newHallStat(name));
@@ -1063,7 +1063,7 @@ async function loadSleeperHallHistory(){
      const groups=new Map();
      for(const row of scoreRows){
       const id=Number(row.roster_id),manager=managerByRoster.get(id),stat=hallStatFor(stats,manager);
-      stat.pf+=Number(row.points);
+      stat.pf+=Number(row.points);stat.regularGames++;
       if(!groups.has(row.matchup_id))groups.set(row.matchup_id,[]);
       groups.get(row.matchup_id).push(row);
      }
@@ -1106,17 +1106,26 @@ async function loadSleeperHallHistory(){
       if(winner)hallStatFor(stats,winner).playoffWins++;
      }
     }
+    let champion=null,runnerUp=null;
     if(completed.length){
      const finalRound=Math.max(...completed.map(game=>Number(game.r)||0));
      const finalGame=completed.filter(game=>(Number(game.r)||0)===finalRound).slice(-1)[0];
-     const champion=managerByRoster.get(Number(finalGame?.w)),runnerUp=managerByRoster.get(Number(finalGame?.l));
-     if(champion){
-      hallStatFor(stats,champion).championships++;
-      seasons.push({year,champion,runnerUp:runnerUp||"—"});
-     }
+     champion=managerByRoster.get(Number(finalGame?.w))||null;
+     runnerUp=managerByRoster.get(Number(finalGame?.l))||null;
+     if(champion)hallStatFor(stats,champion).championships++;
      if(runnerUp)hallStatFor(stats,runnerUp).runnerUps++;
     }
-    seasons.push({year,leagueId:league.league_id,regularWeeks,completedRegularWeeks:weekData.filter(({rows})=>rows.filter(row=>Number(row.points)>0).length===rosters.length).length,managerCount:managerByRoster.size});
+    const bracketGames=bracket.map(game=>({
+     round:Number(game.r)||1,
+     team1:managerByRoster.get(Number(game.t1))||null,
+     team2:managerByRoster.get(Number(game.t2))||null,
+     winner:managerByRoster.get(Number(game.w))||null,
+     loser:managerByRoster.get(Number(game.l))||null,
+     score1:Number.isFinite(Number(game.p1))?Number(game.p1):null,
+     score2:Number.isFinite(Number(game.p2))?Number(game.p2):null,
+     bye:game.t2==null
+    })).filter(game=>game.team1||game.team2||game.winner);
+    seasons.push({year,champion,runnerUp:runnerUp||"—",bracket:bracketGames,leagueId:league.league_id,regularWeeks,completedRegularWeeks:weekData.filter(({rows})=>rows.filter(row=>Number(row.points)>0).length===rosters.length).length,managerCount:managerByRoster.size});
    }catch(error){errors.push(year+" season failed: "+(error?.message||String(error)));}
    if(year>2021){
     const previousId=league.previous_league_id;
@@ -1134,6 +1143,82 @@ async function loadSleeperHallHistory(){
  }).finally(()=>{state.hallHistoryPromise=null;});
  return state.hallHistoryPromise;
 }
+function hallPixelAvatar(name){
+ const palettes=[["#f5b5a8","#492a54","#e7a45b","#8a4d45"],["#a8d9ff","#283b69","#dca47b","#476b9c"],["#f3cf86","#473b31","#b56c56","#6c8a55"],["#c6b2f5","#382d60","#e4ad8c","#bd6284"],["#a8e3c5","#244d47","#c98d6c","#548b9b"]];
+ let seed=Array.from(name).reduce((value,char)=>((value*31)+char.charCodeAt(0))>>>0,7);
+ const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
+ const palette=palettes[Math.floor(random()*palettes.length)];
+ const skin=palette[0],hair=palette[1],shirt=palette[2],accent=palette[3];
+ const rows=[
+  "....HHHH....",
+  "...HHHHHH...",
+  "..HHSSSSHH..",
+  "..HSSSSSSHH.",
+  "..HSESSSEHH.",
+  "..HSSMSSSHH.",
+  "...SSSSSS...",
+  "...SSSSSS...",
+  "..AAA..AAA..",
+  "..AAA..AAA..",
+  "..TTTTTTTT..",
+  ".TTTTTTTTTT.",
+  ".TTTTTTTTTT.",
+  "..TTT..TTT..",
+  "..TTT..TTT..",
+  "..HHH..HHH.."
+ ];
+ const colors={H:hair,S:skin,E:"#201c35",M:"#8d4c54",A:skin,T:shirt};
+ const bg=accent;
+ let rects='<rect width="12" height="16" fill="'+bg+'"/>';
+ rows.forEach((row,y)=>Array.from(row).forEach((cell,x)=>{
+  if(cell!==".")rects+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+(colors[cell]||hair)+'"/>';
+ }));
+ const shine='<rect x="1" y="1" width="2" height="1" fill="#ffffff" opacity=".2"/>';
+ return '<svg class="hall-pixel-avatar" viewBox="0 0 12 16" role="img" aria-label="'+escapeHtml(name)+' pixel avatar" shape-rendering="crispEdges">'+rects+shine+'</svg>';
+}
+function hallManagerHonors(name,stat){
+ const honors=[];
+ if(stat.championships)honors.push({icon:"🏆",label:stat.championships+"× League Champion",detail:[...PRE_SLEEPER_CHAMPIONS.filter(row=>row.champion===name).map(row=>row.year),...(state.hallHistory?.seasons||[]).filter(row=>row.champion===name).map(row=>row.year)].sort((a,b)=>a-b).join(", ")});
+ if(stat.playoffAppearances.size)honors.push({icon:"⭐",label:stat.playoffAppearances.size+" Playoff Appearances",detail:[...stat.playoffAppearances].sort((a,b)=>a-b).join(", ")});
+ const teamAwards=typeof AWARD_TEAM_MANAGERS!=="undefined"?AWARD_TEAM_MANAGERS:{};
+ for(const award of (typeof AWARDS_2025!=="undefined"?AWARDS_2025:[])){
+  const manager=teamAwards[award.winner]||award.winner;
+  if(manager===name&&(award.category==="Best Manager"||award.category==="Worst Manager")){
+   honors.push({icon:award.category==="Best Manager"?"🥇":"🧱",label:award.category,detail:"2025"});
+  }
+ }
+ return honors;
+}
+function hallPreSleeperBracket(year){
+ const season=PRE_SLEEPER_PLAYOFFS.find(row=>row.year===year);
+ if(!season)return [];
+ return season.rounds.flatMap((round,index)=>round.losers.map(loser=>({round:index+1,team1:round.winner,team2:loser,winner:round.winner,loser,score1:null,score2:null})));
+}
+function hallBracketMarkup(year,championRow){
+ const games=championRow?.bracket?.length?championRow.bracket:hallPreSleeperBracket(year);
+ if(!games.length)return '<div class="hall-bracket-empty">PLAYOFF BRACKET NOT AVAILABLE FOR THIS SEASON.</div>';
+ const rounds=new Map();
+ games.forEach(game=>{const key=game.round||1;if(!rounds.has(key))rounds.set(key,[]);rounds.get(key).push(game);});
+ return '<div class="hall-bracket-rounds">'+[...rounds.entries()].sort((a,b)=>a[0]-b[0]).map(([round,items])=>'<section class="hall-bracket-round"><span class="hall-bracket-round-label">'+(round===Math.max(...rounds.keys())?"CHAMPIONSHIP":"ROUND "+round)+'</span>'+items.map(game=>{
+  const winner=game.winner||"TBD",loser=game.loser||"TBD";
+  const score1=game.score1!=null?'<small>'+fmt(game.score1)+'</small>':"",score2=game.score2!=null?'<small>'+fmt(game.score2)+'</small>':"";
+  return '<div class="hall-bracket-game"><div class="hall-bracket-team '+(winner===game.team1||winner===game.winner?"winner":"")+'"><span>'+escapeHtml(game.team1||winner)+'</span>'+score1+'</div><div class="hall-bracket-team '+(loser===game.team2||loser===game.loser?"loser":"")+'"><span>'+escapeHtml(game.team2||loser)+'</span>'+score2+'</div></div>';
+ }).join("")+'</section>').join("")+'</div>';
+}
+function openHallBracket(year){
+ const row=state.hallHistory?.seasons?.find(item=>Number(item.year)===Number(year))||PRE_SLEEPER_CHAMPIONS.find(item=>Number(item.year)===Number(year));
+ const champion=row?.champion||"Champion";
+ const runner=row?.runnerUp||"—";
+ const old=document.querySelector(".hall-bracket-overlay");if(old)old.remove();
+ const overlay=document.createElement("div");overlay.className="hall-bracket-overlay";
+ overlay.innerHTML='<div class="hall-bracket-dialog" role="dialog" aria-modal="true" aria-label="'+year+' playoff bracket"><button class="hall-bracket-close" type="button" aria-label="Close bracket">×</button><div class="hall-kicker">MONKEY BOYS · POSTSEASON ARCHIVE</div><h2>'+year+' Playoff Bracket</h2><div class="hall-bracket-champion"><span>🏆 CHAMPION</span><strong>'+escapeHtml(champion)+'</strong><small>Runner-up · '+escapeHtml(runner)+'</small></div>'+hallBracketMarkup(year,row)+'</div>';
+ document.body.appendChild(overlay);
+ const close=()=>overlay.remove();
+ overlay.addEventListener("click",event=>{if(event.target===overlay)close();});
+ overlay.querySelector(".hall-bracket-close").addEventListener("click",close);
+ const onKey=event=>{if(event.key==="Escape"){close();document.removeEventListener("keydown",onKey);}};
+ document.addEventListener("keydown",onKey);
+}
 function renderHallOfFame(){
  const target=$("hall-content");if(!target)return;
  if(!state.hallStats){
@@ -1148,30 +1233,38 @@ function renderHallOfFame(){
  }
  const allStats=state.hallStats;
  if(!state.hallHistory&&!state.hallHistoryPromise){
-  target.innerHTML='<div class="hall-loading">CONNECTING TO SLEEPER · BUILDING 2021–2026 CAREER RECORDS…</div>';
+  target.innerHTML='<div class="hall-loading">CONNECTING TO SLEEPER · BUILDING CAREER RECORDS…</div>';
   loadSleeperHallHistory().then(()=>renderHallOfFame());
   return;
  }
  if(state.hallHistoryPromise){
-  target.innerHTML='<div class="hall-loading">AGGREGATING SEASON RESULTS · THIS MAY TAKE A MOMENT…</div>';
+  target.innerHTML='<div class="hall-loading">AGGREGATING SEASON RESULTS…</div>';
   return;
  }
- const active=[...new Set(Object.values(MANAGERS))];
- const retired=[...RETIRED_MANAGERS];
+ const active=[...new Set(Object.values(MANAGERS))],retired=[...RETIRED_MANAGERS];
  const statFor=name=>allStats.get(name)||newHallStat(name);
  const makeCard=(name,index,isRetired)=>{
-  const stat=statFor(name),record=stat.seasons.size?stat.regularWins+"-"+stat.regularLosses+(stat.regularTies?"-"+stat.regularTies:""):"—";
-  const playoffYears=[...stat.playoffAppearances].sort((a,b)=>a-b).join(" · ")||"—";
-  const seasons=[...stat.seasons].sort((a,b)=>a-b).join(" · ");
-  return '<article class="hall-manager-card '+(isRetired?'retired':'active')+'"><div class="hall-card-top"><span class="hall-card-number">'+String(index+1).padStart(2,"0")+'</span><span class="hall-status">'+(isRetired?'RETIRED':'ACTIVE')+'</span></div><div class="hall-manager-identity"><span class="hall-avatar">'+escapeHtml(initials(name))+'</span><div><h3>'+escapeHtml(name)+'</h3><span class="hall-manager-years">'+(MANAGER_TENURES[name]||(isRetired?'FORMER MANAGER':'CURRENT MANAGER'))+'</span></div></div><div class="hall-card-stats hall-career-stats"><div><b>'+stat.championships+'</b><span>TITLES</span></div><div><b>'+record+'</b><span>REGULAR W-L</span></div><div><b>'+stat.playoffWins+'</b><span>PLAYOFF WINS</span></div><div><b>'+stat.playoffAppearances.size+'</b><span>PLAYOFF YEARS</span></div></div><div class="hall-card-foot">'+(seasons?'Sleeper seasons: '+seasons+' · ':'')+'Playoff seasons: '+playoffYears+'</div></article>';
+  const stat=statFor(name),games=stat.regularWins+stat.regularLosses+stat.regularTies;
+  const record=stat.seasons.size?stat.regularWins+"-"+stat.regularLosses+(stat.regularTies?"-"+stat.regularTies:""):"—";
+  const winPct=games?(100*stat.regularWins/games).toFixed(1)+"%":"—";
+  const avg=stat.regularGames?fmt(stat.pf/stat.regularGames):"—";
+  const honors=hallManagerHonors(name,stat);
+  const honorIcons=honors.slice(0,4).map(honor=>'<span class="hall-honor-icon" title="'+escapeHtml(honor.label)+'" aria-label="'+escapeHtml(honor.label)+'">'+honor.icon+'</span>').join("");
+  const honorList=honors.length?honors.map(honor=>'<li><span>'+honor.icon+'</span><div><strong>'+escapeHtml(honor.label)+'</strong><small>'+escapeHtml(honor.detail||"")+'</small></div></li>').join(""):'<li class="hall-no-honors">NO RECORDED HONORS YET</li>';
+  const years=MANAGER_TENURES[name]||(isRetired?"FORMER MANAGER":"CURRENT MANAGER");
+  return '<button class="hall-flip-card '+(isRetired?'retired':'active')+'" type="button" aria-expanded="false" aria-label="View '+escapeHtml(name)+' career record"><span class="hall-flip-inner"><span class="hall-card-face hall-card-front"><span class="hall-card-top"><span class="hall-card-number">'+String(index+1).padStart(2,"0")+'</span><span class="hall-status">'+(isRetired?"RETIRED":"ACTIVE")+'</span></span><span class="hall-avatar-line">'+hallPixelAvatar(name)+'</span><span class="hall-manager-name">'+escapeHtml(name)+'</span><span class="hall-manager-years">'+escapeHtml(years)+'</span><span class="hall-front-honors">'+(honorIcons||'<span class="hall-honor-empty">—</span>')+'</span><span class="hall-flip-hint">CLICK TO VIEW CAREER ↻</span></span><span class="hall-card-face hall-card-back"><span class="hall-back-heading"><strong>'+escapeHtml(name)+'</strong><small>CAREER RECORD</small></span><span class="hall-back-stats"><span><b>'+record+'</b><small>REGULAR W-L</small></span><span><b>'+winPct+'</b><small>WIN %</small></span><span><b>'+avg+'</b><small>AVG POINTS</small></span><span><b>'+stat.playoffAppearances.size+'</b><small>PLAYOFF APPS</small></span><span><b>'+stat.playoffWins+'</b><small>PLAYOFF WINS</small></span><span><b>'+stat.championships+'</b><small>CHAMPIONSHIPS</small></span></span><span class="hall-back-honors"><small>HONORS</small><ul>'+honorList+'</ul></span><span class="hall-flip-hint">CLICK TO FLIP BACK ↻</span></span></span></button>';
  };
- const champions=PRE_SLEEPER_CHAMPIONS.concat(state.hallHistory.seasons.filter(row=>row.champion).map(row=>({year:row.year,champion:row.champion,runnerUp:row.runnerUp}))).sort((a,b)=>b.year-a.year);
- const championRows=champions.map(row=>'<tr><td>'+row.year+'</td><td><strong>'+escapeHtml(row.champion)+'</strong></td><td>'+escapeHtml(row.runnerUp||"—")+'</td></tr>').join("");
- const ranked=[...allStats.values()].sort((a,b)=>b.playoffWins-a.playoffWins||b.championships-a.championships||a.name.localeCompare(b.name));
+ const champions=PRE_SLEEPER_CHAMPIONS.concat((state.hallHistory.seasons||[]).filter(row=>row.champion).map(row=>({year:row.year,champion:row.champion,runnerUp:row.runnerUp,bracket:row.bracket}))).sort((a,b)=>b.year-a.year);
+ const championCards=champions.map((row,index)=>'<button class="hall-champion-card" type="button" data-hall-year="'+row.year+'"><span class="hall-champion-season">'+row.year+' CHAMPIONS</span><span class="hall-champion-crown">🏆</span><strong>'+escapeHtml(row.champion)+'</strong><span class="hall-champion-runner">RUNNER-UP · '+escapeHtml(row.runnerUp||"—")+'</span><span class="hall-champion-link">VIEW PLAYOFF BRACKET ↗</span></button>').join("");
  const unresolved=state.hallHistory.unresolved||[],errors=state.hallHistory.errors||[];
  const diagnostic=unresolved.length?'<p class="hall-footnote">MANAGER IDENTITY NEEDS REVIEW: '+unresolved.map(row=>row.year+' · '+escapeHtml(row.displayName)+' (@'+escapeHtml(row.username)+')').join(' | ')+'</p>':'';
  const errorNote=errors.length?'<p class="hall-footnote">DATA NOTES: '+errors.map(escapeHtml).join(' · ')+'</p>':'';
- target.innerHTML='<section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE PEOPLE</span><h2>Current Managers</h2></div><span class="hall-count">'+active.length+' MEMBERS</span></div><div class="hall-manager-grid">'+active.map((name,i)=>makeCard(name,i,false)).join("")+'</div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE LEGACY</span><h2>Retired Managers</h2></div><span class="hall-count">'+retired.length+' MEMBERS</span></div><div class="hall-manager-grid hall-retired-grid">'+retired.map((name,i)=>makeCard(name,i,true)).join("")+'</div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE HARDWARE</span><h2>League Champions</h2></div><span class="hall-count">2017–'+(champions[0]?.year||2020)+' ARCHIVE</span></div><div class="hall-record-table-wrap"><table class="hall-record-table"><thead><tr><th>SEASON</th><th>CHAMPION</th><th>RUNNER-UP</th></tr></thead><tbody>'+championRows+'</tbody></table></div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE POSTSEASON</span><h2>All-Time Playoff Wins</h2></div><span class="hall-count">2017–PRESENT</span></div><div class="hall-record-table-wrap"><table class="hall-record-table"><thead><tr><th>RANK</th><th>MANAGER</th><th>PLAYOFF WINS</th><th>APPEARANCES</th><th>TITLES</th></tr></thead><tbody>'+ranked.map((row,i)=>'<tr><td>'+String(i+1).padStart(2,"0")+'</td><td><strong>'+escapeHtml(row.name)+'</strong></td><td>'+row.playoffWins+'</td><td>'+row.playoffAppearances.size+'</td><td>'+row.championships+'</td></tr>').join("")+'</tbody></table></div>'+diagnostic+errorNote+'<p class="hall-footnote">Regular-season records include the head-to-head result and the league-median result when that Sleeper season had median matchups enabled. Pre-Sleeper regular-season records are not available in the reconstructed archive.</p></section>';
+ target.innerHTML='<section class="hall-record-section hall-champions-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE HARDWARE</span><h2>Champions by Year</h2></div><span class="hall-count">2017–'+(champions[0]?.year||2020)+' ARCHIVE</span></div><div class="hall-champion-grid">'+championCards+'</div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE PEOPLE</span><h2>Current Managers</h2></div><span class="hall-count">12 MEMBERS</span></div><div class="hall-manager-grid">'+active.map((name,i)=>makeCard(name,i,false)).join("")+'</div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE LEGACY</span><h2>Retired Managers</h2></div><span class="hall-count">'+retired.length+' MEMBERS</span></div><div class="hall-manager-grid hall-retired-grid">'+retired.map((name,i)=>makeCard(name,i,true)).join("")+'</div></section><section class="hall-record-section hall-history-notes">'+diagnostic+errorNote+'<p class="hall-footnote">Regular-season records include the head-to-head result and league-median result when enabled. Pre-Sleeper regular-season records are not available in the reconstructed archive.</p></section>';
+ target.querySelectorAll(".hall-flip-card").forEach(card=>card.addEventListener("click",()=>{
+  const flipped=card.classList.toggle("is-flipped");
+  card.setAttribute("aria-expanded",String(flipped));
+ }));
+ target.querySelectorAll("[data-hall-year]").forEach(card=>card.addEventListener("click",()=>openHallBracket(Number(card.dataset.hallYear))));
 }
 
 function renderAwards(){
