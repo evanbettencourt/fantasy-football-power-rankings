@@ -3103,3 +3103,57 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
  .rules-median-visual strong{font-size:20px}
  .rules-median-visual small{font-size:8px}
 }
+
+
+/* Visual rule explainers: voting thresholds, snake draft, FAAB and trades. */
+.rules-vote-visual{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 24px}
+.rules-vote-card{padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);display:flex;flex-direction:column;gap:6px}
+.rules-vote-card>span,.rules-faab-bank>span{font:800 9px var(--mono);letter-spacing:.08em;color:var(--muted)}
+.rules-vote-card>strong{font:900 30px/1 var(--sans);color:var(--lime)}
+.rules-vote-card.special>strong{color:var(--pink)}
+.rules-vote-card>b{font:800 9px var(--mono);color:var(--text)}
+.rules-vote-card>small{font-size:10px;color:var(--muted)}
+.rules-vote-dots{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:7px}
+.rules-vote-dots i{height:10px;border-radius:3px;background:#ffffff16}
+.rules-vote-dots i.yes{background:var(--lime)}
+.rules-vote-card.special .rules-vote-dots i.yes{background:var(--pink)}
+.rules-draft-visual,.rules-faab-visual{padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);margin:0 0 22px}
+.rules-draft-round{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:8px;margin:12px 0}
+.rules-draft-round>b{font:800 9px var(--mono);color:var(--muted)}
+.rules-draft-picks{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px}
+.rules-draft-picks i{display:grid;place-items:center;min-width:0;aspect-ratio:1;border-radius:5px;background:#a9d4f2;color:#24212a;font:800 9px var(--sans);font-style:normal}
+.rules-draft-round.reverse .rules-draft-picks{direction:rtl}
+.rules-draft-round.reverse .rules-draft-picks i{background:#c9b4f0}
+.rules-draft-caption{display:flex;justify-content:space-between;gap:5px;color:var(--muted);font:700 7px var(--mono);letter-spacing:.03em}
+.rules-faab-visual{display:grid;grid-template-columns:140px 1fr;gap:14px;align-items:center}
+.rules-faab-bank{display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:8px;background:#ffffff08}
+.rules-faab-bank strong{font:900 34px/1 var(--sans);color:var(--lime)}
+.rules-faab-bank small{font-size:9px;color:var(--muted)}
+.rules-faab-flow{display:flex;align-items:center;justify-content:space-between;gap:7px}
+.rules-faab-flow>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.rules-faab-flow b,.rules-trade-flow span{font:800 9px var(--mono);color:var(--pink)}
+.rules-faab-flow strong,.rules-trade-flow strong{font:800 9px var(--mono);color:var(--text)}
+.rules-faab-flow small,.rules-trade-flow small{font-size:9px;line-height:1.4;color:var(--muted)}
+.rules-faab-flow>i,.rules-trade-flow>i{font-style:normal;color:var(--lime);font-size:16px}
+.rules-faab-foot{grid-column:1/-1;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-top:10px;border-top:1px solid var(--line);font:700 8px var(--mono);color:var(--muted)}
+.rules-trade-flow{display:flex;align-items:stretch;justify-content:space-between;gap:10px;margin:0 0 12px;padding:15px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
+.rules-trade-flow>div{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}
+.rules-trade-flow span{color:var(--lime)}
+.rules-collusion-note{display:flex;gap:12px;align-items:center;margin:0 0 24px;padding:12px 14px;border-left:3px solid var(--pink);background:#ffffff08}
+.rules-collusion-note b{flex:none;color:var(--pink);font:800 9px var(--mono)}
+.rules-collusion-note span{font-size:10px;line-height:1.5;color:var(--muted)}
+.rules-playoff-bracket .playoff-payout-legend{margin-top:22px}
+@media(max-width:620px){
+ .rules-vote-visual{grid-template-columns:1fr}
+ .rules-faab-visual{grid-template-columns:1fr}
+ .rules-faab-flow{flex-wrap:wrap}
+ .rules-faab-flow>i{font-size:12px}
+ .rules-draft-round{grid-template-columns:56px 1fr;gap:5px}
+ .rules-draft-picks{gap:2px}
+ .rules-draft-picks i{font-size:7px;border-radius:3px}
+ .rules-draft-caption{font-size:6px}
+ .rules-trade-flow{gap:5px;padding:10px}
+ .rules-trade-flow>i{font-size:11px}
+ .rules-trade-flow strong{font-size:7px}
+ .rules-trade-flow small{font-size:8px}
+}
