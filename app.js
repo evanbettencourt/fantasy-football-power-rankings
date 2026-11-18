@@ -1091,8 +1091,9 @@ async function loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,
     const pos=players?.[playerId]?.position;
     if(!["QB","RB","WR","TE"].includes(pos))continue;
     const stats=row?.stats||row;
-    const halfPpr=Number(stats?.pts_half_ppr);
-    const pts=Number.isFinite(halfPpr)?halfPpr:hallScoringPoints(stats,league.scoring_settings);
+    const hasHalfPpr=stats?.pts_half_ppr!=null&&stats?.pts_half_ppr!=="";
+    const halfPpr=hasHalfPpr?Number(stats.pts_half_ppr):NaN;
+    const pts=hasHalfPpr&&Number.isFinite(halfPpr)?halfPpr:hallScoringPoints(stats,league.scoring_settings);
     if(pts==null)continue;
     const old=statsByPlayer.get(playerId)||{points:0,playerId,position:pos};
     old.points+=pts;statsByPlayer.set(playerId,old);
