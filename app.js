@@ -1529,11 +1529,15 @@ function hallBracketMarkup(year,championRow){
   const placements=[...(third?[{label:"3RD PLACE GAME",game:third}]:[]),...otherPlacements.map(game=>({label:(game.placement||"")+"TH PLACE GAME",game}))];
   return '<div class="hall-bracket-tree hall-bracket-playoff"><section class="hall-tree-column hall-tree-round-one"><span class="hall-bracket-round-label">WEEK 15 · FIRST ROUND</span><div class="hall-round-games">'+(firstRoundHtml||'<div class="hall-bracket-empty">NO FIRST-ROUND GAMES</div>')+'</div></section><section class="hall-tree-column hall-tree-round-two"><span class="hall-bracket-round-label">WEEK 16 · SEMIFINALS</span><div class="hall-round-games">'+(orderedSemifinals.map(matchCard).join("")||'<div class="hall-bracket-empty">SEMIFINALS NOT AVAILABLE</div>')+'</div></section><section class="hall-tree-column hall-tree-finals"><span class="hall-bracket-round-label">WEEK 17 · CHAMPIONSHIP</span><div class="hall-round-games">'+(final?'<div class="hall-tree-final">'+matchCard(final)+'</div>':'<div class="hall-bracket-empty">CHAMPIONSHIP NOT DECIDED</div>')+'</div>'+'</section>'+(placements.length?'<div class="hall-placement-games">'+placements.map(item=>'<div class="hall-placement-game"><span class="hall-bracket-round-label">'+item.label+'</span>'+matchCard(item.game)+'</div>').join("")+'</div>':"")+'</div>';
  }
- const rounds=[...new Set(games.map(game=>game.round))].sort((a,b)=>a-b);
- return '<div class="hall-bracket-scroll"><div class="hall-bracket-tree hall-bracket-legacy" style="grid-template-columns:repeat('+rounds.length+',minmax(210px,1fr));min-width:'+Math.max(460,rounds.length*230)+'px">'+rounds.map((round,index)=>{
-  const items=games.filter(game=>game.round===round);
-  return '<section class="hall-tree-column"><span class="hall-bracket-round-label">'+(round===rounds[rounds.length-1]?"CHAMPIONSHIP":"ROUND "+round)+'</span>'+items.map(matchCard).join("")+'</section>';
- }).join("")+'</div><p class="hall-bracket-archive-note">PRE-SLEEPER ARCHIVE · MATCHUP RESULTS RECONSTRUCTED FROM HISTORICAL RECORDS; SEEDS AND SCORES WERE NOT RETAINED.</p></div>';
+ const roundOne=games.filter(game=>game.round===1);
+ const semifinals=games.filter(game=>game.round===2);
+ const championship=games.find(game=>game.round===3)||games.find(game=>game.round===2&&game.matchId===3);
+ const isFourTeam=Number(year)===2017;
+ const finalHtml=championship?matchCard(championship):'<div class="hall-bracket-empty">CHAMPIONSHIP NOT DECIDED</div>';
+ const tree=isFourTeam
+  ? '<div class="hall-bracket-tree hall-bracket-playoff hall-bracket-legacy-playoff hall-bracket-legacy-four"><section class="hall-tree-column hall-tree-round-one"><span class="hall-bracket-round-label">PLAYOFF SEMIFINALS</span><div class="hall-round-games">'+roundOne.map(matchCard).join("")+'</div></section><section class="hall-tree-column hall-tree-finals"><span class="hall-bracket-round-label">CHAMPIONSHIP</span><div class="hall-round-games"><div class="hall-tree-final">'+finalHtml+'</div></div></section></div>'
+  : '<div class="hall-bracket-tree hall-bracket-playoff hall-bracket-legacy-playoff"><section class="hall-tree-column hall-tree-round-one"><span class="hall-bracket-round-label">PLAYOFF ROUND 1</span><div class="hall-round-games">'+roundOne.map(matchCard).join("")+'</div></section><section class="hall-tree-column hall-tree-round-two"><span class="hall-bracket-round-label">PLAYOFF SEMIFINALS</span><div class="hall-round-games">'+semifinals.map(matchCard).join("")+'</div></section><section class="hall-tree-column hall-tree-finals"><span class="hall-bracket-round-label">CHAMPIONSHIP</span><div class="hall-round-games"><div class="hall-tree-final">'+finalHtml+'</div></div></section></div>';
+ return '<div class="hall-bracket-scroll">'+tree+'<p class="hall-bracket-archive-note">PRE-SLEEPER ARCHIVE · MATCHUP RESULTS RECONSTRUCTED FROM HISTORICAL RECORDS; SEEDS AND SCORES WERE NOT RETAINED.</p></div>';
 }
 function hallSleeperStandingsMarkup(row){
  const standings=row?.standings||[];
