@@ -1076,49 +1076,60 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .pr-card.moving[data-dir="up"]{box-shadow:0 0 0 1px rgba(87,242,107,.35),0 6px 26px rgba(87,242,107,.12)}
 .pr-card.moving[data-dir="dn"]{box-shadow:0 0 0 1px rgba(242,104,92,.35),0 6px 26px rgba(242,104,92,.12)}
 
-/* Page-specific accents: mint for Rules, blue for Schedule. */
+/* Rules: keep mint focused on the main section titles and their divider. */
+[data-panel="rules"] .rules-section-head {
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(168, 230, 207, .55);
+  margin-bottom: 17px;
+}
+[data-panel="rules"] .rules-section-head h3 {
+  color: #A8E6CF;
+  font-weight: 800;
+}
+[data-panel="rules"] .rules-section-body h3 {
+  color: var(--text);
+  font-weight: 700;
+  font-style: normal;
+}
+[data-panel="rules"] .rules-index {
+  color: var(--muted) !important;
+}
 [data-panel="rules"] > .eyebrow,
 [data-panel="rules"] .rules-overview .rule-kicker,
 [data-panel="rules"] .rules-payout .rule-kicker,
-[data-panel="rules"] .rules-section-body .rule-kicker,
-[data-panel="rules"] .rules-index {
-  color: #A8E6CF !important;
-}
-[data-panel="rules"] .rules-section-head h3,
-[data-panel="rules"] .rules-section-body h3 {
-  color: #A8E6CF;
-  font-weight: 800;
-  font-style: normal;
+[data-panel="rules"] .rules-section-body .rule-kicker {
+  color: var(--muted) !important;
 }
 [data-panel="rules"] .rules-toc a:hover,
 [data-panel="rules"] .rules-toc a.active {
-  color: #D5F5E8;
+  color: var(--text);
   border-left-color: #A8E6CF !important;
-  background: rgba(168, 230, 207, .10) !important;
+  background: rgba(168, 230, 207, .06) !important;
 }
-[data-panel="rules"] .rules-section-body li::marker,
-[data-panel="rules"] .rules-week-grid .waiver strong,
+[data-panel="rules"] .rules-section-body li::marker {
+  color: var(--muted);
+}
 [data-panel="rules"] .rules-visual-title span,
 [data-panel="rules"] .rules-depth b,
 [data-panel="rules"] .rules-playoff-visual strong,
 [data-panel="rules"] .rules-scoring-visual strong {
-  color: #A8E6CF;
+  color: var(--text);
 }
 [data-panel="rules"] .rules-payout-first,
 [data-panel="rules"] .rules-payout-legend i {
-  background: #A8E6CF;
+  background: var(--lime);
 }
 [data-panel="rules"] .rules-payout-second,
 [data-panel="rules"] .rules-payout-legend i.second {
-  background: #70C9A8;
+  background: color-mix(in srgb, var(--lime) 58%, var(--text));
 }
 [data-panel="rules"] .rules-week-grid .waiver {
-  background: rgba(168, 230, 207, .08);
-  border-color: rgba(168, 230, 207, .35);
+  background: var(--panel2);
+  border-color: var(--line);
 }
+[data-panel="rules"] .rules-week-grid .waiver strong,
 [data-panel="rules"] .rules-source-note a {
-  color: #A8E6CF;
-  text-decoration-color: rgba(168, 230, 207, .55);
+  color: var(--lime);
 }
 
 /* Schedule uses a cool blue accent instead of lavender. */
@@ -1140,4 +1151,3 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .sch-nm.selected {
   color: #A8D8EA;
 }
-
