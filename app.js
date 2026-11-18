@@ -1343,47 +1343,11 @@ function buildHallRecordBook(games,seasonTotals){
  ];
 }
 function hallPixelAvatar(name){
- const palettes=[["#f5b5a8","#492a54","#e7a45b","#8a4d45"],["#a8d9ff","#283b69","#dca47b","#476b9c"],["#f3cf86","#473b31","#b56c56","#6c8a55"],["#c6b2f5","#382d60","#e4ad8c","#bd6284"],["#a8e3c5","#244d47","#c98d6c","#548b9b"]];
- let seed=Array.from(name).reduce((value,char)=>((value*31)+char.charCodeAt(0))>>>0,7);
- const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
- const palette=palettes[Math.floor(random()*palettes.length)];
- const skinTones=["#f1c7a3","#d99b72","#ad704f","#f0d1b1","#85543f"];
- const skin=skinTones[Math.floor(random()*skinTones.length)],hair=palette[1],shirt=palette[2],accent=palette[3];
- const hairStyle=Math.floor(random()*4),beard=random()<.32,glasses=random()<.28;
- const hairRows=[
-  ["....HHHH....","...HHHHHH...","..HHHHHHHH.."],
-  ["..HHHHHHHH..","..HHHHHHHH..","...HHHHHH..."],
-  ["...HHHHHH...","..HHHHHHHH..","..HHHHHHHH.."],
-  ["....HHHH....","..HHHHHHHH..","..HHHHHHHH.."]
- ][hairStyle];
- const rows=[
-  hairRows[0],hairRows[1],hairRows[2],
-  "..HSSSSSSHH.",
-  "..HSSSSSSHH.",
-  "..HSSSSSSHH.",
-  "...SSSSSS...",
-  "...SSSSSS...",
-  "..AAA..AAA..",
-  "..AAA..AAA..",
-  "..TTTTTTTT..",
-  ".TTTTTTTTTT.",
-  ".TTTTTTTTTT.",
-  "..TTT..TTT..",
-  "..TTT..TTT..",
-  "..HHH..HHH.."
- ];
- const colors={H:hair,S:skin,E:"#201c35",M:"#8d4c54",A:skin,T:shirt};
- const bg=accent;
- let rects='<rect width="12" height="16" fill="'+bg+'"/>';
- rows.forEach((row,y)=>Array.from(row).forEach((cell,x)=>{
-  if(cell!==".")rects+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+(colors[cell]||hair)+'"/>';
- }));
- rects+='<rect x="4" y="5" width="1" height="1" fill="#201c35"/><rect x="7" y="5" width="1" height="1" fill="#201c35"/><rect x="5" y="7" width="2" height="1" fill="#8d4c54"/>';
- if(glasses){rects+='<rect x="3" y="5" width="2" height="1" fill="#202033"/><rect x="7" y="5" width="2" height="1" fill="#202033"/><rect x="5" y="5" width="2" height="1" fill="#202033"/>';}
- if(beard){rects+='<rect x="4" y="8" width="4" height="1" fill="'+hair+'"/><rect x="5" y="9" width="2" height="1" fill="'+hair+'"/>';}
- const shine='<rect x="1" y="1" width="2" height="1" fill="#ffffff" opacity=".2"/>';
- return '<svg class="hall-pixel-avatar" viewBox="0 0 12 16" role="img" aria-label="'+escapeHtml(name)+' pixel avatar" shape-rendering="crispEdges">'+rects+shine+'</svg>';
+ const index=HALL_HERO_AVATARS[name]??0,col=index%3,row=Math.floor(index/3);
+ const x=col*50,y=row*25;
+ return '<span class="hall-pixel-avatar" role="img" aria-label="'+escapeHtml(name)+' original superhero avatar" style="background-image:url(data:image/png;base64,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);background-size:300% 500%;background-position:'+x+'% '+y+'%"></span>';
 }
+
 function hallManagerHonors(name,stat){
  const seasons=[...(stat.seasons||new Set())].sort((a,b)=>a-b);
  const playoffYears=[...(stat.playoffAppearances||new Set())].sort((a,b)=>a-b);
