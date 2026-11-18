@@ -478,6 +478,8 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
   const isPast = week < currentWeek;
   const recordRows = week > 1 ? computeRankings(week - 1) : computeRankings(0);
   const recordById = new Map(recordRows.map(team => [team.id, team]));
+  const seedRows = [...recordRows].sort((a,b) => b.wins-a.wins || b.pf-a.pf);
+  const seeds = new Map(seedRows.map((team,index) => [team.id,index+1]));
   const publishedWeek = Object.keys(EDITORIAL_EDITIONS).map(Number).filter(w => w < week && EDITORIAL_EDITIONS[w]?.rankings?.length).sort((a,b) => b-a)[0];
   const powerRanks = new Map((publishedWeek ? EDITORIAL_EDITIONS[publishedWeek].rankings : []).map((entry,index) => [entry.manager, index+1]));
   games.sort((left,right) => {
@@ -559,7 +561,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const record = recordById.get(team.id);
     const powerRank = powerRanks.get(team.name);
     const projected = projectionFor(team, matchup);
-    return { record: record?.record || "0-0", powerRank, projected, score: num(matchup.points), color: lotteryColor(team.name) };
+    return { record: record?.record || "0-0", seed: seeds.get(team.id), powerRank, projected, score: num(matchup.points), color: lotteryColor(team.name) };
   };
   const probability = (a, b) => {
     if (isPast) {
@@ -579,12 +581,11 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
       const projectionClass = projectionDelta > 0.005 ? "up" : projectionDelta < -0.005 ? "down" : "even";
       const probabilityClass = winChance == null ? "" : winChance > 50 ? "favored" : winChance < 50 ? "underdog" : "even";
       return '<div class="mu-side">' +
-        '<div class="mu-manager"><span class="mu-rank">' + (summary.powerRank ? "#" + summary.powerRank : "—") + '</span>' +
+        '<div class="mu-manager"><span class="mu-rank">' + (summary.seed ? "#" + summary.seed : "—") + '</span>' +
           '<div class="mu-manager-copy"><strong style="color:' + summary.color + '">' + escapeHtml(team.name) + '</strong>' +
-          '<small>' + escapeHtml(summary.record) + ' · POWER RANK</small></div></div>' +
+          '<small>' + escapeHtml(summary.record) + ' · SEED ' + (summary.seed || "—") + ' · POWER RANK #' + (summary.powerRank || "—") + '</small></div></div>' +
         '<div class="mu-score-line"><strong>' + fmt(summary.score) + '</strong></div>' +
         '<div class="mu-projection-line ' + projectionClass + '">' + (summary.projected.available ? '<span>PROJECTION</span><b>' + fmt(summary.projected.value) + '</b>' : '<span>PROJECTION</span><b>—</b>') + '</div>' +
-        '<div class="mu-win-line"><span>WIN PROBABILITY</span><b class="' + probabilityClass + '">' + (winChance == null ? "—" : winChance + "%") + '</b></div>' +
       '</div>';
     };
     const bar = probA == null ? '<div class="mu-prob-track unavailable"></div>' :
@@ -594,7 +595,11 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     return '<article class="mu-card">' +
       '<div class="mu-card-head"><span>MATCHUP ' + String(index+1).padStart(2,"0") + '</span><span class="mu-live-tag ' + status.toLowerCase() + '">' + status + '</span></div>' +
       '<div class="mu-faceoff">' + side(game.teamA,a,probA) + '<div class="mu-versus">VS</div>' + side(game.teamB,b,probB) + '</div>' +
-      '<div class="mu-prob-wrap">' + bar + '</div>' +
+      '<div class="mu-prob-wrap">' +
+        '<div class="mu-prob-row"><span class="mu-prob-value ' + (probA == null ? '' : probA >= 50 ? 'favored' : 'underdog') + '">' + (probA == null ? '—' : probA + '%') + '</span>' +
+        bar +
+        '<span class="mu-prob-value ' + (probB == null ? '' : probB >= 50 ? 'favored' : 'underdog') + '">' + (probB == null ? '—' : probB + '%') + '</span></div>' +
+        '<div class="mu-prob-label">WIN PROBABILITY</div></div>' +
       '<details class="mu-rosters"><summary><span>SHOW LINEUPS</span><span class="mu-expand-mark">+</span></summary>' +
         '<div class="mu-roster-grid">' + rosterMarkup(game.teamA,game.a,false) + rosterMarkup(game.teamB,game.b,false) + '</div>' +
         '<details class="mu-bench-details"><summary><span>SHOW BENCH</span><span class="mu-expand-mark">+</span></summary>' +
