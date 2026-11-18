@@ -1384,9 +1384,10 @@ const HALL_CHARACTER_DESIGNS={
 };
 function hallPixelAvatar(name){
  const spriteIndex={"Kevin":0,"Marc":1,"Colby":2,"Ben":3,"Brandon":4,"Evan":5,"Pat":6,"Joey":7,"Butta":8,"Ders":9,"Tanz":10,"Roth":11,"Sam":12,"Schmeef":13,"Hess":14,"Campbell":15,"Lee":16};
- const index=spriteIndex[name]??0;
+ const index=spriteIndex[name];
+ if(index==null)return '<span class="hall-character-avatar hall-pixel-sprite" role="img" aria-label="'+escapeHtml(name)+' character sprite unavailable"></span>';
  const position=(index/16*100).toFixed(4);
- return '<span class="hall-character-avatar hall-pixel-sprite" role="img" aria-label="'+escapeHtml(name)+' original 32-bit game character" style="background-position:'+position+'% center"></span>';
+ return '<span class="hall-character-avatar hall-pixel-sprite" role="img" aria-label="'+escapeHtml(name)+' 32-bit game character" style="background-position:'+position+'% center"></span>';
 }
 function hallManagerHonors(name,stat){
  const playoffYears=[...(stat.playoffAppearances||new Set())].sort((a,b)=>a-b);
