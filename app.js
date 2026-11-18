@@ -1177,8 +1177,8 @@ async function loadSleeperHallHistory(){
     const seasonPoints=new Map(),seasonWins=new Map();
     const addSeasonWin=manager=>seasonWins.set(manager,(seasonWins.get(manager)||0)+1);
     for(const {week,rows} of weekData){
-     const scoreRows=rows.filter(row=>managerByRoster.has(Number(row.roster_id))&&Number.isFinite(Number(row.points))&&Number(row.points)>0);
-     if(scoreRows.length!==rosters.length)continue;
+     const scoreRows=rows.filter(row=>managerByRoster.has(Number(row.roster_id))&&row.points!=null&&Number.isFinite(Number(row.points)));
+     if(scoreRows.length<2)continue;
      const scoreByRoster=new Map(scoreRows.map(row=>[Number(row.roster_id),Number(row.points)]));
      const groups=new Map();
      for(const row of scoreRows){
