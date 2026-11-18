@@ -2,7 +2,7 @@ const LEAGUE_ID = "1313563024161787904";
 const API = "/api/sleeper";
 const $ = (id) => document.getElementById(id);
 const setTextIfPresent = (id, value) => { const element = $(id); if (element) element.textContent = value; };
-const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [], recoveredWeeks: [], usingCachedCore: false, draftOrder: null, draftSeason: null };
+const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [], recoveredWeeks: [], usingCachedCore: false, draftOrder: null, draftSeason: null, nflState: null, matchupWeek: 1, players: null, playersPromise: null, matchupDataByWeek: {} };
 
 const num = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
 const fmt = (v) => num(v).toFixed(2);
@@ -27,7 +27,8 @@ async function fetchJson(path, options = {}) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const response = await fetch(API + path, { signal: controller.signal, headers: { "Accept": "application/json" } });
+      const requestUrl = path.startsWith("/api/") ? path : API + path;
+      const response = await fetch(requestUrl, { signal: controller.signal, headers: { "Accept": "application/json" } });
       if (!response.ok) { const error = new Error("Sleeper API returned " + response.status + " for " + path); error.status = response.status; throw error; }
       return await response.json();
     } catch (error) {
@@ -374,13 +375,18 @@ async function init() {
     state.failedWeeks = weekResults.filter(item => item.source === "missing").map(item => item.week);
     state.recoveredWeeks = weekResults.filter(item => item.source === "cache").map(item => item.week);
     weekResults.forEach(item => { state.weeks[item.week] = item.data; });
+    try { state.nflState = await fetchJson("/state/nfl", { attempts: 1, timeoutMs: 8000 }); } catch (error) { state.nflState = null; }
     const completed = Array.from({ length: maxWeek }, (_, index) => index + 1).filter(week => (state.weeks[week] || []).some(match => num(match.points) > 0));
-    const defaultWeek = completed.length ? Math.max(...completed) : 1;
+    const latestCompletedWeek = completed.length ? Math.max(...completed) : 1;
+    const currentWeek = Math.max(1, Math.min(14, num(state.nflState?.week) || latestCompletedWeek));
+    state.matchupWeek = currentWeek;
+    const defaultWeek = latestCompletedWeek;
     const select = $("week-select");
     select.innerHTML = Array.from({ length: defaultWeek }, (_, index) => `<option value="${index + 1}">WEEK ${index + 1}</option>`).join("");
     select.addEventListener("change", () => renderPowerRankings(Number(select.value)));
     renderWeek(defaultWeek); renderPowerRankings(defaultWeek);
     renderSchedule();
+    renderMatchups(state.matchupWeek);
     $("updated-at").textContent = state.usingCachedCore || state.recoveredWeeks.length ? "SLEEPER API · SAVED DATA USED WHERE NEEDED" : "SLEEPER API · PUBLIC LEAGUE DATA";
   } catch (error) {
     console.error("League startup failed", error);
@@ -391,6 +397,180 @@ async function init() {
     if (standings) standings.innerHTML = '<div class="empty-note">Standings unavailable. Please try again shortly.</div>';
   }
 }
+function matchupNormalCdf(z) {
+  const x = Math.abs(z) / Math.sqrt(2);
+  const t = 1 / (1 + 0.3275911 * x);
+  const erf = 1 - (((((1.061405429*t - 1.453152027)*t) + 1.421413741)*t - 0.284496736)*t + 0.254829592)*t*Math.exp(-x*x);
+  return 0.5 * (1 + (z < 0 ? -erf : erf));
+}
+function normalizeSleeperRows(value) {
+  if (Array.isArray(value)) return value;
+  if (value && typeof value === "object") return Object.entries(value).map(([id,row]) => ({ player_id: String(row?.player_id ?? id), ...row }));
+  return [];
+}
+async function loadMatchupWeekData(week) {
+  if (state.matchupDataByWeek[week]?.loaded || state.matchupDataByWeek[week]?.loading) return;
+  state.matchupDataByWeek[week] = { loading: true };
+  const season = state.league?.season || String(new Date().getFullYear());
+  const playersTask = state.players
+    ? Promise.resolve(state.players)
+    : (state.playersPromise ||= fetchJson("/players/nfl?active=true", { attempts: 1, timeoutMs: 25000 })
+        .then(value => { state.players = value && typeof value === "object" ? value : {}; return state.players; })
+        .catch(error => { console.warn("Sleeper player directory unavailable", error); state.players = {}; return state.players; }));
+  const projectionsPath = "/api/sleeper-projections/" + season + "/" + week +
+    "?season_type=regular&position[]=QB&position[]=RB&position[]=WR&position[]=TE&position[]=K&position[]=DEF&order_by=pts_half_ppr";
+  const statsPath = "/api/sleeper-stats/regular/" + season + "/" + week;
+  const [players, projectionsResult, statsResult] = await Promise.all([
+    playersTask,
+    fetchJson(projectionsPath, { attempts: 1, timeoutMs: 18000 }).catch(error => { console.warn("Sleeper projections unavailable for week " + week, error); return null; }),
+    fetchJson(statsPath, { attempts: 1, timeoutMs: 18000 }).catch(error => { console.warn("Sleeper live stats unavailable for week " + week, error); return null; })
+  ]);
+  state.matchupDataByWeek[week] = {
+    loaded: true,
+    players: players || {},
+    projections: normalizeSleeperRows(projectionsResult),
+    stats: statsResult && typeof statsResult === "object" ? statsResult : {}
+  };
+  if (state.matchupWeek === week) renderMatchups(week, true);
+}
+function renderMatchups(week = state.matchupWeek, dataReady = false) {
+  const target = $("matchups-content");
+  const picker = $("matchups-week-select");
+  if (!target || !state.teams?.size) return;
+  const regularWeeks = Math.max(1, (num(state.league?.settings?.playoff_week_start) || 15) - 1);
+  week = Math.max(1, Math.min(regularWeeks, Number(week) || 1));
+  state.matchupWeek = week;
+  const season = state.league?.season || new Date().getFullYear();
+  setTextIfPresent("matchups-season", season);
+  if (picker) {
+    if (!picker.options.length) {
+      picker.innerHTML = Array.from({ length: regularWeeks }, (_, i) => '<option value="' + (i+1) + '">WEEK ' + String(i+1).padStart(2,"0") + '</option>').join("");
+      picker.addEventListener("change", () => renderMatchups(Number(picker.value)));
+    }
+    picker.value = String(week);
+  }
+  const source = state.weeks[week] || [];
+  const groups = new Map();
+  source.forEach(match => {
+    if (match.matchup_id == null) return;
+    const key = String(match.matchup_id);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(match);
+  });
+  const games = [...groups.values()].filter(group => group.length === 2).map(group => {
+    const a = group[0], b = group[1], teamA = teamFor(a.roster_id), teamB = teamFor(b.roster_id);
+    return teamA && teamB ? { a, b, teamA, teamB } : null;
+  }).filter(Boolean);
+  if (!games.length) {
+    const message = state.failedWeeks.includes(week) ? "Sleeper matchup data is unavailable for this week." : "Sleeper has not posted matchups for this week yet.";
+    target.innerHTML = '<div class="mu-empty">' + escapeHtml(message) + '</div>';
+    if (!dataReady) loadMatchupWeekData(week);
+    return;
+  }
+
+  const data = state.matchupDataByWeek[week] || {};
+  const players = data.players || state.players || {};
+  const projectionRows = data.projections || [];
+  const projections = new Map(projectionRows.map(row => [String(row.player_id ?? row.player?.player_id ?? ""), row]).filter(([id]) => id));
+  const stats = data.stats || {};
+  const currentWeek = Math.max(1, Math.min(regularWeeks, num(state.nflState?.week) || state.matchupWeek));
+  const isPast = week < currentWeek;
+  const recordRows = week > 1 ? computeRankings(week - 1) : computeRankings(0);
+  const recordById = new Map(recordRows.map(team => [team.id, team]));
+  const publishedWeek = Object.keys(EDITORIAL_EDITIONS).map(Number).filter(w => w <= week && EDITORIAL_EDITIONS[w]?.rankings?.length).sort((a,b) => b-a)[0];
+  const powerRanks = new Map((publishedWeek ? EDITORIAL_EDITIONS[publishedWeek].rankings : []).map((entry,index) => [entry.manager, index+1]));
+  const hasProjectionData = projections.size > 0;
+
+  const playerRow = (playerId, matchup, isStarter) => {
+    const id = String(playerId);
+    const player = players[id] || {};
+    const name = player.full_name || [player.first_name, player.last_name].filter(Boolean).join(" ") || (id ? "Player " + id : "Empty slot");
+    const position = player.position || player.fantasy_positions?.[0] || "—";
+    const actualStat = stats[id];
+    const matchupPoints = matchup.players_points && matchup.players_points[id];
+    const actual = actualStat?.pts_half_ppr != null ? num(actualStat.pts_half_ppr) : num(matchupPoints);
+    const projection = num(projections.get(id)?.stats?.pts_half_ppr);
+    const hasProjection = projections.get(id)?.stats?.pts_half_ppr != null;
+    return '<div class="mu-player-row ' + (isStarter ? "starter" : "bench") + '">' +
+      '<span class="mu-player-pos">' + escapeHtml(position) + '</span>' +
+      '<span class="mu-player-name">' + escapeHtml(name) + (player.team ? '<small>' + escapeHtml(player.team) + '</small>' : '') + '</span>' +
+      '<span class="mu-player-points">' + (actualStat || num(matchupPoints) > 0 ? fmt(actual) : "—") + '</span>' +
+      '<span class="mu-player-proj">' + (hasProjection ? fmt(projection) : "—") + '</span>' +
+    '</div>';
+  };
+  const rosterMarkup = (team, matchup) => {
+    const allPlayers = Array.isArray(matchup.players) ? matchup.players.map(String) : [];
+    const starters = Array.isArray(matchup.starters) ? matchup.starters.map(String).filter(id => id && id !== "0") : [];
+    const starterSet = new Set(starters);
+    const bench = allPlayers.filter(id => !starterSet.has(id));
+    const starterRows = starters.map(id => playerRow(id, matchup, true)).join("");
+    const benchRows = bench.map(id => playerRow(id, matchup, false)).join("");
+    return '<section class="mu-roster-team"><h4 style="color:' + lotteryColor(team.name) + '">' + escapeHtml(team.name) + '</h4>' +
+      '<div class="mu-roster-label">STARTERS</div><div class="mu-player-head"><span>POS</span><span>PLAYER</span><span>PTS</span><span>PROJ</span></div>' +
+      (starterRows || '<p class="mu-empty">Starter data unavailable.</p>') +
+      '<div class="mu-roster-label mu-bench-label">BENCH</div>' +
+      (benchRows || '<p class="mu-empty">No bench players listed.</p>') + '</section>';
+  };
+  const projectionFor = (team, matchup) => {
+    const starters = Array.isArray(matchup.starters) ? matchup.starters.map(String).filter(id => id && id !== "0") : [];
+    let remaining = 0, found = false;
+    for (const id of starters) {
+      const stat = stats[id];
+      const current = matchup.players_points && num(matchup.players_points[id]);
+      const alreadyScored = (stat && typeof stat === "object") || current > 0;
+      if (alreadyScored) continue;
+      const projected = projections.get(id)?.stats?.pts_half_ppr;
+      if (projected != null && Number.isFinite(Number(projected))) {
+        remaining += Number(projected);
+        found = true;
+      }
+    }
+    const actual = num(matchup.points);
+    if (isPast) return { value: actual, available: true };
+    return { value: actual + remaining, available: found || actual > 0 };
+  };
+  const teamSummary = (team, matchup) => {
+    const record = recordById.get(team.id);
+    const powerRank = powerRanks.get(team.name);
+    const projected = projectionFor(team, matchup);
+    return { record: record?.record || "0-0", powerRank, projected, score: num(matchup.points), color: lotteryColor(team.name) };
+  };
+  const probability = (a, b) => {
+    if (isPast) {
+      if (a.score === b.score) return 50;
+      return a.score > b.score ? 100 : 0;
+    }
+    if (!a.projected.available || !b.projected.available) return null;
+    return Math.max(1, Math.min(99, Math.round(matchupNormalCdf((a.projected.value - b.projected.value) / 22) * 100)));
+  };
+  const cards = games.map((game,index) => {
+    const a = teamSummary(game.teamA, game.a), b = teamSummary(game.teamB, game.b);
+    const probA = probability(a,b), probB = probA == null ? null : 100 - probA;
+    const status = isPast ? "FINAL" : (a.score > 0 || b.score > 0 ? "LIVE" : "UPCOMING");
+    const side = (team, summary, winChance) =>
+      '<div class="mu-side">' +
+        '<div class="mu-manager"><span class="mu-rank">' + (summary.powerRank ? "#" + summary.powerRank : "—") + '</span>' +
+          '<div class="mu-manager-copy"><strong style="color:' + summary.color + '">' + escapeHtml(team.name) + '</strong>' +
+          '<small>' + escapeHtml(summary.record) + ' · POWER RANK' + '</small></div></div>' +
+        '<div class="mu-score-line"><div><strong>' + fmt(summary.score) + '</strong><span>' + (isPast ? "FINAL SCORE" : "LIVE SCORE") + '</span></div>' +
+          '<div><strong>' + (summary.projected.available ? fmt(summary.projected.value) : "—") + '</strong><span>' + (isPast ? "FINAL" : "LIVE PROJ") + '</span></div></div>' +
+        '<div class="mu-win-line"><span>WIN PROBABILITY</span><b>' + (winChance == null ? "—" : winChance + "%") + '</b></div>' +
+      '</div>';
+    const bar = probA == null ? '<div class="mu-prob-track unavailable"><i></i></div>' :
+      '<div class="mu-prob-track"><i style="width:' + probA + '%"></i></div>';
+    return '<article class="mu-card">' +
+      '<div class="mu-card-head"><span>MATCHUP ' + String(index+1).padStart(2,"0") + '</span><span class="mu-live-tag ' + status.toLowerCase() + '">' + status + '</span></div>' +
+      '<div class="mu-faceoff">' + side(game.teamA,a,probA) + '<div class="mu-versus">VS</div>' + side(game.teamB,b,probB) + '</div>' +
+      '<div class="mu-prob-wrap">' + bar + '</div>' +
+      '<details class="mu-rosters"><summary><span>VIEW ROSTERS</span><span class="mu-expand-mark">+</span></summary>' +
+        '<div class="mu-roster-grid">' + rosterMarkup(game.teamA,game.a) + rosterMarkup(game.teamB,game.b) + '</div>' +
+      '</details>' +
+    '</article>';
+  });
+  target.innerHTML = cards.join("");
+  if (!data.loaded && !data.loading) loadMatchupWeekData(week);
+}
+
 let selectedScheduleTeam = null;
 function renderSchedule() {
   const pickTarget = $("schedule-team-picks");
@@ -600,6 +780,7 @@ function setupNavigation() {
     });
     if (target === "rules") renderRules();
     if (target === "schedule") renderSchedule();
+    if (target === "matchups") renderMatchups(state.matchupWeek);
     if (target === "lottery") renderLotteryHistory();
     if (target === "rankings") renderPowerRankings(state.selectedWeek);
     window.scrollTo({top:0,behavior:"smooth"});
