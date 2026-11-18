@@ -380,7 +380,7 @@ async function init() {
     state.matchupWeek = state.currentWeek;
     const initialWeek = cachedLatest;
     const select = $("week-select");
-    select.innerHTML = Array.from({ length: Math.max(1, initialWeek) }, (_, index) => `<option value="${index + 1}">WEEK ${index + 1}</option>`).join("");
+    select.innerHTML = Array.from({ length: maxWeek }, (_, index) => `<option value="${index + 1}">WEEK ${index + 1}</option>`).join("");
     if (!select.dataset.listenerAttached) {
       select.addEventListener("change", () => renderPowerRankings(Number(select.value)));
       select.dataset.listenerAttached = "yes";
@@ -421,7 +421,7 @@ async function init() {
       const latestCompletedWeek = completed.length ? Math.max(...completed) : 1;
       if (state.selectedWeek === initialWeek && latestCompletedWeek > initialWeek) {
         const nextSelect = $("week-select");
-        nextSelect.innerHTML = Array.from({ length: latestCompletedWeek }, (_, index) => `<option value="${index + 1}">WEEK ${index + 1}</option>`).join("");
+        nextSelect.innerHTML = Array.from({ length: maxWeek }, (_, index) => `<option value="${index + 1}">WEEK ${index + 1}</option>`).join("");
         renderWeek(latestCompletedWeek);
         renderPowerRankings(latestCompletedWeek);
       } else {
