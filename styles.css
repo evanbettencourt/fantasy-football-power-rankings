@@ -3122,7 +3122,6 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .rules-draft-round>b{font:800 9px var(--mono);color:var(--muted)}
 .rules-draft-picks{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px}
 .rules-draft-picks i{display:grid;place-items:center;min-width:0;aspect-ratio:1;border-radius:5px;background:#a9d4f2;color:#24212a;font:800 9px var(--sans);font-style:normal}
-.rules-draft-round.reverse .rules-draft-picks{direction:rtl}
 .rules-draft-round.reverse .rules-draft-picks i{background:#c9b4f0}
 .rules-draft-caption{display:flex;justify-content:space-between;gap:5px;color:var(--muted);font:700 7px var(--mono);letter-spacing:.03em}
 .rules-faab-visual{display:grid;grid-template-columns:140px 1fr;gap:14px;align-items:center}
