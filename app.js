@@ -900,14 +900,14 @@ function renderLotteryHistory() {
   const leaderboard=[...totals.values()].sort((a,b)=>b.luck-a.luck||a.name.localeCompare(b.name));
   const maxAbs=Math.max(1,...leaderboard.map(entry=>Math.abs(entry.luck)));
   $("lottery-luck-list").innerHTML=leaderboard.map(entry=>{
-    const positive=entry.luck>=0;
+    const luckClass=entry.luck>0?"up":entry.luck<0?"dn":"even";
     const width=Math.abs(entry.luck)/maxAbs*46;
     const fill=entry.luck>0
       ? '<span class="ls-fill up" style="left:50%;width:'+width+'%"></span>'
       : entry.luck<0
         ? '<span class="ls-fill dn" style="right:50%;width:'+width+'%"></span>'
         : '';
-    return '<div class="ls-luck"><span class="ls-lnm" style="color:'+lotteryColor(entry.name)+'">'+escapeHtml(entry.name)+'</span><span class="ls-track"><span class="ls-axis"></span>'+fill+'</span><span class="ls-lval '+(positive?'up':'dn')+'">'+(entry.luck>0?'+':'')+entry.luck.toFixed(1)+'</span></div>';
+    return '<div class="ls-luck"><span class="ls-lnm" style="color:'+lotteryColor(entry.name)+'">'+escapeHtml(entry.name)+'</span><span class="ls-track"><span class="ls-axis"></span>'+fill+'</span><span class="ls-lval '+luckClass+'">'+(entry.luck>0?'+':'')+entry.luck.toFixed(1)+'</span></div>';
   }).join("");
 
   $("lottery-history").innerHTML=years.map(year=>{
