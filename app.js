@@ -528,7 +528,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     }
     const actual = num(matchup.points);
     if (isPast) return { value: actual, available: true };
-    return { value: actual + remaining, available: found || actual > 0 };
+    return { value: actual + remaining, available: hasProjectionData && (found || actual > 0) };
   };
   const teamSummary = (team, matchup) => {
     const record = recordById.get(team.id);
