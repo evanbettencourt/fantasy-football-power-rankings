@@ -1152,15 +1152,19 @@ function renderParlays(){
   '<div class="parlay-member-list">'+memberRecords.map((m,i)=>
    '<div class="parlay-member-row"><span class="parlay-member-rank">'+String(i+1).padStart(2,"0")+'</span><span class="parlay-member-name"><strong>'+escapeHtml(m.manager)+'</strong><small>'+m.hits+' HIT · '+m.misses+' MISS'+(m.pushes?' · '+m.pushes+' PUSH':'')+(m.pending?' · '+m.pending+' PENDING':'')+'</small></span><span class="parlay-member-record"><strong>'+m.hits+'/'+m.picks+'</strong><small>'+ (m.rate>=0?Math.round(m.rate*100)+'%':'—')+'</small></span></div>'
   ).join("")+'</div></aside></div>';
- if(!state.parlayHistoryLoading){
+ if(!state.parlayHistoryStarted){
+  state.parlayHistoryStarted=true;
   state.parlayHistoryLoading=true;
   (async()=>{
-   for(let start=1;start<=10;start+=3){
-    await Promise.all(Array.from({length:Math.min(3,11-start)},(_,j)=>loadParlayWeek(start+j)));
+   try {
+    for(let start=1;start<=10;start+=3){
+     await Promise.all(Array.from({length:Math.min(3,11-start)},(_,j)=>loadParlayWeek(start+j)));
+     if(!$("parlays-content")?.hidden)renderParlays();
+    }
+   } finally {
+    state.parlayHistoryLoading=false;
     if(!$("parlays-content")?.hidden)renderParlays();
    }
-   state.parlayHistoryLoading=false;
-   if(!$("parlays-content")?.hidden)renderParlays();
   })();
  }
  target.dataset.ready="yes";
