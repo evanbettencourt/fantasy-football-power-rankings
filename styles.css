@@ -2761,9 +2761,9 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
    Each semifinal occupies the two first-round row tracks feeding into it,
    so its center lands exactly between those two first-round games. */
 .hall-bracket-playoff{
-  width:min(900px,100%);max-width:900px;min-width:0;
-  grid-template-columns:repeat(3,minmax(205px,1fr));
-  column-gap:14px;row-gap:0;overflow:visible;
+  width:max-content;max-width:none;min-width:0;
+  grid-template-columns:repeat(3,205px);
+  column-gap:12px;row-gap:0;overflow:visible;
 }
 .hall-bracket-playoff .hall-tree-column{min-width:0}
 .hall-bracket-playoff .hall-round-games{
