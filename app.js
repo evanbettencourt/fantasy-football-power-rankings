@@ -547,8 +547,8 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const actualStat = stats[id];
     const gameMeta = game
       ? gameCompleted
-        ? '<span class="mu-player-game"><img src="' + escapeHtml(opponentLogo) + '" alt="' + escapeHtml(game.opponentName) + '" title="' + escapeHtml(game.opponentName) + '" loading="lazy" onerror="this.style.display=\\'none\\'"> <span>' + escapeHtml(game.finalScore) + '–' + escapeHtml(game.opponentFinalScore) + '</span><b class="mu-final-label">FINAL</b></span>'
-        : '<span class="mu-player-game">vs. <img src="' + escapeHtml(opponentLogo) + '" alt="' + escapeHtml(game.opponentName) + '" title="' + escapeHtml(game.opponentName) + '" loading="lazy" onerror="this.style.display=\\'none\\'"> <span>' + escapeHtml(game.kickoffLabel) + '</span></span>'
+        ? '<span class="mu-player-game"><img src="' + escapeHtml(opponentLogo) + '" alt="' + escapeHtml(game.opponentName) + '" title="' + escapeHtml(game.opponentName) + '" loading="lazy" onerror="this.style.display=\'none\'"> <span>' + escapeHtml(game.finalScore) + '–' + escapeHtml(game.opponentFinalScore) + '</span><b class="mu-final-label">FINAL</b></span>'
+        : '<span class="mu-player-game">vs. <img src="' + escapeHtml(opponentLogo) + '" alt="' + escapeHtml(game.opponentName) + '" title="' + escapeHtml(game.opponentName) + '" loading="lazy" onerror="this.style.display=\'none\'"> <span>' + escapeHtml(game.kickoffLabel) + '</span></span>'
       : '<span class="mu-player-game">' + (player.team ? "BYE WEEK" : "GAME INFO UNAVAILABLE") + '</span>';
     const matchupPoints = matchup.players_points && matchup.players_points[id];
     const actual = actualStat?.pts_half_ppr != null ? num(actualStat.pts_half_ppr) : num(matchupPoints);
