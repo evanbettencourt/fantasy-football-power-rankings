@@ -1331,3 +1331,20 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   .mu-player-name small{font-size:9px}
   .mu-player-points,.mu-player-proj{font-size:10px}
 }
+
+
+/* Matchup player team marks and opponent/kickoff metadata. */
+.mu-player-row{min-height:48px;align-items:center}
+.mu-player-name{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0;white-space:normal;overflow:visible}
+.mu-player-primary{display:flex;align-items:center;gap:6px;min-width:0;max-width:100%;font-size:11px;line-height:1.2}
+.mu-player-primary>img{width:18px;height:18px;object-fit:contain;flex:0 0 18px}
+.mu-player-primary>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mu-player-game{display:flex;align-items:center;gap:4px;min-width:0;color:var(--muted);font:500 9px var(--mono);line-height:1.2;white-space:nowrap}
+.mu-player-game img{width:15px;height:15px;object-fit:contain;flex:0 0 15px}
+@media(max-width:600px){
+  .mu-player-row{min-height:50px}
+  .mu-player-primary{font-size:11px;gap:5px}
+  .mu-player-primary>img{width:17px;height:17px;flex-basis:17px}
+  .mu-player-game{font-size:9px}
+  .mu-player-game img{width:14px;height:14px;flex-basis:14px}
+}
