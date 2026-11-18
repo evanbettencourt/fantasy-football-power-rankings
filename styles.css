@@ -2757,26 +2757,43 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 }
 
 
-/* Corrective sizing pass: preserve the original matchup-card scale.
-   The previous layout pass accidentally capped every round at 205px.
-   Round 1 and semifinals return to their prior 245px width; championship
-   retains its established 205px width. Only positioning is adjusted. */
+/* Final bracket alignment: every matchup uses the championship card width.
+   Each semifinal occupies the two first-round row tracks feeding into it,
+   so its center lands exactly between those two first-round games. */
 .hall-bracket-playoff{
   width:min(900px,100%);max-width:900px;min-width:0;
-  grid-template-columns:minmax(245px,1.12fr) minmax(245px,1fr) minmax(205px,1fr);
+  grid-template-columns:repeat(3,minmax(205px,1fr));
   column-gap:14px;row-gap:0;overflow:visible;
 }
-.hall-bracket-playoff .hall-tree-round-one .hall-round-games>.hall-tree-game,
+.hall-bracket-playoff .hall-tree-column{min-width:0}
+.hall-bracket-playoff .hall-round-games{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  grid-template-rows:repeat(4,76px);row-gap:12px;
+  min-height:0;height:auto;align-content:start;justify-content:stretch;
+}
+.hall-bracket-playoff .hall-tree-round-one .hall-round-games>.hall-tree-game{
+  grid-column:1;align-self:center;justify-self:center;
+  width:100%;max-width:205px;min-width:205px;margin:0;
+}
 .hall-bracket-playoff .hall-tree-round-two .hall-round-games>.hall-tree-game{
-  width:100%;max-width:245px;min-width:245px;justify-self:center;
+  grid-column:1;align-self:center;justify-self:center;
+  width:100%;max-width:205px;min-width:205px;margin:0;
 }
-.hall-bracket-playoff .hall-tree-finals .hall-round-games>.hall-tree-final .hall-tree-game{
-  width:100%;max-width:205px;min-width:205px;
+.hall-bracket-playoff .hall-tree-round-two .hall-round-games>.hall-tree-game:nth-child(1){grid-row:1 / span 2}
+.hall-bracket-playoff .hall-tree-round-two .hall-round-games>.hall-tree-game:nth-child(2){grid-row:3 / span 2}
+.hall-bracket-playoff .hall-tree-finals .hall-round-games{
+  grid-template-rows:repeat(4,76px);row-gap:12px;
 }
+.hall-bracket-playoff .hall-tree-finals .hall-round-games>.hall-tree-final{
+  grid-row:2 / span 2;grid-column:1;align-self:center;
+  width:100%;margin:0;display:flex;justify-content:center;
+}
+.hall-bracket-playoff .hall-tree-finals .hall-round-games>.hall-tree-final .hall-tree-game,
 .hall-bracket-playoff .hall-tree-finals .hall-placement-game,
 .hall-bracket-playoff .hall-tree-finals .hall-placement-game .hall-tree-game{
-  width:100%;max-width:205px;min-width:205px;
+  width:100%;max-width:205px;min-width:205px;margin:0;
 }
+.hall-bracket-playoff .hall-tree-finals .hall-placement-game{justify-self:center}
 .hall-bracket-playoff .hall-tree-bye .hall-tree-team:first-child,
 .hall-bracket-playoff .hall-tree-bye .hall-tree-team:first-child>span{
   justify-content:center!important;text-align:center!important;
@@ -2787,5 +2804,5 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 @media(max-width:720px){
  .hall-bracket-playoff{min-width:760px;column-gap:10px}
  .hall-bracket-playoff .hall-tree-round-one .hall-round-games>.hall-tree-game,
- .hall-bracket-playoff .hall-tree-round-two .hall-round-games>.hall-tree-game{max-width:245px;min-width:245px}
+ .hall-bracket-playoff .hall-tree-round-two .hall-round-games>.hall-tree-game{max-width:205px;min-width:205px}
 }
