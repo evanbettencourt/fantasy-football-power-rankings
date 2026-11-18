@@ -1383,10 +1383,10 @@ const HALL_CHARACTER_DESIGNS={
  Campbell:{suit:"#737373",shadow:"#3d3d3d",trim:"#e6e6e6",skin:"#b98368",hair:"#262626",hairPath:"M34 38Q28 22 40 15Q55 6 70 14Q83 21 79 39L72 32Q57 28 47 31Q39 28 35 38Z",beard:'<path d="M40 54Q46 67 59 67Q72 67 77 54L70 68Q58 75 46 68Z" fill="#262626"/>',eyes:"#9b9b9b",brow:"#262626",accessory:'<path d="M34 26Q57 18 81 27" fill="none" stroke="#e6e6e6" stroke-width="3"/>',emblem:"◇"}
 };
 function hallPixelAvatar(name){
- const crop={"Kevin":[2,42,26,50],"Marc":[40,38,24,56],"Colby":[80,20,36,72],"Ben":[138,20,36,72],"Brandon":[190,10,60,82],"Evan":[270,56,26,22],"Pat":[320,56,30,32],"Joey":[372,32,48,60],"Butta":[438,10,48,76],"Ders":[506,34,32,60],"Tanz":[558,24,36,68],"Roth":[2,172,24,26],"Sam":[42,150,36,72],"Schmeef":[154,162,28,44],"Hess":[304,186,24,30],"Campbell":[390,142,48,80],"Lee":[452,138,64,84]}[name];
- if(!crop)return '';
- const [x,y,w,h]=crop;
- return '<span class="hall-character-avatar hall-pixel-sprite" role="img" aria-label="'+escapeHtml(name)+' character" style="--sprite-x:'+(-x)+'px;--sprite-y:'+(-y)+'px;--sprite-w:'+w+'px;--sprite-h:'+h+'px"></span>';
+ const spriteIds={"Kevin":"kevin","Marc":"marc","Colby":"colby","Ben":"ben","Brandon":"brandon","Evan":"evan","Pat":"pat","Joey":"joey","Butta":"butta","Ders":"ders","Tanz":"tanz","Roth":"roth","Sam":"sam","Schmeef":"schmeef","Hess":"hess","Campbell":"campbell","Lee":"lee"};
+ const sprite=spriteIds[name];if(!sprite)return "";
+ const dimensions={kevin:[32,98],marc:[38,98],colby:[48,98],ben:[50,98],brandon:[72,98],evan:[42,50],pat:[50,50],joey:[64,80],butta:[64,100],ders:[52,82],tanz:[46,86],roth:[36,100],sam:[48,100],schmeef:[48,96],hess:[56,96],campbell:[42,96],lee:[44,100]}[sprite];
+ return '<svg class="hall-character-avatar hall-pixel-sprite" viewBox="0 0 '+dimensions[0]+' '+dimensions[1]+'" role="img" aria-label="'+escapeHtml(name)+' character" focusable="false"><use href="/assets/hall-sprites.svg#'+sprite+'"></use></svg>';
 }
 function hallManagerHonors(name,stat){
  const playoffYears=[...(stat.playoffAppearances||new Set())].sort((a,b)=>a-b);
@@ -1459,21 +1459,25 @@ function hallAwardsMarkup(){
  const managerLabel=name=>AWARD_TEAM_MANAGERS[name]?' <span class="award-team-manager">· '+escapeHtml(AWARD_TEAM_MANAGERS[name])+'</span>':'';
  return '<section class="hall-season-awards"><div class="hall-section-heading"><div><span class="hall-kicker">2025 SEASON · LEAGUE VOTING</span><h3>Monkey Boys Awards</h3></div><span class="hall-count">15 AWARDS</span></div><div class="awards-grid">'+AWARDS_2025.map((a,i)=>{const teamAward=a.category==="Best Team Name"||a.category==="Worst Team Name";return '<article class="award-card"><div class="award-card-top"><span class="award-number">'+String(i+1).padStart(2,"0")+'</span><span class="award-category">'+escapeHtml(a.category)+'</span></div><div class="award-winner"><span class="award-kicker">2025 WINNER</span><strong>'+escapeHtml(a.winner)+(teamAward?managerLabel(a.winner):'')+'</strong><p>'+escapeHtml(a.detail)+'</p></div><details class="award-nominees"><summary><span>VIEW ALL NOMINEES</span><b>'+a.nominees.length+'</b></summary><ol>'+a.nominees.map(n=>'<li class="'+((n.toLowerCase().includes(a.winner.toLowerCase())||(a.winner==="Kevin"&&n.startsWith("Kev ")))?"selected":"")+'">'+escapeHtml(n)+(teamAward?managerLabel(n):'')+'</li>').join("")+'</ol></details></article>';}).join("")+'</div></section>';
 }
-function openHallBracket(year){
+function openHallSeasonPage(year,updateUrl=true){
+ if(!state.hallHistory&&!state.hallHistoryPromise){loadSleeperHallHistory().then(()=>openHallSeasonPage(year,updateUrl));return;}
+ if(state.hallHistoryPromise){state.hallHistoryPromise.then(()=>openHallSeasonPage(year,updateUrl));return;}
  const row=state.hallHistory?.seasons?.find(item=>Number(item.year)===Number(year))||PRE_SLEEPER_CHAMPIONS.find(item=>Number(item.year)===Number(year));
- const champion=row?.champion||"TBD",runner=row?.runnerUp||"—";
+ if(!row)return;
+ const champion=row.champion||"TBD",runner=row.runnerUp||"—";
  const legacyStandings=hallLegacyStandingsMarkup(year)||hallSleeperStandingsMarkup(row);
  const awardMarkup=year===2025?hallAwardsMarkup():"";
- const old=document.querySelector(".hall-bracket-overlay");if(old)old.remove();
- const overlay=document.createElement("div");overlay.className="hall-bracket-overlay";
- overlay.innerHTML='<div class="hall-bracket-dialog" role="dialog" aria-modal="true" aria-label="'+year+' playoff bracket"><button class="hall-bracket-close" type="button" aria-label="Close bracket">×</button><div class="hall-kicker">MONKEY BOYS · POSTSEASON ARCHIVE</div><h2>'+year+' Playoff Bracket</h2><div class="hall-bracket-champion"><span>🏆 CHAMPION</span><strong>'+escapeHtml(champion)+'</strong><small>Runner-up · '+escapeHtml(runner)+(row?.thirdPlace?' · 3rd Place · '+escapeHtml(row.thirdPlace):'')+(row?.regularSeasonChampion?' · Regular Season Champion · '+escapeHtml(row.regularSeasonChampion):'')+'</small></div>'+hallBracketMarkup(year,row)+legacyStandings+awardMarkup+hallDraftMarkup(row)+hallLeadersMarkup(row)+'</div>';
- document.body.appendChild(overlay);
- const close=()=>overlay.remove();
- overlay.addEventListener("click",event=>{if(event.target===overlay)close();});
- overlay.querySelector(".hall-bracket-close").addEventListener("click",close);
- const onKey=event=>{if(event.key==="Escape"){close();document.removeEventListener("keydown",onKey);}};
- document.addEventListener("keydown",onKey);
+ let page=document.getElementById("hall-season-page");
+ if(!page){page=document.createElement("section");page.id="hall-season-page";page.className="hall-season-page";document.querySelector("main").appendChild(page);}
+ document.querySelectorAll(".tab-panel").forEach(panel=>panel.hidden=true);
+ document.querySelectorAll(".nav-tab").forEach(tab=>tab.classList.remove("active"));
+ page.hidden=false;
+ page.innerHTML='<button class="hall-season-back" type="button">← BACK TO HALL OF FAME</button><header class="hall-season-header"><div class="hall-kicker">MONKEY BOYS · SEASON ARCHIVE</div><h1>'+Number(year)+' Season Detail</h1><div class="hall-season-champion"><span>🏆 CHAMPION</span><strong>'+escapeHtml(champion)+'</strong><small>Runner-up · '+escapeHtml(runner)+(row.thirdPlace?' · 3rd Place · '+escapeHtml(row.thirdPlace):'')+(row.regularSeasonChampion?' · Regular Season Champion · '+escapeHtml(row.regularSeasonChampion):'')+'</small></div></header><section class="hall-season-section"><h2>Playoff Bracket</h2>'+hallBracketMarkup(year,row)+'</section>'+legacyStandings+awardMarkup+hallDraftMarkup(row)+hallLeadersMarkup(row);
+ page.querySelector(".hall-season-back").addEventListener("click",()=>{page.hidden=true;document.querySelectorAll(".tab-panel").forEach(panel=>panel.hidden=panel.dataset.panel!=="hall");document.querySelector('[data-tab="hall"]')?.classList.add("active");history.pushState(null,"","#hall");renderHallOfFame();window.scrollTo({top:0,behavior:"smooth"});});
+ if(updateUrl)history.pushState(null,"","#season-"+Number(year));
+ window.scrollTo({top:0,behavior:"smooth"});
 }
+
 function renderHallOfFame(){
  const target=$("hall-content");if(!target)return;
  if(!state.hallStats){
@@ -1517,7 +1521,7 @@ function renderHallOfFame(){
  const knownSeasons=new Map(PRE_SLEEPER_CHAMPIONS.map(row=>({...row,regularSeasonChampion:hallLegacyStandings(row.year)[0]?.manager||null})).concat((state.hallHistory.seasons||[]).map(row=>({year:row.year,champion:row.champion,runnerUp:row.runnerUp,thirdPlace:row.thirdPlace,regularSeasonChampion:row.regularSeasonChampion,bracket:row.bracket}))).map(row=>[Number(row.year),row]));
  const archiveEnd=Math.max(2020,Number(state.league?.season)||2026);
  const champions=Array.from({length:archiveEnd-2017+1},(_,index)=>{const year=2017+index;return knownSeasons.get(year)||{year,champion:null,runnerUp:null,thirdPlace:null,regularSeasonChampion:null,bracket:[]};});
- const championCards=champions.map((row,index)=>'<button class="hall-champion-card" type="button" data-hall-year="'+row.year+'"><span class="hall-champion-season">'+row.year+' SEASON</span><span class="hall-champion-crown">🏆</span><strong>'+escapeHtml(row.champion||"IN PROGRESS")+'</strong><span class="hall-champion-runner">RUNNER-UP · '+escapeHtml(row.runnerUp||"TBD")+'</span>'+(row.thirdPlace?'<span class="hall-champion-runner">3RD PLACE · '+escapeHtml(row.thirdPlace)+'</span>':'')+(row.regularSeasonChampion?'<span class="hall-champion-runner">REGULAR SEASON · '+escapeHtml(row.regularSeasonChampion)+'</span>':'')+'<span class="hall-champion-link">VIEW PLAYOFF BRACKET ↗</span></button>').join("");
+ const championCards=champions.map((row,index)=>'<button class="hall-champion-card" type="button" data-hall-year="'+row.year+'"><span class="hall-champion-season">'+row.year+' SEASON</span><span class="hall-champion-crown">🏆</span><strong>'+escapeHtml(row.champion||"IN PROGRESS")+'</strong><span class="hall-champion-runner">RUNNER-UP · '+escapeHtml(row.runnerUp||"TBD")+'</span>'+(row.thirdPlace?'<span class="hall-champion-runner">3RD PLACE · '+escapeHtml(row.thirdPlace)+'</span>':'')+(row.regularSeasonChampion?'<span class="hall-champion-runner">REGULAR SEASON · '+escapeHtml(row.regularSeasonChampion)+'</span>':'')+'<span class="hall-champion-link">VIEW SEASON DETAIL ↗</span></button>').join("");
  const unresolved=state.hallHistory.unresolved||[],errors=state.hallHistory.errors||[];
  const diagnostic=unresolved.length?'<p class="hall-footnote">'+unresolved.length+' HISTORICAL ROSTER RECORDS COULD NOT BE MATCHED TO A MANAGER.</p>':'';
  const errorNote=errors.length?'<p class="hall-footnote">DATA NOTES: '+errors.map(escapeHtml).join(' · ')+'</p>':'';
@@ -1529,7 +1533,7 @@ function renderHallOfFame(){
   const flipped=card.classList.toggle("is-flipped");
   card.setAttribute("aria-expanded",String(flipped));
  }));
- target.querySelectorAll("[data-hall-year]").forEach(card=>card.addEventListener("click",()=>openHallBracket(Number(card.dataset.hallYear))));
+ target.querySelectorAll("[data-hall-year]").forEach(card=>card.addEventListener("click",()=>openHallSeasonPage(Number(card.dataset.hallYear))));
 }
 
 function renderAwards(){
@@ -1836,7 +1840,10 @@ function setupNavigation() {
     activateTab(tab.dataset.tab, { updateUrl: true, scroll: true });
   }));
   const initialTab = window.location.hash.replace(/^#/, "");
-  activateTab(tabs.some(tab => tab.dataset.tab === initialTab) ? initialTab : "league");
+  const seasonRoute=initialTab.match(/^season-(\\d{4})$/);
+  if(seasonRoute){activateTab("hall");openHallSeasonPage(Number(seasonRoute[1]),false);}
+  else activateTab(tabs.some(tab => tab.dataset.tab === initialTab) ? initialTab : "league");
+  window.addEventListener("popstate",()=>{const route=window.location.hash.replace(/^#/, "").match(/^season-(\\d{4})$/);if(route)openHallSeasonPage(Number(route[1]),false);else if(window.location.hash==="#hall")activateTab("hall");});
 }
 setupNavigation();
 
