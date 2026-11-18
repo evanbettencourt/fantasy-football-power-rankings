@@ -333,7 +333,6 @@ async function init() {
   const cache = readStartupCache();
   const requests = [["league", "/league/" + LEAGUE_ID], ["users", "/league/" + LEAGUE_ID + "/users"], ["rosters", "/league/" + LEAGUE_ID + "/rosters"]];
   try {
-    // Load each required resource independently; reuse its last good copy if Sleeper is temporarily unavailable.
     const results = await Promise.all(requests.map(async ([key, path]) => {
       try {
         const value = await fetchJson(path);
@@ -351,44 +350,85 @@ async function init() {
     const core = Object.fromEntries(results.map(item => [item.key, item.value]));
     state.league = core.league; state.users = core.users; state.rosters = core.rosters;
     state.usingCachedCore = results.some(item => item.cached);
-    buildTeams(); renderLotteryHistory(); loadActualDraftOrder();
+    buildTeams();
+    renderLotteryHistory();
+    loadActualDraftOrder();
+
     const season = core.league.season || String(new Date().getFullYear());
     $("season-label").textContent = season + " SLEEPER LEAGUE · EST. 2017";
     $("season-tag").textContent = season + " SEASON · EST. 2017";
     const rankingsSeasonTag = $("season-tag-rankings");
     if (rankingsSeasonTag) rankingsSeasonTag.textContent = season + " SEASON · EST. 2017";
+
     const maxWeek = getWeeksToLoad();
-    const weekResults = await Promise.all(Array.from({ length: maxWeek }, (_, index) => index + 1).map(async week => {
-      const key = String(week);
-      try {
-        const data = await fetchJson("/league/" + LEAGUE_ID + "/matchups/" + week);
-        if (!Array.isArray(data)) throw new Error("Invalid matchup data for week " + week);
-        const saved = readStartupCache().weeks || {};
-        writeStartupCache({ weeks: { ...saved, [key]: data } });
-        return { week, data, source: "live" };
-      } catch (error) {
-        console.warn("Week " + week + " failed after retries", error);
-        const saved = readStartupCache().weeks || cache.weeks || {};
-        return Array.isArray(saved[key]) ? { week, data: saved[key], source: "cache" } : { week, data: [], source: "missing" };
-      }
-    }));
-    state.failedWeeks = weekResults.filter(item => item.source === "missing").map(item => item.week);
-    state.recoveredWeeks = weekResults.filter(item => item.source === "cache").map(item => item.week);
-    weekResults.forEach(item => { state.weeks[item.week] = item.data; });
-    try { state.nflState = await fetchJson("/state/nfl", { attempts: 1, timeoutMs: 8000 }); } catch (error) { state.nflState = null; }
-    const completed = Array.from({ length: maxWeek }, (_, index) => index + 1).filter(week => (state.weeks[week] || []).some(match => num(match.points) > 0));
-    const latestCompletedWeek = completed.length ? Math.max(...completed) : 1;
-    const currentWeek = Math.max(1, Math.min(14, num(state.nflState?.week) || latestCompletedWeek));
-    state.currentWeek = currentWeek;
-    state.matchupWeek = currentWeek;
-    const defaultWeek = latestCompletedWeek;
+    const savedWeeks = cache.weeks && typeof cache.weeks === "object" ? cache.weeks : {};
+    for (let week = 1; week <= maxWeek; week++) {
+      if (Array.isArray(savedWeeks[String(week)])) state.weeks[week] = savedWeeks[String(week)];
+    }
+
+    // Get the NFL week without making the main page wait for every historical matchup request.
+    try { state.nflState = await fetchJson("/state/nfl", { attempts: 1, timeoutMs: 6000 }); }
+    catch (error) { state.nflState = null; }
+
+    const cachedCompleted = Array.from({ length: maxWeek }, (_, index) => index + 1)
+      .filter(week => (state.weeks[week] || []).filter(match => num(match.points) > 0).length >= state.teams.size);
+    const cachedLatest = cachedCompleted.length ? Math.max(...cachedCompleted) : 1;
+    state.currentWeek = Math.max(1, Math.min(14, num(state.nflState?.week) || cachedLatest));
+    state.matchupWeek = state.currentWeek;
+    const initialWeek = cachedLatest;
     const select = $("week-select");
-    select.innerHTML = Array.from({ length: defaultWeek }, (_, index) => `<option value="${index + 1}">WEEK ${index + 1}</option>`).join("");
-    select.addEventListener("change", () => renderPowerRankings(Number(select.value)));
-    renderWeek(defaultWeek); renderPowerRankings(defaultWeek);
+    select.innerHTML = Array.from({ length: Math.max(1, initialWeek) }, (_, index) => `<option value="${index + 1}">WEEK ${index + 1}</option>`).join("");
+    if (!select.dataset.listenerAttached) {
+      select.addEventListener("change", () => renderPowerRankings(Number(select.value)));
+      select.dataset.listenerAttached = "yes";
+    }
+
+    // Render immediately from the last saved data. On a first visit, render the shell
+    // with placeholders and fill it in as small batches arrive.
+    renderWeek(initialWeek);
+    renderPowerRankings(initialWeek);
     renderSchedule();
-    renderMatchups(state.matchupWeek);
-    $("updated-at").textContent = state.usingCachedCore || state.recoveredWeeks.length ? "SLEEPER API · SAVED DATA USED WHERE NEEDED" : "SLEEPER API · PUBLIC LEAGUE DATA";
+    $("updated-at").textContent = state.usingCachedCore ? "SLEEPER API · SAVED LEAGUE DETAILS IN USE" : "SLEEPER API · REFRESHING WEEKLY DATA";
+    updateStartupStatus();
+
+    // Keep the expensive historical refresh off the critical rendering path and cap
+    // concurrency so Sleeper/network bursts cannot overwhelm the browser.
+    for (let startWeek = 1; startWeek <= maxWeek; startWeek += 4) {
+      const batch = Array.from({ length: Math.min(4, maxWeek - startWeek + 1) }, (_, index) => startWeek + index);
+      const results = await Promise.all(batch.map(async week => {
+        try {
+          const data = await fetchJson("/league/" + LEAGUE_ID + "/matchups/" + week, { attempts: 2, timeoutMs: 9000 });
+          if (!Array.isArray(data)) throw new Error("Invalid matchup data for week " + week);
+          return { week, data, source: "live" };
+        } catch (error) {
+          console.warn("Week " + week + " failed after retries", error);
+          const saved = readStartupCache().weeks || savedWeeks;
+          return Array.isArray(saved[String(week)]) ? { week, data: saved[String(week)], source: "cache" } : { week, data: [], source: "missing" };
+        }
+      }));
+      results.forEach(item => { state.weeks[item.week] = item.data; });
+      const mergedWeeks = { ...(readStartupCache().weeks || {}) };
+      results.forEach(item => { if (item.source === "live") mergedWeeks[String(item.week)] = item.data; });
+      writeStartupCache({ weeks: mergedWeeks });
+      state.failedWeeks = [...new Set([...state.failedWeeks.filter(week => !batch.includes(week)), ...results.filter(item => item.source === "missing").map(item => item.week)])].sort((a,b)=>a-b);
+      state.recoveredWeeks = [...new Set([...state.recoveredWeeks.filter(week => !batch.includes(week)), ...results.filter(item => item.source === "cache").map(item => item.week)])].sort((a,b)=>a-b);
+
+      const completed = Array.from({ length: maxWeek }, (_, index) => index + 1)
+        .filter(week => (state.weeks[week] || []).filter(match => num(match.points) > 0).length >= state.teams.size);
+      const latestCompletedWeek = completed.length ? Math.max(...completed) : 1;
+      if (state.selectedWeek === initialWeek && latestCompletedWeek > initialWeek) {
+        const nextSelect = $("week-select");
+        nextSelect.innerHTML = Array.from({ length: latestCompletedWeek }, (_, index) => `<option value="${index + 1}">WEEK ${index + 1}</option>`).join("");
+        renderWeek(latestCompletedWeek);
+        renderPowerRankings(latestCompletedWeek);
+      } else {
+        renderWeek(state.selectedWeek || initialWeek);
+        renderPowerRankings(state.selectedWeek || initialWeek);
+      }
+      renderSchedule();
+      $("updated-at").textContent = state.usingCachedCore || state.recoveredWeeks.length ? "SLEEPER API · SAVED DATA USED WHERE NEEDED" : "SLEEPER API · PUBLIC LEAGUE DATA";
+      updateStartupStatus();
+    }
   } catch (error) {
     console.error("League startup failed", error);
     $("status").textContent = "LEAGUE DATA ERROR · " + (error?.message || "Unknown startup error");
@@ -397,6 +437,15 @@ async function init() {
     const standings = $("standings-list");
     if (standings) standings.innerHTML = '<div class="empty-note">Standings unavailable. Please try again shortly.</div>';
   }
+}
+function updateStartupStatus() {
+  const week = state.selectedWeek || 1;
+  const statusParts = ["CONNECTED · " + state.teams.size + " TEAMS", "DATA THROUGH WEEK " + week];
+  if (state.usingCachedCore) statusParts.push("SAVED LEAGUE DETAILS IN USE");
+  if (state.recoveredWeeks.length) statusParts.push("SAVED WEEK DATA: " + state.recoveredWeeks.join(", "));
+  if (state.failedWeeks.length) statusParts.push("WEEKS UNAVAILABLE: " + state.failedWeeks.join(", "));
+  $("status").textContent = statusParts.join(" · ");
+  $("status").classList.toggle("error", state.failedWeeks.length > 0);
 }
 function matchupNormalCdf(z) {
   const x = Math.abs(z) / Math.sqrt(2);
