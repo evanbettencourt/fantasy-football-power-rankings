@@ -2,7 +2,7 @@ const LEAGUE_ID = "1313563024161787904";
 const API = "/api/sleeper";
 const $ = (id) => document.getElementById(id);
 const setTextIfPresent = (id, value) => { const element = $(id); if (element) element.textContent = value; };
-const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [], recoveredWeeks: [], usingCachedCore: false, draftOrder: null, draftSeason: null, nflState: null, currentWeek: 1, matchupWeek: 1, players: null, playersPromise: null, matchupDataByWeek: {} };
+const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [], recoveredWeeks: [], usingCachedCore: false, draftOrder: null, draftSeason: null, nflState: null, currentWeek: 1, matchupWeek: 1, players: null, playersPromise: null, matchupDataByWeek: {}, parlayDataByWeek: {} };
 
 const num = (v) => Number.isFinite(Number(v)) ? Number(v) : 0;
 const fmt = (v) => num(v).toFixed(2);
@@ -901,10 +901,80 @@ function renderAwards(){
  target.innerHTML='<div class="awards-intro"><span class="award-kicker">2025 SEASON · LEAGUE VOTING</span><strong>THE MONKEY BOYS AWARDS</strong><p>Last season’s nominees, with the league’s selected winners highlighted.</p><div class="awards-summary"><span><b>15</b> AWARDS</span><span><b>15</b> WINNERS</span><span><b>'+count+'</b> NOMINEES</span></div></div><div class="awards-grid">'+AWARDS_2025.map((a,i)=>'<article class="award-card"><div class="award-card-top"><span class="award-number">'+String(i+1).padStart(2,"0")+'</span><span class="award-category">'+escapeHtml(a.category)+'</span></div><div class="award-winner"><span class="award-kicker">2025 WINNER</span><strong>'+escapeHtml(a.winner)+'</strong><p>'+escapeHtml(a.detail)+'</p></div><details class="award-nominees"><summary><span>VIEW ALL NOMINEES</span><b>'+a.nominees.length+'</b></summary><ol>'+a.nominees.map(n=>'<li class="'+((n.toLowerCase().includes(a.winner.toLowerCase())||(a.winner==='Kevin'&&n.startsWith('Kev ')))?'selected':'')+'">'+escapeHtml(n)+'</li>').join("")+'</ol></details></article>').join("")+'</div>';
  target.dataset.ready="yes";
 }
+
+const PARLAY_PLAYER_ALIASES = {
+ "loveland":"Colston Loveland","lamar":"Lamar Jackson","saquon":"Saquon Barkley","ja'marr chase":"Ja'Marr Chase","jamarr chase":"Ja'Marr Chase","amon ra":"Amon-Ra St. Brown","amon-ra":"Amon-Ra St. Brown","omarion hampton":"Omarion Hampton","kenneth walker":"Kenneth Walker III","ken walker":"Kenneth Walker III","javonte williams":"Javonte Williams","jayden daniels":"Jayden Daniels","zay flowers":"Zay Flowers","bucky irving":"Bucky Irving","mike evans":"Mike Evans","derrick henry":"Derrick Henry","jeanty":"Ashton Jeanty","drake maye":"Drake Maye","bijan":"Bijan Robinson","etienne":"Travis Etienne","cmc":"Christian McCaffrey","ceedee":"CeeDee Lamb","cee dee":"CeeDee Lamb","terrance ferguson":"Terrance Ferguson","stafford":"Matthew Stafford","jaylen warren":"Jaylen Warren","chuba":"Chuba Hubbard","nabers":"Malik Nabers","goff":"Jared Goff","josh downs":"Josh Downs","aaron jones":"Aaron Jones","jordan addison":"Jordan Addison","monty":"David Montgomery","kyren williams":"Kyren Williams","kyren":"Kyren Williams","michael wilson":"Michael Wilson","trey mcbride":"Trey McBride","laporta":"Sam LaPorta","deshaun watson":"Deshaun Watson","chase brown":"Chase Brown","tyler higbee":"Tyler Higbee","tucker kraft":"Tucker Kraft","xavier worthy":"Xavier Worthy","dallas goedert":"Dallas Goedert","cam skattebo":"Cam Skattebo","drake london":"Drake London","bryce young":"Bryce Young","jalen coker":"Jalen Coker","dk metcalf":"DK Metcalf","brock bowers":"Brock Bowers","jj mccarthy":"J.J. McCarthy","joe burrow":"Joe Burrow","george kittle":"George Kittle","diggs":"Stefon Diggs","jonah coleman":"Jonah Coleman","omar cooper":"Omar Cooper","rashee":"Rashee Rice","ollie gordon":"Ollie Gordon II","antonio williams":"Antonio Williams","rome odunze":"Rome Odunze","jonathan taylor":"Jonathan Taylor","tuten":"Bhayshul Tuten","emmett johnson":"Emmett Johnson","tee higgins":"Tee Higgins","justin herbert":"Justin Herbert","justin jefferson":"Justin Jefferson","kyle mccord":"Kyle McCord"
+};
+const PARLAY_TEAM_ALIASES = {
+ "eagles":"PHI","bengals":"CIN","giants":"NYG","cardinals":"ARI","patriots":"NE","pats":"NE","chiefs":"KC","bills":"BUF","lions":"DET"
+};
+function parlayStatNumber(stat,key){const value=stat?.[key];return value==null||!Number.isFinite(Number(value))?null:Number(value);}
+function gradeParlayPick(pick,stats,players,schedule){
+ const raw=String(pick||"").trim(),lower=raw.toLowerCase();
+ if(!raw||raw==="N/A")return {status:"NA",detail:"No pick"};
+ const teamName=Object.keys(PARLAY_TEAM_ALIASES).find(name=>lower.includes(name));
+ const hasTeamLine=/\bML\b|[+-]\d+(?:\.\d+)?/.test(raw);
+ if(teamName&&hasTeamLine){
+  const abbr=PARLAY_TEAM_ALIASES[teamName];
+  const event=(schedule?.events||[]).find(ev=>(ev.competitions?.[0]?.competitors||[]).some(c=>String(c.team?.abbreviation||"").toUpperCase()===abbr));
+  const comp=event?.competitions?.[0],teams=comp?.competitors||[];
+  const team=teams.find(c=>String(c.team?.abbreviation||"").toUpperCase()===abbr),opp=teams.find(c=>c!==team);
+  if(!comp||!team||!opp||!(comp.status?.type?.completed??event.status?.type?.completed??false))return {status:"PENDING",detail:"Game not final"};
+  const margin=Number(team.score)-Number(opp.score);
+  const spread=raw.match(/([+-]\d+(?:\.\d+)?)/);
+  const hit=spread?margin+Number(spread[1])>0:margin>0;
+  return {status:hit?"HIT":margin+(spread?Number(spread[1]):0)===0?"PUSH":"MISS",detail:team.score+"–"+opp.score};
+ }
+ const alias=Object.keys(PARLAY_PLAYER_ALIASES).sort((a,b)=>b.length-a.length).find(name=>lower.includes(name));
+ if(!alias)return {status:"REVIEW",detail:"Player or team not recognized"};
+ const fullName=PARLAY_PLAYER_ALIASES[alias];
+ const playerEntry=Object.entries(players||{}).find(([,p])=>String(p.full_name||[p.first_name,p.last_name].filter(Boolean).join(" ")).toLowerCase()===fullName.toLowerCase());
+ if(!playerEntry)return {status:"REVIEW",detail:"Player not found in Sleeper directory"};
+ const stat=stats?.[playerEntry[0]];
+ if(!stat)return {status:"PENDING",detail:"Sleeper stats unavailable"};
+ if(/\bTD\b/i.test(raw)&&!/(pass|passing)\s*\d/i.test(raw)){
+  const total=["rush_td","rec_td","def_td","st_td","fum_rec_td"].reduce((sum,key)=>sum+(parlayStatNumber(stat,key)||0),0);
+  return {status:total>0?"HIT":"MISS",detail:total+" TD"};
+ }
+ const overUnder=raw.match(/\b(O|U)\s*(\d+(?:\.\d+)?)/i);
+ const plus=raw.match(/\b(\d+(?:\.\d+)?)\s*\+/);
+ const threshold=overUnder?Number(overUnder[2]):plus?Number(plus[1]):null;
+ if(threshold==null)return {status:"REVIEW",detail:"No clear prop threshold"};
+ let key=null,label="";
+ if(/pass(?:ing)?\s*(?:yards?|yds?)/i.test(raw)){key="pass_yd";label="PASS YDS"}
+ else if(/rush(?:ing)?\s*(?:yards?|yds?)/i.test(raw)){key="rush_yd";label="RUSH YDS"}
+ else if(/receiv(?:ing)?\s*(?:yards?|yds?)/i.test(raw)){key="rec_yd";label="REC YDS"}
+ else if(/\brec(?:eptions?)?\b/i.test(raw)){key="rec";label="REC"}
+ else if(/rush attempts?/i.test(raw)){key="rush_att";label="RUSH ATT"}
+ else if(/pass(?:ing)?\s*(?:td|touchdowns?)/i.test(raw)){key="pass_td";label="PASS TD"}
+ else if(/\bint(?:erceptions?)?\b/i.test(raw)){key="pass_int";label="INT"}
+ else return {status:"REVIEW",detail:"Prop type not recognized"};
+ const value=parlayStatNumber(stat,key);
+ if(value==null)return {status:"PENDING",detail:"Stat not available"};
+ const hit=overUnder?.[1].toUpperCase()==="U"?value<threshold:value>threshold;
+ const push=value===threshold;
+ return {status:push?"PUSH":hit?"HIT":"MISS",detail:label+" "+value+" / "+(overUnder?.[1].toUpperCase()||"OVER")+" "+threshold};
+}
+async function loadParlayWeek(week){
+ if(state.parlayDataByWeek[week]?.loaded||state.parlayDataByWeek[week]?.loading)return;
+ state.parlayDataByWeek[week]={loading:true};
+ const season=state.league?.season||String(new Date().getFullYear());
+ const [stats,schedule,players]=await Promise.all([
+  fetchJson("/api/sleeper-stats/regular/"+season+"/"+week,{attempts:1,timeoutMs:18000}).catch(()=>null),
+  fetchJson("/api/nfl-schedule?seasontype=2&week="+week+"&year="+encodeURIComponent(season),{attempts:1,timeoutMs:18000}).catch(()=>null),
+  state.players?Promise.resolve(state.players):(state.playersPromise||=fetchJson("/players/nfl?active=true",{attempts:1,timeoutMs:25000}).then(v=>{state.players=v||{};return state.players}).catch(()=>({})))
+ ]);
+ state.parlayDataByWeek[week]={loaded:true,stats:stats||{},schedule:schedule||null,players:players||{}};
+ if($("parlays-content")&&!$("parlays-content").hidden)renderParlays();
+}
+
 function renderParlays(){
- const target=$("parlays-content");if(!target||target.dataset.ready==="yes")return;
+ const target=$("parlays-content");if(!target)return;
  const count=PARLAY_WEEKS.reduce((n,w)=>n+w.filter(p=>p&&p!=="N/A").length,0);
- target.innerHTML='<div class="parlay-summary"><div><span class="parlay-kicker">2026 SEASON</span><strong>10</strong><small>WEEKS WITH PICKS</small></div><div><span class="parlay-kicker">LEAGUE PICKS</span><strong>'+count+'</strong><small>RECORDED SELECTIONS</small></div><div><span class="parlay-kicker">RESULTS</span><strong>—</strong><small>GRADING PENDING</small></div></div><div class="parlay-week-grid">'+Array.from({length:14},(_,i)=>{const w=i+1,row=PARLAY_WEEKS[i]||[],placer=PARLAY_PLACERS[i]||"Not assigned";return '<article class="parlay-week-card"><div class="parlay-week-head"><div><span class="parlay-kicker">WEEK '+String(w).padStart(2,"0")+'</span><h3>'+(row.length?'THE PICKS':'PICKS NOT ENTERED')+'</h3></div><div class="parlay-placer"><span>PLACED BY</span><strong>'+escapeHtml(placer)+'</strong></div></div>'+(row.length?'<div class="parlay-pick-list">'+PARLAY_MANAGERS.map((m,j)=>'<div class="parlay-pick"><span class="parlay-manager">'+escapeHtml(m)+'</span><span class="parlay-selection">'+escapeHtml(row[j]||"—")+'</span><span class="parlay-result pending">PENDING</span></div>').join("")+'</div>':'<p class="parlay-empty">Weekly picks and the organizer will be added here.</p>')+'<div class="parlay-week-foot"><span>$5 LEAGUE PARLAY</span><span>RESULTS TO BE ADDED</span></div></article>';}).join("")+'</div>';
+ const loaded=PARLAY_WEEKS.map((row,i)=>state.parlayDataByWeek[i+1]?.loaded);
+ const graded=PARLAY_WEEKS.reduce((n,row,i)=>n+row.filter(p=>p&&p!=="N/A").filter(p=>["HIT","MISS","PUSH"].includes(gradeParlayPick(p,state.parlayDataByWeek[i+1]?.stats,state.parlayDataByWeek[i+1]?.players,state.parlayDataByWeek[i+1]?.schedule).status)).length,0);
+ target.innerHTML='<div class="parlay-summary"><div><span class="parlay-kicker">2026 SEASON</span><strong>10</strong><small>WEEKS WITH PICKS</small></div><div><span class="parlay-kicker">LEAGUE PICKS</span><strong>'+count+'</strong><small>RECORDED SELECTIONS</small></div><div><span class="parlay-kicker">GRADED PICKS</span><strong>'+graded+'</strong><small>OF '+count+' SETTLED</small></div></div><div class="parlay-week-grid">'+Array.from({length:14},(_,i)=>{const w=i+1,row=PARLAY_WEEKS[i]||[],placer=PARLAY_PLACERS[i]||"Not assigned",data=state.parlayDataByWeek[w]||{};return '<article class="parlay-week-card"><div class="parlay-week-head"><div><span class="parlay-kicker">WEEK '+String(w).padStart(2,"0")+'</span><h3>'+(row.length?'THE PICKS':'PICKS NOT ENTERED')+'</h3></div><div class="parlay-placer"><span>PLACED BY</span><strong>'+escapeHtml(placer)+'</strong></div></div>'+(row.length?'<div class="parlay-pick-list">'+PARLAY_MANAGERS.map((m,j)=>{const pick=row[j]||"—",result=pick==="—"?{status:"PENDING"}:gradeParlayPick(pick,data.stats,data.players,data.schedule);return '<div class="parlay-pick"><span class="parlay-manager">'+escapeHtml(m)+'</span><span class="parlay-selection">'+escapeHtml(pick)+'</span><span class="parlay-result '+result.status.toLowerCase()+'">'+result.status+(result.detail?'<small>'+escapeHtml(result.detail)+'</small>':"")+'</span></div>';}).join("")+'</div>':'<p class="parlay-empty">Weekly picks and the organizer will be added here.</p>')+'<div class="parlay-week-foot"><span>$5 LEAGUE PARLAY</span><span>'+(row.length?(data.loaded?"SLEEPER GRADING":"LOADING RESULTS"):"RESULTS TO BE ADDED")+'</span></div></article>';}).join("")+'</div>';
+ PARLAY_WEEKS.forEach((row,i)=>{if(row.length&&!state.parlayDataByWeek[i+1]?.loaded&&!state.parlayDataByWeek[i+1]?.loading)loadParlayWeek(i+1);});
  target.dataset.ready="yes";
 }
 
