@@ -2478,3 +2478,22 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 /* Hall of Fame sprites sit directly on the card; blend away the sprite sheet's black matte. */
 .hall-avatar-line{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}
 .hall-avatar-line .hall-character-avatar,.hall-avatar-line .hall-pixel-sprite{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important;mix-blend-mode:screen}
+
+/* Compact, aligned playoff bracket with a clear wide-to-narrow progression */
+.hall-bracket-playoff{width:min(900px,100%);min-width:0;min-height:460px;margin:0 auto;padding:10px 12px;grid-template-columns:1.25fr 1fr .9fr;gap:34px;align-items:stretch}
+.hall-bracket-playoff .hall-tree-column{display:grid;grid-template-rows:54px minmax(0,1fr);gap:0;justify-content:stretch;min-width:0}
+.hall-bracket-playoff .hall-bracket-round-label{display:flex;align-items:center;justify-content:center;margin:0;text-align:center;color:#55dff3;font:800 12px/1.3 var(--mono);letter-spacing:.08em;white-space:normal}
+.hall-bracket-playoff .hall-round-games{display:flex;flex-direction:column;justify-content:space-around;gap:16px;min-height:390px}
+.hall-bracket-playoff .hall-tree-game{width:100%;max-width:245px;margin:0 auto}
+.hall-bracket-playoff .hall-tree-team{justify-content:center;text-align:center;min-height:34px;padding:7px 8px}
+.hall-bracket-playoff .hall-tree-team>span{justify-content:center;width:100%;text-align:center;line-height:1.25}
+.hall-bracket-playoff .hall-tree-team .hall-bracket-seed{margin-right:2px}
+.hall-bracket-playoff .hall-tree-final{display:flex;align-items:center;justify-content:center;flex:1;margin:0}
+.hall-bracket-playoff .hall-tree-final .hall-tree-game{max-width:205px}
+.hall-bracket-playoff .hall-tree-column:not(:last-child):before{right:-18px;width:18px;top:50%}
+.hall-bracket-playoff .hall-tree-column:not(:last-child):after{right:-9px;top:22%;bottom:22%}
+.hall-placement-games{width:min(620px,100%);margin:28px auto 0;padding-top:18px;display:flex;justify-content:center;align-items:flex-start;gap:24px;border-top:1px dashed #ffffff35}
+.hall-placement-game{width:min(245px,48%);padding:10px;border:1px solid #ffffff18;border-radius:10px;background:#ffffff05}
+.hall-placement-game .hall-bracket-round-label{display:block;margin-bottom:8px;text-align:center;color:#c58c64;font:800 10px/1.3 var(--mono);letter-spacing:.08em}
+.hall-placement-game .hall-tree-game{max-width:none}
+@media(max-width:720px){.hall-bracket-playoff{width:100%;min-width:650px;gap:22px}.hall-bracket-playoff .hall-bracket-round-label{font-size:10px}.hall-placement-games{min-width:600px}}
