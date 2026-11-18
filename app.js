@@ -1163,12 +1163,12 @@ async function loadSleeperHallHistory(){
      if(manager){managerByRoster.set(Number(roster.roster_id),manager);hallStatFor(state.hallStats,manager).seasons.add(year);}
      else unresolved.push({year,rosterId:roster.roster_id,username:user?.username||"unknown",displayName:user?.display_name||"unknown"});
     }
-    const seasonExtras=await loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,Math.max(1,(Number(league.settings?.playoff_week_start)||15)-1));
     const playoffStart=Math.max(2,Number(league.settings?.playoff_week_start)||15);
     const regularWeeks=playoffStart-1;
+    const regularWeeksToLoad=year===currentYear?Math.min(regularWeeks,10):regularWeeks;
+    const seasonExtras=await loadHallDraftAndHonors(league,year,users,rosters,managerByRoster,regularWeeksToLoad);
     const weekData=[];
     const regularGamesBefore=recordGames.length;
-    const regularWeeksToLoad=year===currentYear?Math.min(regularWeeks,10):regularWeeks;
     for(let batchStart=1;batchStart<=regularWeeksToLoad;batchStart+=4){
      const batch=Array.from({length:Math.min(4,regularWeeksToLoad-batchStart+1)},(_,i)=>batchStart+i);
      const loaded=await Promise.all(batch.map(async week=>{
