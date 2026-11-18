@@ -2470,3 +2470,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .hall-draft-table td.hall-draft-pick em{color:#17131c;font:900 9px var(--mono);font-style:normal}
 .hall-draft-table td.pos-qb{background:#F3A6A6}.hall-draft-table td.pos-rb{background:#A9D8B0}.hall-draft-table td.pos-wr{background:#A9D4F2}.hall-draft-table td.pos-te{background:#F3E2A0}.hall-draft-table td.pos-flex{background:#C9B4F0}.hall-draft-table td.pos-sflx{background:#F2B5D5}.hall-draft-table td.pos-other{background:#D5D0DF}
 .hall-draft-table th b{display:block;max-width:100%;white-space:normal;overflow-wrap:anywhere;font:800 8px/1.2 var(--mono)}
+
+.hall-draft-table th.hall-draft-slot-manager{min-width:95px;padding:11px 6px;background:#ffffff12;color:#f3d58b;font:800 9px/1.25 var(--sans);letter-spacing:.02em;white-space:normal;overflow-wrap:anywhere}
+.hall-draft-table td.hall-draft-pick small{margin-top:5px}
+.hall-draft-table td.hall-draft-pick b{overflow-wrap:anywhere;word-break:normal}
