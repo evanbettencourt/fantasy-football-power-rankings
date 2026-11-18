@@ -480,37 +480,55 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
   const recordById = new Map(recordRows.map(team => [team.id, team]));
   const publishedWeek = Object.keys(EDITORIAL_EDITIONS).map(Number).filter(w => w < week && EDITORIAL_EDITIONS[w]?.rankings?.length).sort((a,b) => b-a)[0];
   const powerRanks = new Map((publishedWeek ? EDITORIAL_EDITIONS[publishedWeek].rankings : []).map((entry,index) => [entry.manager, index+1]));
+  games.sort((left,right) => {
+    const leftRanks = [powerRanks.get(left.teamA.name) || Infinity, powerRanks.get(left.teamB.name) || Infinity].sort((a,b)=>a-b);
+    const rightRanks = [powerRanks.get(right.teamA.name) || Infinity, powerRanks.get(right.teamB.name) || Infinity].sort((a,b)=>a-b);
+    return leftRanks[0]-rightRanks[0] || leftRanks[1]-rightRanks[1];
+  });
   const hasProjectionData = projections.size > 0;
 
-  const playerRow = (playerId, matchup, isStarter) => {
+  const positionClass = position => ({
+    QB:"qb", RB:"rb", WR:"wr", TE:"te", FLEX:"flex", WRRB_FLEX:"flex", REC_FLEX:"flex",
+    SUPER_FLEX:"sflx", SFLX:"sflx"
+  }[String(position || "").toUpperCase()] || "other");
+  const positionLabel = position => {
+    const key = String(position || "").toUpperCase();
+    if (["WRRB_FLEX","REC_FLEX"].includes(key)) return "FLEX";
+    if (["SUPER_FLEX","SFLX"].includes(key)) return "SFLX";
+    return key || "—";
+  };
+  const playerRow = (playerId, matchup, isStarter, slotPosition = null) => {
     const id = String(playerId);
     const player = players[id] || {};
     const name = player.full_name || [player.first_name, player.last_name].filter(Boolean).join(" ") || (id ? "Player " + id : "Empty slot");
-    const position = player.position || player.fantasy_positions?.[0] || "—";
+    const position = slotPosition || player.position || player.fantasy_positions?.[0] || "—";
+    const label = positionLabel(position);
     const actualStat = stats[id];
     const matchupPoints = matchup.players_points && matchup.players_points[id];
     const actual = actualStat?.pts_half_ppr != null ? num(actualStat.pts_half_ppr) : num(matchupPoints);
     const projection = num(projections.get(id)?.stats?.pts_half_ppr);
     const hasProjection = projections.get(id)?.stats?.pts_half_ppr != null;
     return '<div class="mu-player-row ' + (isStarter ? "starter" : "bench") + '">' +
-      '<span class="mu-player-pos">' + escapeHtml(position) + '</span>' +
+      '<span class="mu-player-pos ' + positionClass(position) + '">' + escapeHtml(label) + '</span>' +
       '<span class="mu-player-name">' + escapeHtml(name) + (player.team ? '<small>' + escapeHtml(player.team) + '</small>' : '') + '</span>' +
       '<span class="mu-player-points">' + (actualStat || num(matchupPoints) > 0 ? fmt(actual) : "—") + '</span>' +
       '<span class="mu-player-proj">' + (hasProjection ? fmt(projection) : "—") + '</span>' +
     '</div>';
   };
-  const rosterMarkup = (team, matchup) => {
+  const rosterMarkup = (team, matchup, showBench = false) => {
     const allPlayers = Array.isArray(matchup.players) ? matchup.players.map(String) : [];
     const starters = Array.isArray(matchup.starters) ? matchup.starters.map(String).filter(id => id && id !== "0") : [];
     const starterSet = new Set(starters);
     const bench = allPlayers.filter(id => !starterSet.has(id));
-    const starterRows = starters.map(id => playerRow(id, matchup, true)).join("");
-    const benchRows = bench.map(id => playerRow(id, matchup, false)).join("");
+    const slots = Array.isArray(state.league?.roster_positions) ? state.league.roster_positions : [];
+    const rows = (showBench ? bench : starters).map(id => {
+      const slotPosition = showBench ? null : slots[starters.indexOf(id)];
+      return playerRow(id, matchup, !showBench, slotPosition);
+    }).join("");
     return '<section class="mu-roster-team"><h4 style="color:' + lotteryColor(team.name) + '">' + escapeHtml(team.name) + '</h4>' +
-      '<div class="mu-roster-label">STARTERS</div><div class="mu-player-head"><span>POS</span><span>PLAYER</span><span>PTS</span><span>PROJ</span></div>' +
-      (starterRows || '<p class="mu-empty">Starter data unavailable.</p>') +
-      '<div class="mu-roster-label mu-bench-label">BENCH</div>' +
-      (benchRows || '<p class="mu-empty">No bench players listed.</p>') + '</section>';
+      '<div class="mu-player-head"><span>POS</span><span>PLAYER</span><span>PTS</span><span>PROJ</span></div>' +
+      (rows || '<p class="mu-empty">' + (showBench ? "No bench players listed." : "Starter data unavailable.") + '</p>') +
+    '</section>';
   };
   const projectionFor = (team, matchup) => {
     const starters = Array.isArray(matchup.starters) ? matchup.starters.map(String).filter(id => id && id !== "0") : [];
@@ -577,8 +595,11 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
       '<div class="mu-card-head"><span>MATCHUP ' + String(index+1).padStart(2,"0") + '</span><span class="mu-live-tag ' + status.toLowerCase() + '">' + status + '</span></div>' +
       '<div class="mu-faceoff">' + side(game.teamA,a,probA) + '<div class="mu-versus">VS</div>' + side(game.teamB,b,probB) + '</div>' +
       '<div class="mu-prob-wrap">' + bar + '</div>' +
-      '<details class="mu-rosters"><summary><span>VIEW ROSTERS</span><span class="mu-expand-mark">+</span></summary>' +
-        '<div class="mu-roster-grid">' + rosterMarkup(game.teamA,game.a) + rosterMarkup(game.teamB,game.b) + '</div>' +
+      '<details class="mu-rosters"><summary><span>SHOW LINEUPS</span><span class="mu-expand-mark">+</span></summary>' +
+        '<div class="mu-roster-grid">' + rosterMarkup(game.teamA,game.a,false) + rosterMarkup(game.teamB,game.b,false) + '</div>' +
+        '<details class="mu-bench-details"><summary><span>SHOW BENCH</span><span class="mu-expand-mark">+</span></summary>' +
+          '<div class="mu-roster-grid">' + rosterMarkup(game.teamA,game.a,true) + rosterMarkup(game.teamB,game.b,true) + '</div>' +
+        '</details>' +
       '</details>' +
     '</article>';
   });
