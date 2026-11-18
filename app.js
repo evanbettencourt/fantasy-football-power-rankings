@@ -893,7 +893,7 @@ async function loadActualDraftOrder() {
 
 const AWARDS_2025=[{"category":"Most Valuable Player","winner":"Trey McBride","detail":"TE1 · 15.2 PPG","nominees":["Trey McBride (TE1, 15.2 PPG)","Christian McCaffrey (RB1, 22.3 PPG)","Josh Allen (QB1, 22.8 PPG)","Puka Nacua (WR1, 19.3 PPG)"]},{"category":"Steal of the Draft","winner":"Matt Stafford","detail":"Drafted 8.01 · QB22 · finished QB3","nominees":["Javonte Williams (drafted 10.05, RB38, finished RB11)","Travis Etienne (drafted 8.07, RB30, finished RB9)","Trey McBride (drafted 4.06, TE2, finished TE1 by >3 PPG)","George Pickens (drafted 7.02, WR27, finished WR4)","Drake Maye (drafted 5.03, QB15, finished QB2)","Matt Stafford (drafted 8.01, QB22, finished QB3)"]},{"category":"Bust of the Draft","winner":"Justin Jefferson","detail":"Drafted 1.10 · WR2 · finished WR28 and WR38 in PPG","nominees":["Lamar Jackson (drafted 1.02, QB2, finished QB20 / QB19 PPG)","Brian Thomas Jr. (drafted 3.01, WR8, finished WR44)","Ladd McConkey (drafted 3.08, WR11, finished WR26)","Justin Jefferson (drafted 1.10, WR2, finished WR28 and WR38 in PPG)"]},{"category":"Waiver Pickup of the Year","winner":"Jacoby Brissett","detail":"QB9 in PPG after becoming the starter in Week 6","nominees":["Jacoby Brissett (QB9 in PPG after becoming starter in Week 6)","Michael Wilson (WR3 in PPG after being added in Week 11)","Christian Watson (WR17 in PPG after being added in Week 10)","Joe Flacco (QB8 in PPG from Weeks 6–12 while Burrow was out)"]},{"category":"Breakout Player of the Year","winner":"Drake Maye","detail":"Finished QB2 with 21 PPG; highest previous finish QB23 in 2024","nominees":["Trey McBride (finished TE1 with 15.2 PPG, breaking the all-time TE receptions record)","Drake Maye (finished QB2 with 21 PPG, highest previous finish QB23 in 2024)","Javonte Williams (finished RB11 with 14 PPG following 3 consecutive seasons outside the top 30 RBs)","George Pickens (finished WR4 with 15.3 PPG, highest previous finish WR26 in 2023)"]},{"category":"Rookie of the Year","winner":"TreVeyon Henderson","detail":"RB20 · RB10 in PPG from Week 9 on","nominees":["TreVeyon Henderson (RB20, RB10 in PPG from Week 9 on)","RJ Harvey (RB19, RB9 in PPG after JK Dobbins injury in Week 10)","Emeka Egbuka (WR17)","Tet McMillan (WR14)","Jaxson Dart (QB16, QB8 in PPG after becoming the starter in Week 4)"]},{"category":"Comeback Player of the Year","winner":"Christian McCaffrey","detail":"RB1 following a season-long injury in 2024","nominees":["Daniel Jones (QB7 in PPG pre-injury after being a backup in Minnesota in 2024)","Christian McCaffrey (RB1 following season-long injury in 2024)","Trevor Lawrence (QB4 after missing the last 5 games of 2024)","Dak Prescott (QB5 after missing 9 games in 2024)"]},{"category":"Best Team Name","winner":"Puka & Rally","detail":"Colby's team","nominees":["Gibbs Me the Money","Exciting Whites","Nix Seven","Slim Pickens","Puka & Rally","Drake's Room","Bryce Likes 'Em Young","At DK, Have it Your Way"]},{"category":"Worst Team Name","winner":"Sorry Coop","detail":"Lee's team","nominees":["Sorry Coop","The Consheepsus","Fuck League Median","Haliee's Babiees"]},{"category":"Best Trade","winner":"Ben: Omarion Hampton for Trevor Lawrence (Joey)","detail":"Ben acquired Omarion Hampton from Joey in exchange for Trevor Lawrence","nominees":["Joey: Chuba + Monangai for Egbuka + Jayden Reed (Evan)","Ben: Omarion Hampton for Trevor Lawrence (Joey)","Butta: Rico Dowdle + Devonta Smith for Amon-Ra St. Brown (Joey)","Pat: Drake London (injured) + Trey Benson (injured) for Jameson Williams + Quinshon Judkins (Marc)"]},{"category":"Best Manager","winner":"Joey","detail":"Made the most trades to create a well-balanced team and earn the 1 seed","nominees":["Joey (made the most trades to create a well balanced team and earn the 1 seed)","Evan (earned a bye week with first-round pick missing 10 weeks)","Brandon (highest % of max points)","Butta (arguably had the best trade and best waiver pickup of the year)"]},{"category":"Worst Manager","winner":"Ders","detail":"Made one trade for FAAB despite having a dogshit team","nominees":["Kev (worst % of max points)","Marc (worst trade right before the playoffs)","Ben (made 1 trade despite having a dogshit team)","Ders (made 1 trade for FAAB despite having a dogshit team)","Colby (had Puka and JT and didn't make the playoffs)"]},{"category":"Matchup of the Year","winner":"Butta vs. Marc · Week 15","detail":"113–113.76 · first-round playoff thriller with Achane clutch","nominees":["Ben vs. Kevin · Week 13 (81.22 to 76.38, battle of the punishment)","Butta vs. Marc · Week 15 (113 to 113.76, first-round playoff Achane clutch)","Evan vs. Colby · Week 7 (175.22 to 134.82, highest-scoring matchup of the year)","Kevin vs. Brandon · Week 14 (108.78 to 116.84, Kev redemption arc)","Butta vs. Brandon · Week 17 (87.22 to 101.46, championship Bijan legacy game)"]},{"category":"Luckiest Manager","winner":"Brandon","detail":"Avoided nearly all injuries; Nico Collins missing Week 8 was the only missed game from someone on his roster","nominees":["Joey (opponents averaged 10 PPG under their season-long averages against him; 9/14 scored below average)","Ders (opponents averaged 6.5 PPG under their season-long averages; 12/14 scored below average)","Brandon (avoided nearly all injuries; Nico Collins missing Week 8 was the only missed game from someone on his roster)","Butta (advanced to the championship with the second-fewest points in the league that week)"]},{"category":"Unluckiest Manager","winner":"Kevin","detail":"Opponents averaged 6 PPG over their season-long averages; Nabers and Purdy missed big chunks of the season","nominees":["Pat (opponents averaged 7.5 PPG over their season-long averages; 8/14 scored above average)","Kev (opponents averaged 6 PPG over their season-long averages; 7/14 scored above average, WR1 Nabers and QB1 Purdy missed big chunks of the season)"]}];
 const PARLAY_MANAGERS=["Evan","Tanz","Ben","Brandon","Colby","Joey","Marc","Butta","Lee","Ders","Pat","Kevin"];
-const PARLAY_WEEKS=[["Loveland O4.5 REC","Lamar O215.5 pass yards","Saquon TD","Ja'marr Chase TD","Amon Ra TD","Omarion Hampton TD","Kenneth Walker 70 rush yards","Javonte Williams TD","Jayden Daniels TD","Josh Allen TD","Zay Flowers O66.5 receiving yards","Bucky Irving O60.5 rush yards"],["Mike Evans TD","Lamar O passing yards","Bucky TD","Derrick Henry 90 yards + TD","Jeanty TD","Eagles -6.5","Kenneth Walker O82.5 yards","Drake Maye O1.5 TD","Bijan O95 yards","Etienne O1.5 receptions","CMC TD","Ceedee O76.5 yards"],["Terrance Ferguson O3.5 rec","Lamar 230+","Bengals ML","David Montgomery TD","Kyren Williams TD","Omarion Hampton TD","Stafford O1.5 pass TD","Jaylen Warren O86.5 yards","Giants ML","Etienne TD","Chase Brown O63.5 rush yards","Breece Hall TD"],["Wicks O3.5 rec","N/A","Cardinals -2.5","CMC O4.5 rec","Chuba TD","Nabers O55.5 yards","Goff O1.5 TD","Josh Downs TD","Aaron Jones TD","N/A","Jordan Addison O62.5 yards","Chiefs -4.5"],["Jacoby Brissett O1.5 passing TD","Monty U43.5 rushing yards","Amon Ra O81.5 receiving yards","Michael Wilson O71.5 receiving yards","Kyren TD","Pats ML","Trey McBride TD","LaPorta O51.5 receiving yards","Bills +3.5","Deshaun Watson O190.5 yards","Chase Brown TD","Lions -5.5"],["Tyler Higbee O32.5 receiving yards","Tucker Kraft 4+ receptions","Bijan 2+ TD","Omarion Hampton O32.5 rushing yards","Christian Watson TD","Jaylen Warren TD","Xavier Worthy O48.5 receiving yards","Dallas Goedert TD","Cam Skattebo U39.5 rushing yards","Drake London TD","Bryce Young 2+ Passing TD","Bills -5.5"],["Jordan Mason O12.5 rush attempts","Jalen Coker 6+ receptions","DK Metcalf TD","Brock Bowers TD","JJ McCarthy O0.5 passing TD","Bengals -2.5","N/A","Joe Burrow O1.5 passing TD","Bijan TD","N/A","CMC O53.5 rushing yards","George Kittle O69.5 receiving yards"],["Derrick Henry 80+ rush yards","Diggs O4.5 rec","Jonah Coleman O44.5 rush yards","Brock Bowers O68.5 rec yards","Kyren TD","Bills -3","Ken Walker TD","Javonte TD","Omar Cooper U41.5 rec yards","DK O4.5 receptions","Zay Flowers 80+ rec yards","Bucky Irving O70.5 rush yards"],["Keenan Allen O4.5 rec","Jayden Daniels O38.5 rush yards","Rashee TD","Ollie Gordon TD","Kyren TD","Jonah Coleman TD","Ken Walker O93.5 rush yards","Javonte TD","Antonio Williams O49.5 rec yards","Rome Odunze U50.5 rec yards","CMC TD","Puka O92.5 rec yards"],["George Kittle TD","Justin Herbert O0.5 INT","Emmett Johnson TD","Tuten TD","Chuba TD","Tee Higgins TD","Jonathan Taylor TD","Drake Maye O1.5 passing TD","Justin Jefferson TD","N/A","Zay Flowers O70.5 rec yards","Kyle McCord O0.5 INT"]];
+const PARLAY_WEEKS=[["Loveland O4.5 REC","Lamar O215.5 pass yards","Saquon TD","Ja'marr Chase TD","Amon Ra TD","Omarion Hampton TD","Kenneth Walker 70+ rushing yards","Javonte Williams TD","Jayden Daniels TD","Josh Allen TD","Zay Flowers O66.5 receiving yards","Bucky Irving O60.5 rush yards"],["Mike Evans TD","Lamar O224.5 passing yards","Bucky TD","Derrick Henry 90+ rushing yards + TD","Jeanty TD","Eagles -6.5","Kenneth Walker O82.5 rushing yards","Drake Maye O1.5 passing TD","Bijan O95 rushing yards","Etienne O1.5 receptions","CMC TD","Ceedee O76.5 yards"],["Terrance Ferguson O3.5 rec","Lamar 230+ passing yards","Bengals ML","David Montgomery TD","Kyren Williams TD","Omarion Hampton TD","Stafford O1.5 pass TD","Jaylen Warren O86.5 rushing yards","Giants ML","Etienne TD","Chase Brown O63.5 rush yards","Breece Hall TD"],["Wicks O3.5 rec","N/A","Cardinals -2.5","CMC O4.5 rec","Chuba TD","Nabers O55.5 receiving yards","Goff O1.5 passing TD","Josh Downs TD","Aaron Jones TD","N/A","Jordan Addison O62.5 yards","Chiefs -4.5"],["Jacoby Brissett O1.5 passing TD","Monty U43.5 rushing yards","Amon Ra O81.5 receiving yards","Michael Wilson O71.5 receiving yards","Kyren TD","Pats ML","Trey McBride TD","LaPorta O51.5 receiving yards","Bills +3.5","Deshaun Watson O190.5 passing yards","Chase Brown TD","Lions -5.5"],["Tyler Higbee O32.5 receiving yards","Tucker Kraft 4+ receptions","Bijan 2+ TD","Omarion Hampton O32.5 rushing yards","Christian Watson TD","Jaylen Warren TD","Xavier Worthy O48.5 receiving yards","Dallas Goedert TD","Cam Skattebo U39.5 rushing yards","Drake London TD","Bryce Young 2+ Passing TD","Bills -5.5"],["Jordan Mason O12.5 rush attempts","Jalen Coker 6+ receptions","DK Metcalf TD","Brock Bowers TD","JJ McCarthy O0.5 passing TD","Bengals -2.5","N/A","Joe Burrow O1.5 passing TD","Bijan TD","N/A","CMC O53.5 rushing yards","George Kittle O69.5 receiving yards"],["Derrick Henry 80+ rush yards","Diggs O4.5 rec","Jonah Coleman O44.5 rush yards","Brock Bowers O68.5 rec yards","Kyren TD","Bills -3","Ken Walker TD","Javonte TD","Omar Cooper U41.5 rec yards","DK O4.5 receptions","Zay Flowers 80+ rec yards","Bucky Irving O70.5 rush yards"],["Keenan Allen O4.5 rec","Jayden Daniels O38.5 rush yards","Rashee TD","Ollie Gordon TD","Kyren TD","Jonah Coleman TD","Ken Walker O93.5 rush yards","Javonte TD","Antonio Williams O49.5 rec yards","Rome Odunze U50.5 rec yards","CMC TD","Puka O92.5 rec yards"],["George Kittle TD","Justin Herbert O0.5 INT","Emmett Johnson TD","Tuten TD","Chuba TD","Tee Higgins TD","Jonathan Taylor TD","Drake Maye O1.5 passing TD","Justin Jefferson TD","N/A","Zay Flowers O70.5 rec yards","Kyle McCord O0.5 INT"]];
 const PARLAY_PLACERS=["Ben (random spin)","Ben","Tanz","Tanz","Tanz","Tanz","Joey","Lee","Marc","Tanz","Butta","","",""];
 function renderAwards(){
  const target=$("awards-content");if(!target||target.dataset.ready==="yes")return;
@@ -903,57 +903,110 @@ function renderAwards(){
 }
 
 const PARLAY_PLAYER_ALIASES = {
- "loveland":"Colston Loveland","lamar":"Lamar Jackson","saquon":"Saquon Barkley","ja'marr chase":"Ja'Marr Chase","jamarr chase":"Ja'Marr Chase","amon ra":"Amon-Ra St. Brown","amon-ra":"Amon-Ra St. Brown","omarion hampton":"Omarion Hampton","kenneth walker":"Kenneth Walker III","ken walker":"Kenneth Walker III","javonte williams":"Javonte Williams","jayden daniels":"Jayden Daniels","zay flowers":"Zay Flowers","bucky irving":"Bucky Irving","mike evans":"Mike Evans","derrick henry":"Derrick Henry","jeanty":"Ashton Jeanty","drake maye":"Drake Maye","bijan":"Bijan Robinson","etienne":"Travis Etienne","cmc":"Christian McCaffrey","ceedee":"CeeDee Lamb","cee dee":"CeeDee Lamb","terrance ferguson":"Terrance Ferguson","stafford":"Matthew Stafford","jaylen warren":"Jaylen Warren","chuba":"Chuba Hubbard","nabers":"Malik Nabers","goff":"Jared Goff","josh downs":"Josh Downs","aaron jones":"Aaron Jones","jordan addison":"Jordan Addison","monty":"David Montgomery","kyren williams":"Kyren Williams","kyren":"Kyren Williams","michael wilson":"Michael Wilson","trey mcbride":"Trey McBride","laporta":"Sam LaPorta","deshaun watson":"Deshaun Watson","chase brown":"Chase Brown","tyler higbee":"Tyler Higbee","tucker kraft":"Tucker Kraft","xavier worthy":"Xavier Worthy","dallas goedert":"Dallas Goedert","cam skattebo":"Cam Skattebo","drake london":"Drake London","bryce young":"Bryce Young","jalen coker":"Jalen Coker","dk metcalf":"DK Metcalf","brock bowers":"Brock Bowers","jj mccarthy":"J.J. McCarthy","joe burrow":"Joe Burrow","george kittle":"George Kittle","diggs":"Stefon Diggs","jonah coleman":"Jonah Coleman","omar cooper":"Omar Cooper","rashee":"Rashee Rice","ollie gordon":"Ollie Gordon II","antonio williams":"Antonio Williams","rome odunze":"Rome Odunze","jonathan taylor":"Jonathan Taylor","tuten":"Bhayshul Tuten","emmett johnson":"Emmett Johnson","tee higgins":"Tee Higgins","justin herbert":"Justin Herbert","justin jefferson":"Justin Jefferson","kyle mccord":"Kyle McCord"
+ "loveland":"Colston Loveland","lamar":"Lamar Jackson","saquon":"Saquon Barkley","ja'marr chase":"Ja'Marr Chase","jamarr chase":"Ja'Marr Chase","amon ra":"Amon-Ra St. Brown","amon-ra":"Amon-Ra St. Brown","omarion hampton":"Omarion Hampton","kenneth walker":"Kenneth Walker III","ken walker":"Kenneth Walker III","javonte williams":"Javonte Williams","jayden daniels":"Jayden Daniels","zay flowers":"Zay Flowers","bucky irving":"Bucky Irving","bucky":"Bucky Irving","mike evans":"Mike Evans","derrick henry":"Derrick Henry","jeanty":"Ashton Jeanty","drake maye":"Drake Maye","bijan":"Bijan Robinson","etienne":"Travis Etienne","cmc":"Christian McCaffrey","ceedee":"CeeDee Lamb","cee dee":"CeeDee Lamb","terrance ferguson":"Terrance Ferguson","stafford":"Matthew Stafford","jaylen warren":"Jaylen Warren","chuba":"Chuba Hubbard","nabers":"Malik Nabers","goff":"Jared Goff","josh downs":"Josh Downs","aaron jones":"Aaron Jones","jordan addison":"Jordan Addison","monty":"David Montgomery","kyren williams":"Kyren Williams","kyren":"Kyren Williams","michael wilson":"Michael Wilson","trey mcbride":"Trey McBride","laporta":"Sam LaPorta","deshaun watson":"Deshaun Watson","chase brown":"Chase Brown","tyler higbee":"Tyler Higbee","tucker kraft":"Tucker Kraft","xavier worthy":"Xavier Worthy","dallas goedert":"Dallas Goedert","cam skattebo":"Cam Skattebo","drake london":"Drake London","bryce young":"Bryce Young","jalen coker":"Jalen Coker","dk metcalf":"DK Metcalf","dk":"DK Metcalf","brock bowers":"Brock Bowers","jj mccarthy":"J.J. McCarthy","joe burrow":"Joe Burrow","george kittle":"George Kittle","diggs":"Stefon Diggs","jonah coleman":"Jonah Coleman","omar cooper":"Omar Cooper","rashee":"Rashee Rice","ollie gordon":"Ollie Gordon II","antonio williams":"Antonio Williams","rome odunze":"Rome Odunze","jonathan taylor":"Jonathan Taylor","tuten":"Bhayshul Tuten","emmett johnson":"Emmett Johnson","tee higgins":"Tee Higgins","justin herbert":"Justin Herbert","justin jefferson":"Justin Jefferson","kyle mccord":"Kyle McCord","jacoby brissett":"Jacoby Brissett","christian watson":"Christian Watson","breece hall":"Breece Hall","josh allen":"Josh Allen","keenan allen":"Keenan Allen","puka":"Puka Nacua"
 };
 const PARLAY_TEAM_ALIASES = {
- "eagles":"PHI","bengals":"CIN","giants":"NYG","cardinals":"ARI","patriots":"NE","pats":"NE","chiefs":"KC","bills":"BUF","lions":"DET"
+ "eagles":"Philadelphia Eagles","bengals":"Cincinnati Bengals","giants":"New York Giants","cardinals":"Arizona Cardinals","patriots":"New England Patriots","pats":"New England Patriots","chiefs":"Kansas City Chiefs","bills":"Buffalo Bills","lions":"Detroit Lions"
 };
+const PARLAY_PLAYER_INDEX = new WeakMap();
+function parlayPlayerEntry(players, fullName){
+ if(!players||typeof players!=="object")return null;
+ let index=PARLAY_PLAYER_INDEX.get(players);
+ if(!index){
+  index=new Map();
+  for(const [id,p] of Object.entries(players)){
+   const name=String(p.full_name||[p.first_name,p.last_name].filter(Boolean).join(" ")).trim().toLowerCase();
+   if(name)index.set(name,[id,p]);
+  }
+  PARLAY_PLAYER_INDEX.set(players,index);
+ }
+ return index.get(fullName.toLowerCase())||null;
+}
 function parlayStatNumber(stat,key){const value=stat?.[key];return value==null||!Number.isFinite(Number(value))?null:Number(value);}
+function parlayPickIdentity(raw){
+ const lower=String(raw||"").toLowerCase();
+ const team=Object.keys(PARLAY_TEAM_ALIASES).find(name=>lower.includes(name));
+ if(team)return {name:PARLAY_TEAM_ALIASES[team],team:true};
+ const alias=Object.keys(PARLAY_PLAYER_ALIASES).sort((a,b)=>b.length-a.length).find(name=>lower.includes(name));
+ return alias?{name:PARLAY_PLAYER_ALIASES[alias],team:false}:{name:"",team:false};
+}
+function describeParlayPick(pick){
+ const raw=String(pick||"").trim();
+ if(!raw||raw==="N/A")return "No selection";
+ const identity=parlayPickIdentity(raw),lower=raw.toLowerCase();
+ if(identity.team){
+  const spread=raw.match(/([+-]\d+(?:\.\d+)?)/);
+  return identity.name+" — "+(spread?"Spread: "+spread[1]+" points":"Moneyline");
+ }
+ const name=identity.name||"Unresolved player";
+ if(/yards?\s*\+\s*TD/i.test(raw))return name+" — 90+ rushing yards AND 1+ anytime touchdown";
+ if(/pass(?:ing)?\s*(?:TD|touchdowns?)/i.test(raw)){
+  const line=raw.match(/\b(O|U)\s*(\d+(?:\.\d+)?)/i)||raw.match(/\b(\d+(?:\.\d+)?)\s*\+/);
+  return name+" — "+(line?(line[1]?line[1].toUpperCase()+" ":"")+line[line[1]?2:1]:"")+" passing touchdowns";
+ }
+ if(/\bTD\b/i.test(raw))return name+" — Anytime touchdown scorer";
+ let type="";
+ if(/pass(?:ing)?\s*(?:yards?|yds?)/i.test(raw))type="passing yards";
+ else if(/rush(?:ing)?\s*(?:yards?|yds?)/i.test(raw))type="rushing yards";
+ else if(/receiv(?:ing)?\s*(?:yards?|yds?)/i.test(raw))type="receiving yards";
+ else if(/\brec(?:eptions?)?\b/i.test(raw))type="receptions";
+ else if(/rush attempts?/i.test(raw))type="rushing attempts";
+ else if(/\bint(?:erceptions?)?\b/i.test(raw))type="interceptions thrown";
+ else if(/\byards?\b/i.test(raw)){
+  if(/bijan|kenneth walker|ken walker|derrick henry|jaylen warren|jonah coleman/i.test(raw))type="rushing yards";
+  else if(/nabers|deshaun watson|lamar|keenan|puka/i.test(raw))type=/deshaun watson|lamar/i.test(raw)?"passing yards":"receiving yards";
+ }
+ const line=raw.match(/\b(O|U)\s*(\d+(?:\.\d+)?)/i);
+ const plus=raw.match(/\b(\d+(?:\.\d+)?)\s*\+/);
+ const bare=raw.match(/\b(\d+(?:\.\d+)?)\s+(?:rush|rushing)\s*yards/i);
+ const threshold=line?(line[1].toUpperCase()+" "+line[2]):plus?(plus[1]+"+"):bare?(bare[1]+"+"):"";
+ return name+" — "+(threshold?threshold+" ":"")+(type||"Prop needs clarification");
+}
 function gradeParlayPick(pick,stats,players,schedule){
- const raw=String(pick||"").trim(),lower=raw.toLowerCase();
+ const raw=String(pick||"").trim();
  if(!raw||raw==="N/A")return {status:"NA",detail:"No pick"};
- const teamName=Object.keys(PARLAY_TEAM_ALIASES).find(name=>lower.includes(name));
- const hasTeamLine=/\bML\b|[+-]\d+(?:\.\d+)?/.test(raw);
- if(teamName&&hasTeamLine){
-  const abbr=PARLAY_TEAM_ALIASES[teamName];
+ const lower=raw.toLowerCase(),identity=parlayPickIdentity(raw);
+ if(identity.team){
+  const teamAlias=Object.keys(PARLAY_TEAM_ALIASES).find(name=>lower.includes(name));
+  const abbr=PARLAY_TEAM_ALIASES[teamAlias];
   const event=(schedule?.events||[]).find(ev=>(ev.competitions?.[0]?.competitors||[]).some(c=>String(c.team?.abbreviation||"").toUpperCase()===abbr));
   const comp=event?.competitions?.[0],teams=comp?.competitors||[];
   const team=teams.find(c=>String(c.team?.abbreviation||"").toUpperCase()===abbr),opp=teams.find(c=>c!==team);
   if(!comp||!team||!opp||!(comp.status?.type?.completed??event.status?.type?.completed??false))return {status:"PENDING",detail:"Game not final"};
-  const margin=Number(team.score)-Number(opp.score);
-  const spread=raw.match(/([+-]\d+(?:\.\d+)?)/);
-  const hit=spread?margin+Number(spread[1])>0:margin>0;
-  return {status:hit?"HIT":margin+(spread?Number(spread[1]):0)===0?"PUSH":"MISS",detail:team.score+"–"+opp.score};
+  const margin=Number(team.score)-Number(opp.score),spread=raw.match(/([+-]\d+(?:\.\d+)?)/),adjusted=margin+(spread?Number(spread[1]):0);
+  return {status:adjusted===0?"PUSH":adjusted>0?"HIT":"MISS",detail:team.score+"–"+opp.score+(spread?" · "+(adjusted>0?"covered":"did not cover"):"")};
  }
- const alias=Object.keys(PARLAY_PLAYER_ALIASES).sort((a,b)=>b.length-a.length).find(name=>lower.includes(name));
- if(!alias)return {status:"REVIEW",detail:"Player or team not recognized"};
- const fullName=PARLAY_PLAYER_ALIASES[alias];
- const playerEntry=Object.entries(players||{}).find(([,p])=>String(p.full_name||[p.first_name,p.last_name].filter(Boolean).join(" ")).toLowerCase()===fullName.toLowerCase());
+ if(!identity.name)return {status:"REVIEW",detail:"Player not recognized"};
+ const playerEntry=parlayPlayerEntry(players,identity.name);
  if(!playerEntry)return {status:"REVIEW",detail:"Player not found in Sleeper directory"};
- const stat=stats?.[playerEntry[0]];
+ const [playerId,player]=playerEntry,stat=stats?.[playerId];
  if(!stat)return {status:"PENDING",detail:"Sleeper stats unavailable"};
- const playerTeam=({JAC:"JAX",WAS:"WSH",LA:"LAR"}[String(playerEntry[1].team||"").toUpperCase()]||String(playerEntry[1].team||"").toUpperCase());
+ const playerTeam=({JAC:"JAX",WAS:"WSH",LA:"LAR"}[String(player.team||"").toUpperCase()]||String(player.team||"").toUpperCase());
  const game=(schedule?.events||[]).find(ev=>(ev.competitions?.[0]?.competitors||[]).some(c=>String(c.team?.abbreviation||"").toUpperCase()===playerTeam));
  const competition=game?.competitions?.[0],finished=Boolean(competition?.status?.type?.completed??game?.status?.type?.completed??competition?.status?.type?.state==="post");
  if(!finished)return {status:"PENDING",detail:"Player's NFL game not final"};
- if(/\bTD\b/i.test(raw)&&/yards?\s*\+\s*TD/i.test(raw))return {status:"REVIEW",detail:"Combined yards + touchdown prop"};
- if(/pass(?:ing)?\s*(?:TD|touchdowns?)/i.test(raw)){
-  const line=raw.match(/\b(O|U)\s*(\d+(?:\.\d+)?)/i);
-  if(!line)return {status:"REVIEW",detail:"Passing TD line not clear"};
+ if(/yards?\s*\+\s*TD/i.test(raw)){
+  const yards=parlayStatNumber(stat,"rush_yd"),td=["rush_td","rec_td","def_td","st_td","fum_rec_td"].reduce((sum,key)=>sum+(parlayStatNumber(stat,key)||0),0);
+  if(yards==null)return {status:"PENDING",detail:"Rushing yards unavailable"};
+  const hit=yards>=90&&td>=1;
+  return {status:hit?"HIT":"MISS",detail:yards+" rush yds + "+td+" TD (90+ yds and 1+ TD)"};
+ }
+ const passingTd=/pass(?:ing)?\s*(?:TD|touchdowns?)/i.test(raw);
+ if(passingTd){
+  const overUnder=raw.match(/\b(O|U)\s*(\d+(?:\.\d+)?)/i),plus=raw.match(/\b(\d+(?:\.\d+)?)\s*\+/),threshold=overUnder?Number(overUnder[2]):plus?Number(plus[1]):null;
+  if(threshold==null)return {status:"REVIEW",detail:"Passing TD threshold unclear"};
   const value=parlayStatNumber(stat,"pass_td");
   if(value==null)return {status:"PENDING",detail:"Passing TD stat unavailable"};
-  const hit=line[1].toUpperCase()==="U"?value<Number(line[2]):value>Number(line[2]);
-  return {status:value===Number(line[2])?"PUSH":hit?"HIT":"MISS",detail:"PASS TD "+value+" / "+line[1].toUpperCase()+" "+line[2]};
+  const push=!plus&&value===threshold,hit=plus?value>=threshold:overUnder[1].toUpperCase()==="U"?value<threshold:value>threshold;
+  return {status:push?"PUSH":hit?"HIT":"MISS",detail:value+" pass TD / "+(plus?"at least ":"")+threshold};
  }
- if(/\bTD\b/i.test(raw)&&/\b[OU]\s*\d/i.test(raw)&&!/(pass|passing|rush|rushing|rec|receiving)\s*(?:TD|touchdowns?)/i.test(raw))return {status:"REVIEW",detail:"Touchdown type is ambiguous"};
  if(/\bTD\b/i.test(raw)){
   const total=["rush_td","rec_td","def_td","st_td","fum_rec_td"].reduce((sum,key)=>sum+(parlayStatNumber(stat,key)||0),0);
   const multi=raw.match(/\b(\d+)\s*\+?\s*TD/i),needed=multi?Number(multi[1]):1;
-  return {status:total>=needed?"HIT":"MISS",detail:total+" TD / "+needed+"+"};
+  return {status:total>=needed?"HIT":"MISS",detail:total+" anytime TD / "+needed+"+"};
  }
- const overUnder=raw.match(/\b(O|U)\s*(\d+(?:\.\d+)?)/i);
- const plus=raw.match(/\b(\d+(?:\.\d+)?)\s*\+/);
- const threshold=overUnder?Number(overUnder[2]):plus?Number(plus[1]):null;
+ const overUnder=raw.match(/\b(O|U)\s*(\d+(?:\.\d+)?)/i),plus=raw.match(/\b(\d+(?:\.\d+)?)\s*\+/),bare=raw.match(/\b(\d+(?:\.\d+)?)\s+(?:rush|rushing)\s*yards/i);
+ const threshold=overUnder?Number(overUnder[2]):plus?Number(plus[1]):bare?Number(bare[1]):null;
  if(threshold==null)return {status:"REVIEW",detail:"No clear prop threshold"};
  let key=null,label="";
  if(/pass(?:ing)?\s*(?:yards?|yds?)/i.test(raw)){key="pass_yd";label="PASS YDS"}
@@ -961,25 +1014,22 @@ function gradeParlayPick(pick,stats,players,schedule){
  else if(/receiv(?:ing)?\s*(?:yards?|yds?)/i.test(raw)){key="rec_yd";label="REC YDS"}
  else if(/\brec(?:eptions?)?\b/i.test(raw)){key="rec";label="REC"}
  else if(/rush attempts?/i.test(raw)){key="rush_att";label="RUSH ATT"}
- else if(/pass(?:ing)?\s*(?:td|touchdowns?)/i.test(raw)){key="pass_td";label="PASS TD"}
  else if(/\bint(?:erceptions?)?\b/i.test(raw)){key="pass_int";label="INT"}
  else return {status:"REVIEW",detail:"Prop type not recognized"};
  const value=parlayStatNumber(stat,key);
  if(value==null)return {status:"PENDING",detail:"Stat not available"};
- const hit=plus?value>=threshold:overUnder?.[1].toUpperCase()==="U"?value<threshold:value>threshold;
- const push=!plus&&value===threshold;
- return {status:push?"PUSH":hit?"HIT":"MISS",detail:label+" "+value+" / "+(overUnder?.[1].toUpperCase()||"OVER")+" "+threshold};
+ const hit=plus||bare?value>=threshold:overUnder?.[1].toUpperCase()==="U"?value<threshold:value>threshold;
+ const push=!plus&&!bare&&value===threshold;
+ return {status:push?"PUSH":hit?"HIT":"MISS",detail:label+" "+value+" / "+(plus||bare?"at least ":overUnder?.[1].toUpperCase()+" ")+threshold};
 }
-
-function summarizeParlayWeek(row,data){
- const results=row.filter(p=>p&&p!=="N/A").map(p=>gradeParlayPick(p,data.stats,data.players,data.schedule).status);
- if(!results.length)return "PENDING";
- if(results.includes("MISS"))return "MISS";
- if(results.includes("REVIEW"))return "REVIEW";
- if(results.every(status=>status==="HIT"||status==="PUSH"))return "HIT";
+function summarizeParlayResults(results){
+ const statuses=results.filter(r=>r.status!=="NA").map(r=>r.status);
+ if(!statuses.length)return "PENDING";
+ if(statuses.includes("MISS"))return "MISS";
+ if(statuses.includes("REVIEW"))return "REVIEW";
+ if(statuses.every(status=>status==="HIT"||status==="PUSH"))return "HIT";
  return "PENDING";
 }
-
 async function loadParlayWeek(week){
  if(state.parlayDataByWeek[week]?.loaded||state.parlayDataByWeek[week]?.loading)return;
  state.parlayDataByWeek[week]={loading:true};
@@ -990,18 +1040,33 @@ async function loadParlayWeek(week){
   state.players?Promise.resolve(state.players):(state.playersPromise||=fetchJson("/players/nfl?active=true",{attempts:1,timeoutMs:25000}).then(v=>{state.players=v||{};return state.players}).catch(()=>({})))
  ]);
  state.parlayDataByWeek[week]={loaded:true,stats:stats||{},schedule:schedule||null,players:players||{}};
- if($("parlays-content")&&!$("parlays-content").hidden)renderParlays();
 }
-
 function renderParlays(){
  const target=$("parlays-content");if(!target)return;
  const count=PARLAY_WEEKS.reduce((n,w)=>n+w.filter(p=>p&&p!=="N/A").length,0);
- const loaded=PARLAY_WEEKS.map((row,i)=>state.parlayDataByWeek[i+1]?.loaded);
- const graded=PARLAY_WEEKS.reduce((n,row,i)=>n+row.filter(p=>p&&p!=="N/A").filter(p=>["HIT","MISS","PUSH"].includes(gradeParlayPick(p,state.parlayDataByWeek[i+1]?.stats,state.parlayDataByWeek[i+1]?.players,state.parlayDataByWeek[i+1]?.schedule).status)).length,0);
- target.innerHTML='<div class="parlay-summary"><div><span class="parlay-kicker">2026 SEASON</span><strong>10</strong><small>WEEKS WITH PICKS</small></div><div><span class="parlay-kicker">LEAGUE PICKS</span><strong>'+count+'</strong><small>RECORDED SELECTIONS</small></div><div><span class="parlay-kicker">GRADED PICKS</span><strong>'+graded+'</strong><small>OF '+count+' SETTLED</small></div></div><div class="parlay-week-grid">'+Array.from({length:14},(_,i)=>{const w=i+1,row=PARLAY_WEEKS[i]||[],placer=PARLAY_PLACERS[i]||"Not assigned",data=state.parlayDataByWeek[w]||{},weekResult=summarizeParlayWeek(row,data);return '<article class="parlay-week-card"><div class="parlay-week-head"><div><span class="parlay-kicker">WEEK '+String(w).padStart(2,"0")+'</span><h3>'+(row.length?'THE PICKS':'PICKS NOT ENTERED')+'</h3></div><div class="parlay-placer"><span>PLACED BY</span><strong>'+escapeHtml(placer)+'</strong></div></div>'+(row.length?'<div class="parlay-pick-list">'+PARLAY_MANAGERS.map((m,j)=>{const pick=row[j]||"—",result=pick==="—"?{status:"PENDING"}:gradeParlayPick(pick,data.stats,data.players,data.schedule);return '<div class="parlay-pick"><span class="parlay-manager">'+escapeHtml(m)+'</span><span class="parlay-selection">'+escapeHtml(pick)+'</span><span class="parlay-result '+result.status.toLowerCase()+'">'+result.status+(result.detail?'<small>'+escapeHtml(result.detail)+'</small>':"")+'</span></div>';}).join("")+'</div>':'<p class="parlay-empty">Weekly picks and the organizer will be added here.</p>')+'<div class="parlay-week-foot"><span>$5 LEAGUE PARLAY</span><span class="parlay-week-result '+weekResult.toLowerCase()+'">PARLAY: '+weekResult+'</span></div></article>';}).join("")+'</div>';
+ const graded=PARLAY_WEEKS.reduce((n,row,i)=>{
+  const data=state.parlayDataByWeek[i+1]||{};
+  return n+row.filter(p=>p&&p!=="N/A").filter(p=>["HIT","MISS","PUSH"].includes(gradeParlayPick(p,data.stats,data.players,data.schedule).status)).length;
+ },0);
+ target.innerHTML='<div class="parlay-summary"><div><span class="parlay-kicker">2026 SEASON</span><strong>10</strong><small>WEEKS WITH PICKS</small></div><div><span class="parlay-kicker">LEAGUE PICKS</span><strong>'+count+'</strong><small>RECORDED SELECTIONS</small></div><div><span class="parlay-kicker">SETTLED PICKS</span><strong>'+graded+'</strong><small>OF '+count+' GRADED</small></div></div><div class="parlay-week-grid">'+Array.from({length:14},(_,i)=>{
+  const w=i+1,row=PARLAY_WEEKS[i]||[],placer=PARLAY_PLACERS[i]||"Not assigned",data=state.parlayDataByWeek[w]||{};
+  const results=row.map(p=>p&&p!=="N/A"?gradeParlayPick(p,data.stats,data.players,data.schedule):{status:"NA"});
+  const weekResult=summarizeParlayResults(results);
+  return '<article class="parlay-week-card"><div class="parlay-week-head"><div><span class="parlay-kicker">WEEK '+String(w).padStart(2,"0")+'</span><h3>'+(row.length?'THE PICKS':'PICKS NOT ENTERED')+'</h3></div><div class="parlay-placer"><span>PLACED BY</span><strong>'+escapeHtml(placer)+'</strong></div></div>'+(row.length?'<div class="parlay-pick-list">'+PARLAY_MANAGERS.map((m,j)=>{
+   const pick=row[j]||"—",result=results[j]||{status:"PENDING"};
+   return '<div class="parlay-pick"><span class="parlay-manager">'+escapeHtml(m)+'</span><span class="parlay-selection"><strong>'+escapeHtml(describeParlayPick(pick))+'</strong></span><span class="parlay-result '+result.status.toLowerCase()+'">'+result.status+(result.detail?'<small>'+escapeHtml(result.detail)+'</small>':"")+'</span></div>';
+  }).join("")+'</div>':'<p class="parlay-empty">Weekly picks and the organizer will be added here.</p>')+'<div class="parlay-week-foot"><span>$5 LEAGUE PARLAY</span><span class="parlay-week-result '+weekResult.toLowerCase()+'">PARLAY: '+weekResult+'</span></div></article>';
+ }).join("")+'</div>';
  if(!state.parlayHistoryLoading){
   state.parlayHistoryLoading=true;
-  (async()=>{for(let start=1;start<=10;start+=3){await Promise.all(Array.from({length:Math.min(3,11-start)},(_,j)=>loadParlayWeek(start+j)));}state.parlayHistoryLoading=false;renderParlays();})();
+  (async()=>{
+   for(let start=1;start<=10;start+=3){
+    await Promise.all(Array.from({length:Math.min(3,11-start)},(_,j)=>loadParlayWeek(start+j)));
+    if(!$("parlays-content")?.hidden)renderParlays();
+   }
+   state.parlayHistoryLoading=false;
+   if(!$("parlays-content")?.hidden)renderParlays();
+  })();
  }
  target.dataset.ready="yes";
 }
