@@ -1361,6 +1361,22 @@ const HALL_SPRITE_PALETTES={
  Hess:{C:"#a7a7a7",D:"#4c4c4c",A:"#e6e6e6",S:"#c4c4c4",P:"#777777"},
  Campbell:{C:"#a7a7a7",D:"#4c4c4c",A:"#e6e6e6",S:"#c4c4c4",P:"#777777"}
 };
+const HALL_SPRITE_DETAILS={
+ Kevin:'<path d="M4 7L3 3H6L8 1L10 3H13L12 7" fill="#f4c542" stroke="#101321" stroke-width=".7"/><rect x="7" y="4" width="2" height="2" fill="#fff2a8"/>',
+ Marc:'<path d="M5 9L1 11L2 20L5 18L7 12M11 9L15 11L14 20L11 18L9 12" fill="#8a55d8" stroke="#101321" stroke-width=".7"/><rect x="6" y="3" width="4" height="1" fill="#f3b4ff"/>',
+ Colby:'<path d="M4 5L3 2H6L8 1L10 2H13L12 5" fill="#d8ef72" stroke="#101321" stroke-width=".7"/><rect x="5" y="4" width="6" height="2" fill="#8ee6b0"/>',
+ Ben:'<path d="M4 5L3 2L6 3L8 1L10 3L13 2L12 5" fill="#ffc34d" stroke="#101321" stroke-width=".7"/><rect x="7" y="10" width="2" height="2" fill="#fff1b4"/>',
+ Brandon:'<path d="M3 7L2 4L5 4L6 2L8 3L10 2L11 4L14 4L13 7" fill="#f7e07a" stroke="#101321" stroke-width=".7"/><rect x="7" y="14" width="2" height="2" fill="#f7e07a"/>',
+ Evan:'<path d="M4 6L2 3L6 3L8 1L10 3L14 3L12 6" fill="#e9e8f2" stroke="#101321" stroke-width=".7"/><path d="M4 9L1 13L4 18L6 12M12 9L15 13L12 18L10 12" fill="#258dba" stroke="#101321" stroke-width=".7"/>',
+ Pat:'<path d="M4 6L3 2L6 3L8 1L10 3L13 2L12 6" fill="#f2d46d" stroke="#101321" stroke-width=".7"/><path d="M3 9L1 12L3 16L6 13M13 9L15 12L13 16L10 13" fill="#b94e9b" stroke="#101321" stroke-width=".7"/>',
+ Joey:'<path d="M4 6L2 3L6 3L8 1L10 3L14 3L12 6" fill="#39d5e6" stroke="#101321" stroke-width=".7"/><path d="M5 10L2 13L5 17L7 12M11 10L14 13L11 17L9 12" fill="#d44a36" stroke="#101321" stroke-width=".7"/>',
+ Butta:'<path d="M4 6L2 3L6 2L8 1L10 2L14 3L12 6" fill="#e8cb50" stroke="#101321" stroke-width=".7"/><path d="M3 9L1 12L4 16L6 12M13 9L15 12L12 16L10 12" fill="#5c9d35" stroke="#101321" stroke-width=".7"/>',
+ Lee:'<path d="M4 6L2 3L6 3L8 1L10 3L14 3L12 6" fill="#d5e5ff" stroke="#101321" stroke-width=".7"/><path d="M3 9L1 12L4 15L6 11M13 9L15 12L12 15L10 11" fill="#596bdb" stroke="#101321" stroke-width=".7"/>',
+ Ders:'<path d="M4 6L3 2L6 3L8 1L10 3L13 2L12 6" fill="#f4e5a2" stroke="#101321" stroke-width=".7"/><path d="M4 9L1 12L4 16L6 12M12 9L15 12L12 16L10 12" fill="#c3a12e" stroke="#101321" stroke-width=".7"/>',
+ Tanz:'<path d="M4 6L2 3L6 2L8 1L10 2L14 3L12 6" fill="#f5a7d7" stroke="#101321" stroke-width=".7"/><path d="M4 9L1 12L4 17L6 12M12 9L15 12L12 17L10 12" fill="#a64cc4" stroke="#101321" stroke-width=".7"/>',
+ Roth:'<path d="M4 6L2 3L6 3L8 1L10 3L14 3L12 6" fill="#eeeeef" stroke="#101321" stroke-width=".7"/>',
+ Sam:'<path d="M4 6L2 3L6 3L8 1L10 3L14 3L12 6" fill="#e9eef5" stroke="#101321" stroke-width=".7"/>'
+};
 const HALL_SPRITE_BODY=[
 "................",
 "......OOOO......",
@@ -1396,7 +1412,7 @@ function hallPixelAvatar(name){
   const fill=colorFor(ch);if(fill)pixels.push('<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+fill+'"/>');
  }));
  const accent=name==="Kevin"?"⚡":name==="Marc"?"✦":name==="Colby"?"✚":name==="Ben"?"★":name==="Brandon"?"☀":name==="Evan"?"✧":name==="Pat"?"✦":name==="Joey"?"◆":name==="Butta"?"✚":name==="Lee"?"✦":name==="Ders"?"★":"✧";
- const svg='<svg class="hall-pixel-avatar" viewBox="0 0 16 24" role="img" aria-label="'+escapeHtml(name)+' full-body pixel hero" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="16" height="24" fill="#111426"/><ellipse cx="8" cy="23.4" rx="5" ry=".5" fill="#000" opacity=".5"/>'+pixels.join("")+'<rect x="7" y="8" width="2" height="1" fill="'+palette.A+'"/><rect x="7" y="13" width="2" height="1" fill="'+palette.A+'"/><rect x="7" y="20" width="2" height="1" fill="'+palette.A+'"/></svg>';
+ const svg='<svg class="hall-pixel-avatar" viewBox="0 0 16 24" role="img" aria-label="'+escapeHtml(name)+' full-body pixel hero" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="16" height="24" fill="#111426"/><ellipse cx="8" cy="23.4" rx="5" ry=".5" fill="#000" opacity=".5"/>'+(HALL_SPRITE_DETAILS[name]||"")+pixels.join("")+'<rect x="7" y="8" width="2" height="1" fill="'+palette.A+'"/><rect x="7" y="13" width="2" height="1" fill="'+palette.A+'"/><rect x="7" y="20" width="2" height="1" fill="'+palette.A+'"/></svg>';
  return svg;
 }
 
