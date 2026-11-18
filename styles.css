@@ -2474,3 +2474,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .hall-draft-table th.hall-draft-slot-manager{min-width:95px;padding:11px 6px;background:#ffffff12;color:#f3d58b;font:800 9px/1.25 var(--sans);letter-spacing:.02em;white-space:normal;overflow-wrap:anywhere}
 .hall-draft-table td.hall-draft-pick small{margin-top:5px}
 .hall-draft-table td.hall-draft-pick b{overflow-wrap:anywhere;word-break:normal}
+
+/* Hall of Fame sprites sit directly on the card; blend away the sprite sheet's black matte. */
+.hall-avatar-line{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}
+.hall-avatar-line .hall-character-avatar,.hall-avatar-line .hall-pixel-sprite{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important;mix-blend-mode:screen}
