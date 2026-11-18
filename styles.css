@@ -2358,3 +2358,6 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 
 /* Sleeper history diagnostics */
 .hall-debug-details{margin:12px 0 18px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font:10px var(--mono);letter-spacing:.04em}.hall-debug-details summary{cursor:pointer;padding:12px 14px;color:var(--lime);letter-spacing:.1em}.hall-debug-body{padding:0 14px 12px}.hall-debug-body p{padding:9px 0;margin:0;border-top:1px solid var(--line);line-height:1.7;overflow-wrap:anywhere}.hall-debug-body p b{color:var(--text)}.hall-debug-body small{color:#aab4a4}.hall-debug-body .hall-debug-error{color:var(--red)}
+
+/* Full-body 64-bit-inspired character sprites */
+.hall-avatar-line{width:82px;height:112px;margin:7px auto 6px;border-radius:8px;background:#101321;overflow:hidden}.hall-character-avatar{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;shape-rendering:crispEdges}.hall-flip-card{height:246px}.hall-manager-grid .hall-flip-card{height:246px}@media(max-width:440px){.hall-avatar-line{width:70px;height:96px}.hall-flip-card,.hall-manager-grid .hall-flip-card{height:232px}}
