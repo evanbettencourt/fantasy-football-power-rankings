@@ -1389,63 +1389,12 @@ const HALL_CHARACTER_DESIGNS={
  Campbell:{suit:"#737373",shadow:"#3d3d3d",trim:"#e6e6e6",skin:"#b98368",hair:"#262626",hairPath:"M34 38Q28 22 40 15Q55 6 70 14Q83 21 79 39L72 32Q57 28 47 31Q39 28 35 38Z",beard:'<path d="M40 54Q46 67 59 67Q72 67 77 54L70 68Q58 75 46 68Z" fill="#262626"/>',eyes:"#9b9b9b",brow:"#262626",accessory:'<path d="M34 26Q57 18 81 27" fill="none" stroke="#e6e6e6" stroke-width="3"/>',emblem:"◇"}
 };
 function hallPixelAvatar(name){
- const d=HALL_CHARACTER_DESIGNS[name]||HALL_CHARACTER_DESIGNS.Kevin;
- const archetypes={
-  Kevin:"knight",Marc:"mage",Colby:"ranger",Ben:"berserker",Brandon:"paladin",Evan:"rogue",Pat:"bard",Joey:"samurai",Butta:"druid",Lee:"engineer",Ders:"viking",Tanz:"sorcerer",
-  Roth:"wizard",Sam:"ranger",Schmeef:"knight",Hess:"berserker",Campbell:"paladin"
- };
- const archetype=archetypes[name]||"knight";
- const colors={skin:d.skin,hair:d.hair,suit:d.suit,shade:d.shadow,trim:d.trim,black:"#171a28",white:"#f4f0df",eye:d.eyes,metal:"#bfc7d6",boot:"#302b35"};
- const pixels=new Map();
- const put=(x,y,c)=>{if(x>=0&&x<16&&y>=0&&y<24&&c)pixels.set(x+","+y,c);};
- const rect=(x,y,w,h,c)=>{for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)put(xx,yy,c);};
- const line=(pts,c)=>pts.forEach(([x,y])=>put(x,y,c));
- // Individual body silhouettes: broad armor, flowing robe, light scout, or heavy barbarian.
- if(["berserker","viking"].includes(archetype)){rect(4,8,8,7,"shade");rect(3,9,10,5,"suit");rect(2,9,2,5,"trim");rect(12,9,2,5,"trim");}
- else if(["mage","sorcerer","bard","druid","wizard"].includes(archetype)){rect(5,8,6,5,"suit");for(let y=12;y<17;y++){rect(4-Math.floor((y-12)/2),y,8+Math.floor((y-12)/2)*2,1,y%2?"shade":"suit");}rect(5,8,6,1,"trim");}
- else if(archetype==="engineer"){rect(5,8,6,7,"shade");rect(4,9,8,5,"suit");rect(3,10,2,4,"trim");rect(11,10,2,4,"trim");}
- else if(archetype==="rogue"||archetype==="ranger"){rect(5,8,6,7,"shade");rect(5,9,6,5,"suit");rect(4,10,2,4,"suit");rect(11,10,2,4,"suit");}
- else {rect(4,8,8,7,"shade");rect(5,8,6,7,"suit");rect(3,9,2,5,"suit");rect(11,9,2,5,"suit");}
- // Head, neck, and distinct hair/helmet silhouettes.
- rect(7,6,2,2,"skin");rect(5,2,6,5,"skin");rect(4,3,1,3,"skin");rect(11,3,1,3,"skin");
- const hairStyle={Kevin:0,Marc:1,Colby:2,Ben:3,Brandon:4,Evan:5,Pat:6,Joey:7,Butta:8,Lee:9,Ders:10,Tanz:11,Roth:12,Sam:13,Schmeef:14,Hess:15,Campbell:16}[name]||0;
- if(hairStyle%4===0){rect(5,1,6,2,"hair");rect(4,2,1,2,"hair");rect(11,2,1,2,"hair");put(6,0,"trim");}
- else if(hairStyle%4===1){rect(5,1,6,2,"hair");rect(4,2,2,2,"hair");rect(10,2,2,1,"hair");put(5,0,"hair");put(9,0,"trim");}
- else if(hairStyle%4===2){rect(5,1,6,1,"hair");rect(4,2,1,3,"hair");rect(11,2,1,3,"hair");rect(6,0,4,1,"hair");}
- else {rect(5,1,6,2,"hair");rect(4,2,2,2,"hair");rect(10,2,2,2,"hair");put(7,0,"trim");put(8,0,"trim");}
- // Face details remain deliberately chunky, like a classic 8-bit RPG.
- put(6,4,"white");put(9,4,"white");put(6,4,"eye");put(9,4,"eye");put(7,5,"shade");put(8,5,"shade");
- if(["Marc","Colby","Ben","Brandon","Evan","Joey","Butta","Ders","Roth","Sam","Hess","Campbell"].includes(name)){rect(6,6,4,1,"hair");}
- // Neckline, belt, emblem and layered armor.
- rect(6,8,4,1,"trim");rect(5,13,6,1,"shade");rect(6,13,4,1,"trim");put(7,10,"trim");put(8,10,"trim");
- // Arms and legs vary by class, with asymmetric pixel highlights.
- if(archetype==="berserker"||archetype==="viking"){rect(2,10,2,4,"skin");rect(12,10,2,4,"skin");rect(5,16,2,4,"shade");rect(9,16,2,4,"shade");}
- else if(["mage","sorcerer","bard","druid","wizard"].includes(archetype)){rect(4,10,1,5,"trim");rect(11,10,1,5,"trim");rect(6,16,2,4,"shade");rect(9,16,2,4,"shade");}
- else {rect(3,10,2,4,"shade");rect(11,10,2,4,"shade");rect(5,16,2,4,"shade");rect(9,16,2,4,"shade");}
- rect(4,20,4,1,"boot");rect(9,20,4,1,"boot");rect(4,21,4,1,"black");rect(9,21,4,1,"black");
- // Class-specific equipment creates a different silhouette for every manager.
- if(archetype==="knight"){line([[13,5],[13,6],[13,7],[13,8],[13,9],[13,10],[14,4],[12,11],[14,11]],"metal");rect(2,10,2,5,"trim");}
- if(archetype==="mage"||archetype==="wizard"||archetype==="sorcerer"){line([[14,1],[14,2],[14,3],[14,4],[14,5],[14,6],[14,7],[14,8],[14,9],[14,10],[13,3],[15,3]],"trim");put(14,0,"white");}
- if(archetype==="ranger"){line([[2,4],[2,5],[2,6],[2,7],[2,8],[2,9],[2,10],[2,11],[2,12],[3,4],[3,12]],"trim");line([[3,7],[4,8],[3,9]],"metal");}
- if(archetype==="berserker"||archetype==="viking"){rect(1,7,2,5,"metal");rect(1,6,2,1,"trim");rect(12,7,3,2,"hair");put(14,6,"trim");}
- if(archetype==="paladin"){rect(2,9,2,5,"metal");put(2,8,"trim");line([[13,3],[13,4],[13,5],[13,6],[13,7],[13,8],[13,9],[13,10]],"trim");}
- if(archetype==="rogue"){rect(2,8,2,4,"black");line([[1,7],[2,6],[3,7],[2,8]],"metal");rect(12,11,2,1,"trim");}
- if(archetype==="bard"){rect(2,8,2,4,"trim");line([[13,3],[13,4],[13,5],[13,6],[13,7],[13,8],[13,9]],"metal");put(12,2,"trim");put(14,2,"trim");}
- if(archetype==="druid"){line([[13,2],[13,3],[13,4],[13,5],[13,6],[13,7],[13,8],[13,9],[13,10]],"hair");line([[12,3],[14,2],[14,4],[12,7],[14,8]],"trim");}
- if(archetype==="samurai"){rect(4,1,8,1,"trim");rect(3,2,10,1,"shade");line([[14,5],[14,6],[14,7],[14,8],[14,9],[14,10],[13,4]],"metal");}
- if(archetype==="engineer"){rect(2,8,2,4,"metal");rect(12,8,2,4,"metal");put(13,7,"trim");put(2,7,"trim");}
- if(archetype==="viking"){put(4,2,"metal");put(3,1,"metal");put(11,2,"metal");put(12,1,"metal");}
- // Add a distinct cape/shoulder treatment to several characters.
- if(["Marc","Pat","Tanz","Roth"].includes(name)){rect(3,9,1,7,"trim");rect(12,9,1,7,"shade");}
- if(name==="Lee"){rect(5,2,6,1,"metal");put(4,3,"metal");put(11,3,"metal");}
- if(name==="Butta"){rect(5,0,6,1,"hair");put(4,1,"trim");put(11,1,"trim");}
- if(name==="Kevin"){put(7,0,"trim");put(8,0,"trim");}
- if(name==="Ben"){rect(5,0,2,1,"trim");rect(9,0,2,1,"trim");}
- const rects=[...pixels.entries()].map(([key,color])=>{const [x,y]=key.split(",").map(Number);return '<rect x="'+(x*8)+'" y="'+(y*8)+'" width="8" height="8" fill="'+colors[color]+'"/>';}).join("");
- return '<svg class="hall-character-avatar hall-pixel-sprite" viewBox="0 0 128 192" role="img" aria-label="'+escapeHtml(name)+' 8-bit full-body game character" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="image-rendering:pixelated"><rect x="24" y="176" width="80" height="8" fill="#080a12" opacity=".45"/>'+rects+'</svg>';
+ const spriteIndex={"Kevin":0,"Marc":1,"Colby":2,"Ben":3,"Brandon":4,"Evan":5,"Pat":6,"Joey":7,"Butta":8,"Ders":9,"Tanz":10,"Roth":11,"Sam":12,"Schmeef":13,"Hess":14,"Campbell":15,"Lee":16};
+ const index=spriteIndex[name]??0;
+ const position=(index/16*100).toFixed(4);
+ return '<span class="hall-character-avatar hall-pixel-sprite" role="img" aria-label="'+escapeHtml(name)+' original 32-bit game character" style="background-position:'+position+'% center"></span>';
 }
 function hallManagerHonors(name,stat){
- const seasons=[...(stat.seasons||new Set())].sort((a,b)=>a-b);
  const playoffYears=[...(stat.playoffAppearances||new Set())].sort((a,b)=>a-b);
  const championYears=[...PRE_SLEEPER_CHAMPIONS.filter(row=>row.champion===name).map(row=>row.year),...(state.hallHistory?.seasons||[]).filter(row=>row.champion===name).map(row=>row.year)].sort((a,b)=>a-b);
  const runnerUpYears=[...PRE_SLEEPER_CHAMPIONS.filter(row=>row.runnerUp===name).map(row=>row.year),...(state.hallHistory?.seasons||[]).filter(row=>row.runnerUp===name).map(row=>row.year)].sort((a,b)=>a-b);
@@ -1457,7 +1406,6 @@ function hallManagerHonors(name,stat){
  if(thirdPlaceYears.length)honors.push({icon:"🏆",tone:"bronze",label:thirdPlaceYears.length+"× 3rd Place",detail:thirdPlaceYears.join(", ")});
  if(regularChampionYears.length)honors.push({icon:"🥇",tone:"gold",label:regularChampionYears.length+"× Regular Season Champion",detail:regularChampionYears.join(", ")});
  if(playoffYears.length)honors.push({icon:"🥈",tone:"silver",label:playoffYears.length+"× Playoff Appearance",detail:playoffYears.join(", ")});
- if(seasons.length)honors.push({icon:"🥉",tone:"bronze",label:seasons.length+" Seasons Played",detail:seasons.join(", ")});
  return honors;
 }
 function hallPreSleeperBracket(year){
