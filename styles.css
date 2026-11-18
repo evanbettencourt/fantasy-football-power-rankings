@@ -2995,3 +2995,32 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   font-style:normal;
   font-weight:800;
 }
+
+
+/* Payout labels remain visible beneath the Hall-style playoff bracket. */
+.sch-playoff-bracket .hall-bracket-playoff,
+.rules-playoff-bracket .hall-bracket-playoff{
+  margin:0 auto;
+}
+.sch-playoff-bracket .hall-bracket-scroll,
+.rules-playoff-bracket .hall-bracket-scroll{
+  overflow-x:auto!important;
+  overflow-y:visible!important;
+  max-width:100%;
+}
+.playoff-payout-legend{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:12px 24px;
+  margin:22px auto 0;
+  padding:16px 18px;
+  border:1px solid #ffffff20;
+  border-radius:10px;
+  background:#ffffff08;
+  color:#aaa4c6;
+  font:700 9px var(--mono);
+  letter-spacing:.07em;
+}
+.playoff-payout-legend span{display:flex;align-items:center;gap:9px}
+.playoff-payout-legend b{color:#f5d27b;font:900 16px var(--sans);letter-spacing:0}
