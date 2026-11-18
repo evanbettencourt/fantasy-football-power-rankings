@@ -2845,3 +2845,35 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   .hall-bracket-playoff .hall-tree-round-two .hall-round-games>.hall-tree-game:nth-child(1){top:35px}
   .hall-bracket-playoff .hall-tree-round-two .hall-round-games>.hall-tree-game:nth-child(2){top:189px}
 }
+
+
+/* Center the championship card on the midpoint of the two semifinal cards.
+   Semifinal top offsets are 44px and 220px (desktop), 35px and 189px (mobile). */
+.hall-bracket-playoff .hall-tree-finals .hall-round-games{
+  position:relative;
+  display:block;
+  height:340px;
+  min-height:340px;
+}
+.hall-bracket-playoff .hall-tree-finals .hall-round-games>.hall-tree-final{
+  position:absolute;
+  top:132px;
+  left:50%;
+  width:100%;
+  margin:0;
+  padding:0;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+}
+.hall-bracket-playoff .hall-tree-finals .hall-round-games>.hall-tree-final>.hall-tree-game{
+  width:205px;
+  min-width:205px;
+  max-width:205px;
+  margin:0;
+}
+@media(max-width:720px){
+ .hall-bracket-playoff .hall-tree-finals .hall-round-games{height:308px;min-height:308px}
+ .hall-bracket-playoff .hall-tree-finals .hall-round-games>.hall-tree-final{top:112px}
+}
