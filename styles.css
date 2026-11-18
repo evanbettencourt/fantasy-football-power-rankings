@@ -1909,3 +1909,140 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 /* Restore player-level actual-vs-projection result colors. */
 .mu-player-points.up{color:#57F26B}
 .mu-player-points.down{color:#F2685C}
+
+
+/* Parlays dashboard: compact weekly accordion beside member standings. */
+.parlay-dashboard{
+  display:grid;
+  grid-template-columns:minmax(0,1.12fr) minmax(300px,.88fr);
+  gap:22px;
+  align-items:start;
+  margin-top:22px;
+}
+.parlay-weeks-panel,.parlay-members-panel{
+  min-width:0;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--panel,rgba(255,255,255,.02));
+  overflow:hidden;
+}
+.parlay-panel-heading{
+  padding:20px 20px 16px;
+  border-bottom:1px solid var(--line);
+}
+.parlay-panel-heading h2{
+  margin:5px 0 0;
+  color:var(--text);
+  font-size:21px;
+  line-height:1.2;
+  letter-spacing:-.025em;
+}
+.parlay-panel-heading p{
+  margin:8px 0 0;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.5;
+}
+.parlay-week-list{padding:0 16px}
+.parlay-week-dropdown{border-bottom:1px solid var(--line)}
+.parlay-week-dropdown:last-child{border-bottom:0}
+.parlay-week-dropdown summary{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto 18px;
+  align-items:center;
+  gap:16px;
+  min-height:67px;
+  padding:10px 5px;
+  cursor:pointer;
+  list-style:none;
+  user-select:none;
+}
+.parlay-week-dropdown summary::-webkit-details-marker{display:none}
+.parlay-week-label{display:flex;flex-direction:column;gap:4px;min-width:0}
+.parlay-week-label b{
+  color:var(--text);
+  font:700 13px var(--mono);
+  letter-spacing:.04em;
+}
+.parlay-week-label small{
+  color:var(--muted);
+  font:500 9px var(--mono);
+  letter-spacing:.035em;
+}
+.parlay-week-record{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.parlay-week-record strong{
+  color:var(--text);
+  font:700 20px var(--mono);
+  font-variant-numeric:tabular-nums;
+}
+.parlay-week-record small{
+  color:var(--muted);
+  font:500 8px var(--mono);
+  letter-spacing:.08em;
+}
+.parlay-chevron{color:var(--muted);font-size:17px;transition:transform .18s ease}
+.parlay-week-dropdown[open] .parlay-chevron{transform:rotate(180deg)}
+.parlay-week-dropdown[open] summary{padding-bottom:13px}
+.parlay-week-details{padding:0 5px 14px}
+.parlay-detail-meta{
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:6px 12px;
+  padding:9px 0;
+  color:var(--muted);
+  font:500 9px var(--mono);
+  letter-spacing:.035em;
+  border-top:1px solid var(--line);
+}
+.parlay-week-details .parlay-pick-list{padding:0}
+.parlay-week-details .parlay-pick{
+  grid-template-columns:62px minmax(0,1fr) 60px;
+  gap:9px;
+  padding:10px 0;
+}
+.parlay-week-details .parlay-manager{font-size:11px}
+.parlay-week-details .parlay-selection{font-size:11px;line-height:1.4}
+.parlay-week-details .parlay-result{font-size:9px}
+.parlay-week-details .parlay-result small{font-size:8px}
+.parlay-member-list{padding:0 18px}
+.parlay-member-row{
+  display:grid;
+  grid-template-columns:26px minmax(0,1fr) auto;
+  align-items:center;
+  gap:11px;
+  min-height:62px;
+  border-bottom:1px solid var(--line);
+}
+.parlay-member-row:last-child{border-bottom:0}
+.parlay-member-rank{
+  color:var(--muted);
+  font:500 10px var(--mono);
+}
+.parlay-member-name{display:flex;flex-direction:column;gap:4px;min-width:0}
+.parlay-member-name strong{color:var(--text);font-size:13px;font-weight:650}
+.parlay-member-name small{
+  color:var(--muted);
+  font:500 8px var(--mono);
+  letter-spacing:.025em;
+  line-height:1.4;
+}
+.parlay-member-record{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.parlay-member-record strong{
+  color:var(--text);
+  font:700 16px var(--mono);
+  font-variant-numeric:tabular-nums;
+}
+.parlay-member-record small{color:var(--muted);font:500 9px var(--mono)}
+@media(max-width:850px){
+  .parlay-dashboard{grid-template-columns:1fr;gap:16px}
+}
+@media(max-width:600px){
+  .parlay-dashboard{margin-top:15px}
+  .parlay-panel-heading{padding:16px}
+  .parlay-week-list{padding:0 12px}
+  .parlay-member-list{padding:0 14px}
+  .parlay-week-details .parlay-pick{grid-template-columns:52px minmax(0,1fr) 52px;gap:7px}
+  .parlay-week-details .parlay-manager{font-size:10px}
+  .parlay-week-details .parlay-selection{font-size:10px}
+}
