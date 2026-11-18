@@ -202,7 +202,7 @@ function renderPowerRankings(week) {
   $("pr-week-title").textContent="Week "+week;
   $("pr-edition-label").textContent=edition?.date||"EDITION PENDING";
   const stats=computeRankings(week),byName=new Map(stats.map(t=>[t.name,t])),previous=EDITORIAL_EDITIONS[week-1]?.rankings||[],priorRanks=new Map(previous.map((r,i)=>[r.manager,i+1])),hasEdition=Boolean(edition?.rankings?.length);
-  const palette=["#9FE7F5","#FFB7D5","#C9B6FF","#FFE29A","#A9E8C5","#FFC1A8","#D6C7FF","#A9DFF5","#F3B9D2","#D2E9A4","#FFD0A1","#BFCBFF"];
+  const palette=["#8FC7C3","#D99AAF","#B7A6D8","#D8BE83","#A8C9A0","#D99B86","#9DAED3","#8FB9D0","#C69AB8","#B9C58D","#D8AD83","#A5B6C8"];
   const teamOrder=[...state.teams.keys()];
   const colorFor=t=>palette[Math.max(0,teamOrder.indexOf(t?.id))%palette.length];
   const ordinal=n=>n%100>=11&&n%100<=13?n+"th":n%10===1?n+"st":n%10===2?n+"nd":n%10===3?n+"rd":n+"th";
