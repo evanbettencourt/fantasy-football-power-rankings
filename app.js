@@ -523,7 +523,7 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
       if (projection != null && Number.isFinite(Number(projection))) {
         const original = Number(projection);
         originalTotal += original;
-        liveTotal += stat || matchupPoints != null ? actual : original;
+        liveTotal += stat || num(matchupPoints) > 0 ? actual : original;
         found = true;
       } else if (stat || matchupPoints != null) {
         liveTotal += actual;
