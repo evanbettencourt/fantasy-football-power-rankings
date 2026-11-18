@@ -380,6 +380,7 @@ async function init() {
     select.innerHTML = Array.from({ length: defaultWeek }, (_, index) => `<option value="${index + 1}">WEEK ${index + 1}</option>`).join("");
     select.addEventListener("change", () => renderPowerRankings(Number(select.value)));
     renderWeek(defaultWeek); renderPowerRankings(defaultWeek);
+    renderSchedule();
     $("updated-at").textContent = state.usingCachedCore || state.recoveredWeeks.length ? "SLEEPER API · SAVED DATA USED WHERE NEEDED" : "SLEEPER API · PUBLIC LEAGUE DATA";
   } catch (error) {
     console.error("League startup failed", error);
@@ -390,13 +391,48 @@ async function init() {
     if (standings) standings.innerHTML = '<div class="empty-note">Standings unavailable. Please try again shortly.</div>';
   }
 }
+let selectedScheduleTeam = null;
 function renderSchedule() {
-  const rows = [];
-  for (let week=1; week<=getWeeksToLoad(); week++) {
-    const games = calculateWeek(week).results;
-    for (const game of games) rows.push(`<div class="schedule-row"><span class="schedule-week">W${week}</span><span>${teamName(game.a)} <small>${escapeHtml(game.a.owner)}</small></span><strong>${fmt(game.scoreA)} – ${fmt(game.scoreB)}</strong><span>${teamName(game.b)} <small>${escapeHtml(game.b.owner)}</small></span></div>`);
+  const pickTarget = $("schedule-team-picks");
+  const contentTarget = $("schedule-content");
+  if (!pickTarget || !contentTarget || !state.teams?.size) return;
+  const teams = [...state.teams.values()].sort((a,b)=>a.name.localeCompare(b.name));
+  const season = state.league?.season || new Date().getFullYear();
+  const seasonLabel = $("schedule-season");
+  if (seasonLabel) seasonLabel.textContent = season + " SEASON";
+  pickTarget.innerHTML = teams.map(team => {
+    const color = lotteryColor(team.name);
+    return '<button type="button" class="schedule-team-pick '+(selectedScheduleTeam===team.name?'active':'')+'" data-schedule-team="'+escapeHtml(team.name)+'" aria-pressed="'+(selectedScheduleTeam===team.name?'true':'false')+'"><span class="schedule-team-dot" style="background:'+color+'"></span>'+escapeHtml(team.name)+'</button>';
+  }).join("");
+  const weeks = [];
+  for (let week=1; week<=14; week++) {
+    const source = state.weeks[week] || [];
+    const groups = new Map();
+    source.forEach(match => {
+      if (match.matchup_id == null) return;
+      const id = String(match.matchup_id);
+      if (!groups.has(id)) groups.set(id,[]);
+      groups.get(id).push(match);
+    });
+    const games = [...groups.values()].filter(group=>group.length===2).map(group=>{
+      const a=teamFor(group[0].roster_id), b=teamFor(group[1].roster_id);
+      return a&&b?{a,b}:null;
+    }).filter(Boolean).sort((a,b)=>a.a.name.localeCompare(b.a.name));
+    const phase = week<=11 ? "regular" : "rematch";
+    const tag = week<=11 ? "REGULAR SEASON" : "WEEK "+(week-11)+" REMATCH";
+    const rows = games.map(game=>{
+      const isMatch = !selectedScheduleTeam || game.a.name===selectedScheduleTeam || game.b.name===selectedScheduleTeam;
+      return '<div class="schedule-matchup '+(selectedScheduleTeam?(isMatch?'is-match':'not-match'):'')+'"><span class="schedule-match-team '+(game.a.name===selectedScheduleTeam?'selected':'')+'">'+escapeHtml(game.a.name)+'</span><span class="schedule-vs">VS</span><span class="schedule-match-team '+(game.b.name===selectedScheduleTeam?'selected':'')+'">'+escapeHtml(game.b.name)+'</span></div>';
+    }).join("");
+    const empty = state.failedWeeks.includes(week) ? "Schedule data unavailable for this week." : "Matchups have not been posted by Sleeper yet.";
+    weeks.push('<article class="schedule-week-card '+phase+'"><header class="schedule-week-head"><div><span class="schedule-week-number">WEEK '+String(week).padStart(2,"0")+'</span>'+(week>=12?'<small>REMATCH OF WEEK '+(week-11)+'</small>':'')+'</div><span class="schedule-week-tag">'+tag+'</span></header><div class="schedule-matchups">'+(rows||'<p class="schedule-empty">'+empty+'</p>')+'</div></article>');
   }
-  $("schedule-content").innerHTML = rows.length ? rows.join("") : '<p class="empty-note">No completed schedule data yet.</p>';
+  contentTarget.classList.toggle("has-selection",!!selectedScheduleTeam);
+  contentTarget.innerHTML = weeks.join("");
+  pickTarget.querySelectorAll("[data-schedule-team]").forEach(button=>button.addEventListener("click",()=>{
+    selectedScheduleTeam=selectedScheduleTeam===button.dataset.scheduleTeam?null:button.dataset.scheduleTeam;
+    renderSchedule();
+  }));
 }
 
 function renderEditorial(week, rankings) {
@@ -551,6 +587,7 @@ function setupNavigation() {
       panel.hidden = !visible;
     });
     if (target === "rules") renderRules();
+    if (target === "schedule") renderSchedule();
     if (target === "lottery") renderLotteryHistory();
     if (target === "rankings") renderPowerRankings(state.selectedWeek);
     window.scrollTo({top:0,behavior:"smooth"});
