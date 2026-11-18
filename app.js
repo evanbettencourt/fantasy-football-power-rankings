@@ -1282,11 +1282,15 @@ function hallManagerHonors(name,stat){
 function hallPreSleeperBracket(year){
  const season=PRE_SLEEPER_PLAYOFFS.find(row=>row.year===year);
  if(!season)return [];
- return season.rounds.flatMap((round,index)=>round.losers.map((loser,gameIndex)=>({
-  matchId:index*10+gameIndex+1,round:index+1,placement:null,
-  team1:round.winner,team2:loser,winner:round.winner,loser,
-  score1:null,score2:null,legacy:true
- })));
+ return season.rounds.map((game,index)=>{
+  const bracketRound=year===2017?(index<2?1:2):(index<2?1:index<4?2:3);
+  const opposingTeam=game.losers.join(" & ");
+  return {
+   matchId:index+1,round:bracketRound,placement:null,
+   team1:game.winner,team2:opposingTeam,winner:game.winner,loser:opposingTeam,
+   score1:null,score2:null,legacy:true
+  };
+ });
 }
 function hallBracketMarkup(year,championRow){
  const games=championRow?.bracket?.length?championRow.bracket:hallPreSleeperBracket(year);
@@ -1377,7 +1381,7 @@ function renderHallOfFame(){
  const errorNote=errors.length?'<p class="hall-footnote">DATA NOTES: '+errors.map(escapeHtml).join(' · ')+'</p>':'';
  const recordBook=state.hallHistory.recordBook||[];
  const recordCards=recordBook.map((record,index)=>'<article class="hall-record-card"><div class="hall-record-card-top"><span class="hall-record-icon">'+record.icon+'</span><span class="hall-record-number">'+String(index+1).padStart(2,"0")+'</span></div><span class="hall-record-title">'+escapeHtml(record.title)+'</span><strong class="hall-record-value">'+escapeHtml(record.value)+'</strong><span class="hall-record-holder">'+escapeHtml(record.holder)+'</span><small class="hall-record-detail">'+escapeHtml(record.detail)+'</small></article>').join("");
- target.innerHTML='<section class="hall-record-section hall-champions-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE HARDWARE</span><h2>Champions by Year</h2></div><span class="hall-count">2017–'+(champions[champions.length-1]?.year||2026)+' ARCHIVE</span></div><div class="hall-champion-grid">'+championCards+'</div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE PEOPLE</span><h2>Current Managers</h2></div><span class="hall-count">12 MEMBERS</span></div><div class="hall-manager-grid">'+active.map((name,i)=>makeCard(name,i,false)).join("")+'</div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE LEGACY</span><h2>Retired Managers</h2></div><span class="hall-count">'+retired.length+' MEMBERS</span></div><div class="hall-manager-grid hall-retired-grid">'+retired.map((name,i)=>makeCard(name,i,true)).join("")+'</div></section><section class="hall-record-section hall-record-book"><div class="hall-section-heading"><div><span class="hall-kicker">THE RECORD BOOK</span><h2>League Records</h2></div><span class="hall-count">ALL-TIME BESTS</span></div><div class="hall-record-grid">'+recordCards+'</div><div class="hall-history-notes">'+diagnostic+errorNote+'<p class="hall-footnote">Records include completed regular-season head-to-head matchups and playoff games with available scores. Highest scoring season uses regular-season points. Median matchups are excluded from matchup records.</p></div></section>';
+ target.innerHTML='<section class="hall-record-section hall-champions-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE HARDWARE</span><h2>Champions by Year</h2></div><span class="hall-count">2017–'+(champions[champions.length-1]?.year||2026)+' ARCHIVE</span></div><div class="hall-champion-grid">'+championCards+'</div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE PEOPLE</span><h2>Current Managers</h2></div><span class="hall-count">12 MEMBERS</span></div><div class="hall-manager-grid">'+active.map((name,i)=>makeCard(name,i,false)).join("")+'</div></section><section class="hall-record-section"><div class="hall-section-heading"><div><span class="hall-kicker">THE LEGACY</span><h2>Retired Managers</h2></div><span class="hall-count">'+retired.length+' MEMBERS</span></div><div class="hall-manager-grid hall-retired-grid">'+retired.map((name,i)=>makeCard(name,i,true)).join("")+'</div></section><section class="hall-record-section hall-record-book"><div class="hall-section-heading"><div><span class="hall-kicker">THE RECORD BOOK</span><h2>League Records</h2></div><span class="hall-count">ALL-TIME BESTS</span></div><div class="hall-record-grid">'+recordCards+'</div><div class="hall-history-notes">'+diagnostic+errorNote+'<p class="hall-footnote">Records include completed regular-season head-to-head matchups and playoff games with available scores. Highest scoring season uses regular-season points. Median matchups are excluded from matchup records. Pre-Sleeper seasons played are counted only where postseason participation is documented.</p></div></section>';
  target.querySelectorAll(".hall-flip-card").forEach(card=>card.addEventListener("click",()=>{
   const flipped=card.classList.toggle("is-flipped");
   card.setAttribute("aria-expanded",String(flipped));
