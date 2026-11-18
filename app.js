@@ -970,10 +970,10 @@ const PARLAY_TEAM_ALIASES = {
 const PARLAY_PLAYER_ID_OVERRIDES = { "Lamar Jackson": "4881" };
 function normalizeParlayPlayerName(value){
  return String(value||"").toLowerCase()
-  .replace(/\\b(jr|sr|ii|iii|iv|v)\\.?\\b/g,"")
+  .replace(/\b(jr|sr|ii|iii|iv|v)\.?\b/g,"")
   .replace(/[^a-z0-9]+/g," ")
   .trim()
-  .replace(/\\s+/g," ");
+  .replace(/\s+/g," ");
 }
 const PARLAY_PLAYER_INDEX = new WeakMap();
 const PARLAY_TEAM_ABBR = {eagles:"PHI",bengals:"CIN",giants:"NYG",cardinals:"ARI",patriots:"NE",pats:"NE",chiefs:"KC",bills:"BUF",lions:"DET"};
@@ -1112,7 +1112,7 @@ function gradeParlayPick(pick,stats,players,schedule,diagnostics={}){
  else if(/\brec(?:eptions?)?\b/i.test(raw)){key="rec";label="REC"}
  else if(/rush attempts?/i.test(raw)){key="rush_att";label="RUSH ATT"}
  else if(/\bint(?:erceptions?)?\b/i.test(raw)){key="pass_int";label="INT"}
- else if(/\\byards?\\b/i.test(raw)){
+ else if(/\byards?\b/i.test(raw)){
   const position=String(player.position||"").toUpperCase();
   if(position==="QB"){key="pass_yd";label="PASS YDS"}
   else if(position==="RB"){key="rush_yd";label="RUSH YDS"}
