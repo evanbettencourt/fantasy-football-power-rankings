@@ -124,53 +124,29 @@
       </div>
     </section>
     <section class="section tab-panel schedule-page" data-panel="schedule" hidden>
-      <div class="schedule-shell">
-        <header class="schedule-mast">
-          <div class="schedule-mast-copy">
-            <div class="schedule-kicker">MONKEY BOYS FANTASY LEAGUE <span>·</span> <span id="schedule-season">2026 SEASON</span></div>
-            <h1>THE <em>SCHEDULE</em></h1>
-            <p class="schedule-lede">Every matchup. Every week. One road to the championship.</p>
-          </div>
-          <div class="schedule-crest" aria-label="Monkey Boys crest"><span>MB</span><small>EST. 2017</small></div>
-        </header>
-
-        <section class="schedule-timeline" aria-label="Season schedule timeline">
-          <div class="schedule-section-topline"><div><span class="schedule-eyebrow">THE ROAD TO THE TITLE</span><h2>2026 SEASON</h2></div><span class="schedule-timeline-note">17 WEEKS · 3 PHASES</span></div>
-          <div class="schedule-arc-wrap">
-            <svg class="schedule-arc" viewBox="0 0 1000 180" role="img" aria-label="Regular season Weeks 1 through 11, rematches Weeks 12 through 14, playoffs Weeks 15 through 17">
-              <defs>
-                <linearGradient id="scheduleArcGradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff4f91"/><stop offset=".66" stop-color="#8d45ed"/><stop offset="1" stop-color="#20b9d7"/></linearGradient>
-              </defs>
-              <path class="schedule-arc-track" d="M55 132 C245 10 755 10 945 132"/>
-              <path class="schedule-arc-progress" d="M55 132 C245 10 755 10 945 132"/>
-              <circle cx="55" cy="132" r="9" class="schedule-arc-point regular-point"/>
-              <circle cx="675" cy="48" r="9" class="schedule-arc-point rematch-point"/>
-              <circle cx="945" cy="132" r="9" class="schedule-arc-point playoff-point"/>
-            </svg>
-            <div class="schedule-phase-labels">
-              <div class="schedule-phase-label regular"><span>01 — 11</span><strong>REGULAR SEASON</strong><small>Every team plays every other team once</small></div>
-              <div class="schedule-phase-label rematch"><span>12 — 14</span><strong>REMATCH WEEKS</strong><small>Weeks 1–3 matchups repeat</small></div>
-              <div class="schedule-phase-label playoffs"><span>15 — 17</span><strong>PLAYOFFS</strong><small>Six teams compete for the title</small></div>
-            </div>
-          </div>
-          <p class="schedule-random-note"><span class="schedule-note-mark">i</span> Sleeper randomizes the regular-season schedule after the draft.</p>
+      <section class="sch-hero">
+        <p class="eyebrow">Monkey Boys · <span id="schedule-season">2026</span></p>
+        <div class="sch-lock"><h1>Schedule</h1><div class="sch-crest" aria-label="Monkey Boys crest">MB</div></div>
+      </section>
+      <div class="sch-arc" aria-label="Season phases">
+        <div class="sch-seg regular"><span class="t">Regular Season</span><span class="w">Weeks 1–11</span></div>
+        <div class="sch-seg rematch"><span class="t">Rematch Weeks</span><span class="w">Weeks 12–14</span></div>
+        <div class="sch-seg playoffs"><span class="t">Playoffs</span><span class="w">Weeks 15–17</span></div>
+      </div>
+      <div class="sch-body">
+        <section class="sch-sec">
+          <div class="sch-sec-hd">Managers</div>
+          <p class="sch-hint">Tap a manager to trace their season via the grid below.</p>
+          <div id="schedule-team-picks" class="sch-picks"></div>
         </section>
-
-        <section class="schedule-teams-section">
-          <div class="schedule-section-topline"><div><span class="schedule-eyebrow">PICK YOUR SIDE</span><h2>FOLLOW A TEAM</h2></div><span class="schedule-timeline-note">12 MANAGERS</span></div>
-          <p class="schedule-section-copy">Choose a manager to spotlight their matchups across the full regular season. Choose them again to clear the filter.</p>
-          <div id="schedule-team-picks" class="schedule-team-picks"></div>
+        <section class="sch-sec">
+          <div class="sch-sec-hd">Week by Week</div>
+          <div id="schedule-content" class="sch-grid"><p class="sch-empty">Loading the Sleeper schedule…</p></div>
         </section>
-
-        <section class="schedule-weeks-section">
-          <div class="schedule-section-topline"><div><span class="schedule-eyebrow">THE FULL SLATE</span><h2>WEEK BY WEEK</h2></div><span class="schedule-timeline-note">WEEKS 01–14</span></div>
-          <div id="schedule-content" class="schedule-grid"><p class="empty-note">Loading the Sleeper schedule…</p></div>
-        </section>
-
-        <section class="schedule-playoff-section">
-          <div class="schedule-section-topline"><div><span class="schedule-eyebrow">THE FINISH LINE</span><h2>THE PLAYOFFS</h2></div><span class="schedule-timeline-note">WEEKS 15–17</span></div>
-          <p class="schedule-section-copy">The six-team playoff closes the season. The top two seeds earn first-round byes, followed by reseeded semifinals and the championship.</p>
-          <div class="schedule-playoff-bracket"><img src="playoff-bracket.svg" alt="Six-team playoff bracket for Weeks 15–17, including first-round byes, reseeded semifinals, and championship payouts."/></div>
+        <section class="sch-sec sch-playoff-sec">
+          <div class="sch-sec-hd">Playoffs · Weeks 15–17</div>
+          <p class="sch-hint">The top two seeds receive first-round byes. The semifinals are reseeded before the championship.</p>
+          <div class="sch-playoff-bracket"><img src="playoff-bracket.svg" alt="Six-team playoff bracket for Weeks 15–17, with first-round byes, reseeded semifinals, and championship payouts."></div>
         </section>
       </div>
     </section>
