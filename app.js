@@ -2,7 +2,7 @@ const LEAGUE_ID = "1313563024161787904";
 const API = "/api/sleeper";
 const $ = (id) => document.getElementById(id);
 const setTextIfPresent = (id, value) => { const element = $(id); if (element) element.textContent = value; };
-const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, rankingsByWeek: {}, failedWeeks: [], recoveredWeeks: [], usingCachedCore: false, draftOrder: null, draftSeason: null, nflState: null, currentWeek: 1, matchupWeek: 1, players: null, playersPromise: null, matchupDataByWeek: {}, parlayDataByWeek: {}, hallHistory: null, hallHistoryPromise: null, hallHistoryError: null };
+const state = { league: null, users: [], rosters: [], weeks: {}, selectedWeek: 1, weekManuallySelected: false, rankingsByWeek: {}, failedWeeks: [], recoveredWeeks: [], usingCachedCore: false, draftOrder: null, draftSeason: null, nflState: null, currentWeek: 1, matchupWeek: 1, players: null, playersPromise: null, matchupDataByWeek: {}, parlayDataByWeek: {}, hallHistory: null, hallHistoryPromise: null, hallHistoryError: null };
 let resolveSleeperCoreReady;
 const sleeperCoreReady = new Promise(resolve=>{resolveSleeperCoreReady=resolve;});
 
@@ -292,7 +292,7 @@ function renderLeagueStatus(week){
  const phaseNames=["PRE-DRAFT","DRAFT","REGULAR SEASON","PLAYOFFS"];
  if(phase)phase.textContent=phaseNames[phaseIndex];
  document.querySelectorAll(".phase-track span").forEach((bar,i)=>bar.classList.toggle("phase-done",i<=phaseIndex));
- if(buttons){buttons.innerHTML=Array.from({length:max},(_,i)=>i+1).map(w=>'<button type="button" class="week-chip '+(w===week?'active':'')+'" data-week="'+w+'">'+w+'</button>').join("");buttons.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>renderWeek(Number(btn.dataset.week))));}
+ if(buttons){buttons.innerHTML=Array.from({length:max},(_,i)=>i+1).map(w=>'<button type="button" class="week-chip '+(w===week?'active':'')+'" data-week="'+w+'">'+w+'</button>').join("");buttons.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>{state.weekManuallySelected=true;renderWeek(Number(btn.dataset.week));}));}
 }
 function renderStats(week, rankings) {
   // Legacy dashboard statistic cards are not part of the current page layout.
@@ -382,7 +382,7 @@ async function init() {
     const select = $("week-select");
     select.innerHTML = Array.from({ length: maxWeek }, (_, index) => `<option value="${index + 1}">WEEK ${index + 1}</option>`).join("");
     if (!select.dataset.listenerAttached) {
-      select.addEventListener("change", () => renderPowerRankings(Number(select.value)));
+      select.addEventListener("change", () => { state.weekManuallySelected=true; renderPowerRankings(Number(select.value)); });
       select.dataset.listenerAttached = "yes";
     }
 
@@ -419,7 +419,7 @@ async function init() {
       const completed = Array.from({ length: maxWeek }, (_, index) => index + 1)
         .filter(week => (state.weeks[week] || []).filter(match => num(match.points) > 0).length >= state.teams.size);
       const latestCompletedWeek = completed.length ? Math.max(...completed) : 1;
-      if (state.selectedWeek === initialWeek && latestCompletedWeek > initialWeek) {
+      if (!state.weekManuallySelected && state.selectedWeek !== latestCompletedWeek) {
         const nextSelect = $("week-select");
         nextSelect.innerHTML = Array.from({ length: maxWeek }, (_, index) => `<option value="${index + 1}">WEEK ${index + 1}</option>`).join("");
         renderWeek(latestCompletedWeek);
