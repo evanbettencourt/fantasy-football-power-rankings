@@ -3059,7 +3059,8 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   background:var(--panel2);
   display:grid;
   grid-template-columns:1fr;
-  grid-template-rows:auto 1fr;
+  grid-template-rows:auto;
+  grid-auto-rows:min-content;
   align-content:start;
   gap:9px;
 }
