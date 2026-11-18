@@ -124,29 +124,52 @@
       </div>
     </section>
     <section class="section tab-panel schedule-page" data-panel="schedule" hidden>
-      <div class="schedule-hero">
-        <div class="eyebrow">MONKEY BOYS · <span id="schedule-season">2026 SEASON</span></div>
-        <div class="schedule-hero-row"><h1>Schedule</h1><div class="schedule-crest" aria-label="Monkey Boys crest">MB</div></div>
-        <p class="schedule-intro">Sleeper randomizes the regular-season schedule after the draft. Over the first 11 weeks, every team faces each of the other 11 teams once. Weeks 12–14 bring back the matchups from Weeks 1–3.</p>
-      </div>
-      <div class="schedule-phase-track" aria-label="Season schedule phases">
-        <div class="schedule-phase regular"><strong>Regular Season</strong><span>Weeks 1–11</span></div>
-        <div class="schedule-phase rematch"><strong>Rematch Weeks</strong><span>Weeks 12–14</span></div>
-        <div class="schedule-phase playoffs"><strong>Playoffs</strong><span>Weeks 15–17</span></div>
-      </div>
-      <div class="schedule-body">
-        <section class="schedule-section">
-          <div class="schedule-section-heading">Follow a Team</div>
-          <p class="schedule-hint">Select a manager to highlight their matchups throughout the schedule. Select them again to clear.</p>
+      <div class="schedule-shell">
+        <header class="schedule-mast">
+          <div class="schedule-mast-copy">
+            <div class="schedule-kicker">MONKEY BOYS FANTASY LEAGUE <span>·</span> <span id="schedule-season">2026 SEASON</span></div>
+            <h1>THE <em>SCHEDULE</em></h1>
+            <p class="schedule-lede">Every matchup. Every week. One road to the championship.</p>
+          </div>
+          <div class="schedule-crest" aria-label="Monkey Boys crest"><span>MB</span><small>EST. 2017</small></div>
+        </header>
+
+        <section class="schedule-timeline" aria-label="Season schedule timeline">
+          <div class="schedule-section-topline"><div><span class="schedule-eyebrow">THE ROAD TO THE TITLE</span><h2>2026 SEASON</h2></div><span class="schedule-timeline-note">17 WEEKS · 3 PHASES</span></div>
+          <div class="schedule-arc-wrap">
+            <svg class="schedule-arc" viewBox="0 0 1000 180" role="img" aria-label="Regular season Weeks 1 through 11, rematches Weeks 12 through 14, playoffs Weeks 15 through 17">
+              <defs>
+                <linearGradient id="scheduleArcGradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff4f91"/><stop offset=".66" stop-color="#8d45ed"/><stop offset="1" stop-color="#20b9d7"/></linearGradient>
+              </defs>
+              <path class="schedule-arc-track" d="M55 132 C245 10 755 10 945 132"/>
+              <path class="schedule-arc-progress" d="M55 132 C245 10 755 10 945 132"/>
+              <circle cx="55" cy="132" r="9" class="schedule-arc-point regular-point"/>
+              <circle cx="675" cy="48" r="9" class="schedule-arc-point rematch-point"/>
+              <circle cx="945" cy="132" r="9" class="schedule-arc-point playoff-point"/>
+            </svg>
+            <div class="schedule-phase-labels">
+              <div class="schedule-phase-label regular"><span>01 — 11</span><strong>REGULAR SEASON</strong><small>Every team plays every other team once</small></div>
+              <div class="schedule-phase-label rematch"><span>12 — 14</span><strong>REMATCH WEEKS</strong><small>Weeks 1–3 matchups repeat</small></div>
+              <div class="schedule-phase-label playoffs"><span>15 — 17</span><strong>PLAYOFFS</strong><small>Six teams compete for the title</small></div>
+            </div>
+          </div>
+          <p class="schedule-random-note"><span class="schedule-note-mark">i</span> Sleeper randomizes the regular-season schedule after the draft. There are no divisions.</p>
+        </section>
+
+        <section class="schedule-teams-section">
+          <div class="schedule-section-topline"><div><span class="schedule-eyebrow">PICK YOUR SIDE</span><h2>FOLLOW A TEAM</h2></div><span class="schedule-timeline-note">12 MANAGERS</span></div>
+          <p class="schedule-section-copy">Choose a manager to spotlight their matchups across the full regular season. Choose them again to clear the filter.</p>
           <div id="schedule-team-picks" class="schedule-team-picks"></div>
         </section>
-        <section class="schedule-section">
-          <div class="schedule-section-heading">Week by Week</div>
+
+        <section class="schedule-weeks-section">
+          <div class="schedule-section-topline"><div><span class="schedule-eyebrow">THE FULL SLATE</span><h2>WEEK BY WEEK</h2></div><span class="schedule-timeline-note">WEEKS 01–14</span></div>
           <div id="schedule-content" class="schedule-grid"><p class="empty-note">Loading the Sleeper schedule…</p></div>
         </section>
-        <section class="schedule-section schedule-playoff-section">
-          <div class="schedule-section-heading">The Playoffs</div>
-          <p class="schedule-playoff-note">The six-team playoff runs Weeks 15–17. The top two seeds receive first-round byes, and the semifinals reseed based on the opening-round results.</p>
+
+        <section class="schedule-playoff-section">
+          <div class="schedule-section-topline"><div><span class="schedule-eyebrow">THE FINISH LINE</span><h2>THE PLAYOFFS</h2></div><span class="schedule-timeline-note">WEEKS 15–17</span></div>
+          <p class="schedule-section-copy">The six-team playoff closes the season. The top two seeds earn first-round byes, followed by reseeded semifinals and the championship.</p>
           <div class="schedule-playoff-bracket"><img src="playoff-bracket.svg" alt="Six-team playoff bracket for Weeks 15–17, including first-round byes, reseeded semifinals, and championship payouts."/></div>
         </section>
       </div>
