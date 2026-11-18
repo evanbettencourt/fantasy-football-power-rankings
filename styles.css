@@ -1853,3 +1853,39 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   .parlay-result small{font-size:8px}
   .parlay-week-foot{padding:11px 14px;font-size:9px}
 }
+
+
+/* Matchup header: keep each team's three info groups compact and inward-facing. */
+.mu-side.side-a,.mu-side.side-b{
+  width:max-content;
+  max-width:100%;
+  grid-template-columns:max-content minmax(0,max-content) max-content;
+  gap:clamp(8px,1vw,14px);
+}
+.mu-side.side-a{
+  grid-template-areas:"meta manager score";
+  justify-self:end;
+}
+.mu-side.side-b{
+  grid-template-areas:"score manager meta";
+  justify-self:start;
+}
+.mu-side .mu-manager-copy{
+  width:auto;
+  max-width:clamp(88px,11vw,140px);
+}
+.mu-side .mu-manager-copy strong,
+.mu-side .mu-manager-copy small{
+  width:100%;
+}
+.mu-side.side-a .mu-manager-meta{justify-self:end;align-items:flex-end}
+.mu-side.side-b .mu-manager-meta{justify-self:start;align-items:flex-start}
+.mu-side.side-a .mu-score-stack{justify-self:end}
+.mu-side.side-b .mu-score-stack{justify-self:start}
+@media(max-width:600px){
+  .mu-side.side-a,.mu-side.side-b{
+    grid-template-columns:max-content minmax(0,max-content) max-content;
+    gap:clamp(5px,1.5vw,9px);
+  }
+  .mu-side .mu-manager-copy{max-width:76px}
+}
