@@ -1377,15 +1377,15 @@ const HALL_SPRITE_BODY=[
 "...OOCCCCCCOO...",
 "..ODCCCCCCCCDO..",
 "..DCCCAACCCCD...",
-"...DCCCCCCCD.....",
-".....DD..DD......",
+"...DCCCCCCCD....",
+".....DD..DD.....",
 ".....DD..DD......",
 ".....DD..DD......",
 "....ODD..DDO.....",
 "....DPP..PPD.....",
 "....DDD..DDD.....",
 "....DDD..DDD.....",
-"....OOOOOOOO....."
+"....OOOOOOOO...."
 ];
 function hallPixelAvatar(name){
  const palette=HALL_SPRITE_PALETTES[name]||HALL_SPRITE_PALETTES.Kevin;
