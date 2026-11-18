@@ -2201,3 +2201,11 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 @media(max-width:1000px){.hall-manager-grid,.hall-champion-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hall-flip-card{height:286px}}
 @media(max-width:720px){.hall-manager-grid,.hall-champion-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hall-record-section{margin-top:32px}}
 @media(max-width:480px){.hall-page{padding-top:26px}.hall-manager-grid,.hall-champion-grid{grid-template-columns:1fr}.hall-flip-card{height:280px}.hall-bracket-dialog{padding:22px 16px}.hall-section-heading{align-items:flex-start;flex-direction:column;gap:7px}}
+
+.hall-page{background:#15142b;color:#f7f4ff;padding:38px 24px 48px;border:1px solid #3e365e;border-radius:14px}
+.hall-page .hall-hero{border-bottom-color:#514574}
+.hall-page .hall-hero h1{color:#f7f4ff}
+.hall-page .hall-hero .eyebrow{color:#55dff3}
+.hall-page .hall-hero>p{color:#b7b0d0}
+.hall-page .hall-section-heading h2{color:#f7f4ff}
+.hall-page .hall-flip-card{font-family:var(--sans)}
