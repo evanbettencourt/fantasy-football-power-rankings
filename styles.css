@@ -2075,3 +2075,47 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   .parlay-week-details .parlay-result{font-size:10px}
   .parlay-week-details .parlay-result small{font-size:8px}
 }
+
+
+/* Hall of Fame / all-time record book */
+.hall-page{padding-top:44px}
+.hall-hero{padding:0 0 32px;border-bottom:1px solid var(--line)}
+.hall-hero h1{margin:14px 0 10px;font-size:clamp(54px,7vw,82px)}
+.hall-hero h1 em{color:var(--lime);font-style:italic}
+.hall-hero>p{max-width:650px;margin:0;color:var(--muted);font-size:14px;line-height:1.65}
+.hall-era-note{display:flex;flex-direction:column;gap:5px;margin-top:24px;padding:14px 16px;border-left:3px solid var(--lime);background:var(--panel2)}
+.hall-era-note b,.hall-kicker,.hall-count,.hall-status,.hall-manager-years,.hall-card-stats span,.hall-card-foot,.hall-record-table th,.hall-footnote{font-family:var(--mono);letter-spacing:.08em}
+.hall-era-note b{font-size:9px;color:var(--text)}
+.hall-era-note span{font-size:11px;color:var(--muted);line-height:1.5}
+.hall-record-section{margin-top:38px}
+.hall-section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px}
+.hall-kicker{display:block;color:var(--lime);font-size:9px;font-weight:600}
+.hall-section-heading h2{margin:6px 0 0;font-size:clamp(23px,3vw,30px);letter-spacing:-.045em}
+.hall-count{color:var(--muted);font-size:9px;white-space:nowrap}
+.hall-manager-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.hall-manager-card{min-width:0;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.hall-manager-card.retired{background:linear-gradient(145deg,var(--panel2),var(--panel));border-style:dashed}
+.hall-card-top{display:flex;align-items:center;justify-content:space-between}
+.hall-card-number{color:var(--muted);font:10px var(--mono)}
+.hall-status{font-size:8px;color:var(--lime)}
+.hall-manager-card.retired .hall-status{color:var(--muted)}
+.hall-manager-identity{display:flex;align-items:center;gap:11px;margin:17px 0 18px}
+.hall-avatar{display:grid;place-items:center;width:39px;height:39px;flex:none;border-radius:50%;background:var(--text);color:var(--bg);font:700 11px var(--mono)}
+.hall-manager-identity h3{margin:0;font-size:18px;letter-spacing:-.03em}
+.hall-manager-years{display:block;margin-top:4px;color:var(--muted);font-size:8px}
+.hall-card-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.hall-card-stats>div{display:flex;flex-direction:column;gap:4px}
+.hall-card-stats b{font:700 21px var(--mono);font-variant-numeric:tabular-nums}
+.hall-card-stats span{color:var(--muted);font-size:7px;line-height:1.3}
+.hall-card-foot{min-height:26px;padding-top:10px;color:var(--muted);font-size:8px;letter-spacing:.035em;line-height:1.5}
+.hall-record-table-wrap{overflow-x:auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.hall-record-table{width:100%;border-collapse:collapse;text-align:left;white-space:nowrap}
+.hall-record-table th{height:38px;color:var(--muted);font-size:8px;font-weight:500}
+.hall-record-table td{height:45px;border-top:1px solid var(--line);font:11px var(--mono);color:var(--muted)}
+.hall-record-table td strong{color:var(--text);font-family:var(--sans);font-size:12px}
+.hall-record-table th,.hall-record-table td{padding:0 13px}
+.hall-record-table th:first-child,.hall-record-table td:first-child{padding-left:16px}
+.hall-footnote{margin:12px 0 0;color:var(--muted);font-size:8px;line-height:1.6;letter-spacing:.035em}
+.hall-loading{padding:24px 0;color:var(--muted);font:10px var(--mono)}
+@media(max-width:850px){.hall-manager-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.hall-page{padding-top:28px}.hall-manager-grid{grid-template-columns:1fr}.hall-section-heading{align-items:flex-start;flex-direction:column;gap:7px}.hall-manager-card{padding:14px}.hall-record-section{margin-top:30px}}
