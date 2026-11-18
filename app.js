@@ -1293,6 +1293,7 @@ async function loadSleeperHallHistory(){
     catch(error){errors.push(year+" playoff bracket unavailable");}
     const completed=bracket.filter(game=>game.w!=null&&game.l!=null);
     const completedRegularWeeks=completedScoringWeeks;
+    const playoffFieldFinalized=year!==currentYear||completedRegularWeeks>=regularWeeks;
     const standingsWeeksComplete=completedScoringWeeks;
     const medianGameEnabled=Number(league.settings?.league_average_match)===1||league.settings?.league_average_match===true;
     const playoffTeams=Number(league.settings?.playoff_teams)||0;
@@ -1340,7 +1341,7 @@ async function loadSleeperHallHistory(){
       recordGames.push({year,week:null,label:"Playoff Round "+game.round,type:"Playoffs",manager1:game.team1,manager2:game.team2,score1:game.score1,score2:game.score2});
      }
     }
-    for(const game of bracket){
+    if(playoffFieldFinalized)for(const game of bracket){
      for(const rosterId of [game.t1,game.t2]){
       if(rosterId==null)continue;
       const manager=managerByRoster.get(Number(rosterId));
@@ -1364,9 +1365,9 @@ async function loadSleeperHallHistory(){
      runnerUp=managerByRoster.get(Number(finalGame?.l))||null;
     }
     if(thirdPlaceGame?.w!=null)thirdPlace=managerByRoster.get(Number(thirdPlaceGame.w))||null;
-    if(champion)hallStatFor(stats,champion).championships++;
-    if(runnerUp)hallStatFor(stats,runnerUp).runnerUps++;
-    if(thirdPlace)hallStatFor(stats,thirdPlace).thirdPlaces++;
+    if(playoffFieldFinalized&&champion)hallStatFor(stats,champion).championships++;
+    if(playoffFieldFinalized&&runnerUp)hallStatFor(stats,runnerUp).runnerUps++;
+    if(playoffFieldFinalized&&thirdPlace)hallStatFor(stats,thirdPlace).thirdPlaces++;
     const bracketGames=seasonBracketGames;
     if(completedRegularWeeks>=regularWeeks)seasonPoints.forEach((points,manager)=>seasonTotals.push({year,manager,points}));
     const regularMatchups=recordGames.length-regularGamesBefore;
