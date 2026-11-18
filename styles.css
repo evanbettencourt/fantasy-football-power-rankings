@@ -1889,3 +1889,18 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   }
   .mu-side .mu-manager-copy{max-width:76px}
 }
+
+
+/* Subtle divider between each matchup score cluster and manager details. */
+.mu-side.side-a .mu-score-stack{
+  border-left:1px solid var(--line);
+  padding-left:9px;
+}
+.mu-side.side-b .mu-score-stack{
+  border-right:1px solid var(--line);
+  padding-right:9px;
+}
+@media(max-width:600px){
+  .mu-side.side-a .mu-score-stack{padding-left:5px}
+  .mu-side.side-b .mu-score-stack{padding-right:5px}
+}
