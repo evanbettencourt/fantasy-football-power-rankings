@@ -514,21 +514,22 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
   };
   const projectionFor = (team, matchup) => {
     const starters = Array.isArray(matchup.starters) ? matchup.starters.map(String).filter(id => id && id !== "0") : [];
-    let remaining = 0, found = false;
+    let projectedTotal = 0, found = false;
     for (const id of starters) {
       const stat = stats[id];
-      const current = matchup.players_points && num(matchup.players_points[id]);
-      const alreadyScored = (stat && typeof stat === "object") || current > 0;
-      if (alreadyScored) continue;
+      const matchupPoints = matchup.players_points && matchup.players_points[id];
+      const actual = stat?.pts_half_ppr != null ? num(stat.pts_half_ppr) : num(matchupPoints);
       const projected = projections.get(id)?.stats?.pts_half_ppr;
       if (projected != null && Number.isFinite(Number(projected))) {
-        remaining += Number(projected);
+        projectedTotal += Math.max(actual, Number(projected));
         found = true;
+      } else if (stat || actual > 0) {
+        projectedTotal += actual;
       }
     }
-    const actual = num(matchup.points);
-    if (isPast) return { value: actual, available: true };
-    return { value: actual + remaining, available: hasProjectionData && (found || actual > 0) };
+    const actualTeamScore = num(matchup.points);
+    if (isPast) return { value: actualTeamScore, available: true };
+    return { value: Math.max(actualTeamScore, projectedTotal), available: hasProjectionData && found };
   };
   const teamSummary = (team, matchup) => {
     const record = recordById.get(team.id);
