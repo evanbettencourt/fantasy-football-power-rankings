@@ -20,6 +20,7 @@
     <button class="nav-tab" data-tab="lottery">Draft Lottery</button>
     <button class="nav-tab" data-tab="rankings">Power Rankings</button>
     <button class="nav-tab" data-tab="schedule">Schedule</button>
+    <button class="nav-tab" data-tab="matchups">Matchups</button>
     <button class="nav-tab" data-tab="parlays">Parlays</button>
     <button class="nav-tab" data-tab="awards">Awards</button>
     <button class="nav-tab" data-tab="hall">Hall of Fame</button>
@@ -151,6 +152,21 @@
           <div class="sch-playoff-bracket"><img src="playoff-bracket.svg" alt="Six-team playoff bracket for Weeks 15–17, with first-round byes, reseeded semifinals, and championship payouts."></div>
         </section>
       </div>
+    </section>
+    <section class="section tab-panel matchups-page" data-panel="matchups" hidden>
+      <div class="mu-hero">
+        <div>
+          <p class="mu-eyebrow">MONKEY BOYS · <span id="matchups-season">2026</span> SEASON</p>
+          <h1>Matchups</h1>
+          <p class="mu-intro">The weekly head-to-head. Follow the live score, projected finish, and matchup odds.</p>
+        </div>
+        <div class="mu-week-control">
+          <label for="matchups-week-select">WEEK</label>
+          <select id="matchups-week-select" aria-label="Select matchup week"></select>
+        </div>
+      </div>
+      <p class="mu-method-note">Live projections combine current team points with Sleeper projections for starters who have yet to record points. Win probability is an estimate based on the projected scoring margin.</p>
+      <div id="matchups-content" class="mu-grid"><p class="mu-empty">Loading weekly matchups…</p></div>
     </section>
     <section class="section tab-panel extra-panel" data-panel="parlays" hidden>
       <div class="eyebrow">WEEKLY LEAGUE ACTION</div>
