@@ -1134,7 +1134,9 @@ async function loadSleeperHallHistory(){
     catch(error){errors.push(year+" playoff bracket unavailable");}
     const completed=bracket.filter(game=>game.w!=null&&game.l!=null);
     const completedRegularWeeks=weekData.filter(({rows})=>rows.filter(row=>Number(row.points)>0).length===rosters.length).length;
-    const seasonStandings=[...seasonPoints.entries()].map(([manager,points])=>({manager,points,wins:seasonWins.get(manager)||0})).sort((a,b)=>b.wins-a.wins||b.points-a.points);
+    const standingsWeeksComplete=weekData.filter(({rows})=>rows.filter(row=>Number(row.points)>0).length===rosters.length).length;
+    const medianGameEnabled=Number(league.settings?.league_average_match)===1||league.settings?.league_average_match===true;
+    const seasonStandings=[...seasonPoints.entries()].map(([manager,points])=>({manager,points,wins:seasonWins.get(manager)||0,losses:Math.max(0,standingsWeeksComplete*(medianGameEnabled?2:1)-(seasonWins.get(manager)||0))})).sort((a,b)=>b.wins-a.wins||b.points-a.points).map((row,index)=>({...row,rank:index+1,playoff:index<Math.max(0,Number(league.settings?.playoff_teams)||Number(league.settings?.playoff_teams)||0)}));
     const regularSeasonChampion=completedRegularWeeks>=regularWeeks?seasonStandings[0]?.manager||null:null;
     if(regularSeasonChampion)hallStatFor(stats,regularSeasonChampion).regularSeasonChampionships.add(year);
     const rawBracketById=new Map(bracket.map(game=>[Number(game.m),game]));
@@ -1207,7 +1209,7 @@ async function loadSleeperHallHistory(){
     const regularMatchups=recordGames.length-regularGamesBefore;
     const playoffMatchups=seasonBracketGames.filter(game=>game.team1&&game.team2&&game.score1!=null&&game.score2!=null).length;
     seasonDiagnostics.push({year,leagueId:league.league_id,rosters:rosters.length,mappedManagers:managerByRoster.size,regularWeeksLoaded:weekData.length,regularMatchups,playoffMatchups,completedRegularWeeks});
-    seasons.push({year,champion,runnerUp:runnerUp||null,thirdPlace,regularSeasonChampion,bracket:bracketGames,leagueId:league.league_id,regularWeeks,completedRegularWeeks,managerCount:managerByRoster.size,mappedManagers:managerByRoster.size,regularMatchups,playoffMatchups});
+    seasons.push({year,champion,runnerUp:runnerUp||null,thirdPlace,regularSeasonChampion,standings:seasonStandings,bracket:bracketGames,leagueId:league.league_id,regularWeeks,completedRegularWeeks,managerCount:managerByRoster.size,mappedManagers:managerByRoster.size,regularMatchups,playoffMatchups});
    }catch(error){errors.push(year+" season failed: "+(error?.message||String(error)));}
    if(year>2021){
     const previousId=league.previous_league_id;
@@ -1365,6 +1367,11 @@ function hallBracketMarkup(year,championRow){
   return '<section class="hall-tree-column"><span class="hall-bracket-round-label">'+(round===rounds[rounds.length-1]?"CHAMPIONSHIP":"ROUND "+round)+'</span>'+items.map(matchCard).join("")+'</section>';
  }).join("")+'</div><p class="hall-bracket-archive-note">PRE-SLEEPER ARCHIVE · MATCHUP RESULTS RECONSTRUCTED FROM HISTORICAL RECORDS; SEEDS AND SCORES WERE NOT RETAINED.</p></div>';
 }
+function hallSleeperStandingsMarkup(row){
+ const standings=row?.standings||[];
+ if(!standings.length)return "";
+ return '<section class="hall-season-standings"><h3>FINAL REGULAR-SEASON STANDINGS</h3><div class="hall-season-table-wrap"><table class="hall-season-table"><thead><tr><th>#</th><th>MANAGER</th><th>W-L</th><th>POINTS</th><th>STATUS</th></tr></thead><tbody>'+standings.map(item=>'<tr><td>'+item.rank+'</td><td>'+escapeHtml(item.manager)+'</td><td>'+item.wins+'-'+item.losses+'</td><td>'+fmt(item.points)+'</td><td>'+(item.playoff?'<span class="hall-season-playoff">PLAYOFFS</span>':'—')+'</td></tr>').join("")+'</tbody></table></div><p class="hall-archive-note">SLEEPER ARCHIVE · STANDINGS USE COMPLETED REGULAR-SEASON WEEKS AND LEAGUE MEDIAN WINS WHERE ENABLED.</p></section>';
+}
 function hallAwardsMarkup(){
  const count=AWARDS_2025.reduce((n,a)=>n+a.nominees.length,0);
  const managerLabel=name=>AWARD_TEAM_MANAGERS[name]?' <span class="award-team-manager">· '+escapeHtml(AWARD_TEAM_MANAGERS[name])+'</span>':'';
@@ -1373,7 +1380,7 @@ function hallAwardsMarkup(){
 function openHallBracket(year){
  const row=state.hallHistory?.seasons?.find(item=>Number(item.year)===Number(year))||PRE_SLEEPER_CHAMPIONS.find(item=>Number(item.year)===Number(year));
  const champion=row?.champion||"TBD",runner=row?.runnerUp||"—";
- const legacyStandings=hallLegacyStandingsMarkup(year);
+ const legacyStandings=hallLegacyStandingsMarkup(year)||hallSleeperStandingsMarkup(row);
  const awardMarkup=year===2025?hallAwardsMarkup():"";
  const old=document.querySelector(".hall-bracket-overlay");if(old)old.remove();
  const overlay=document.createElement("div");overlay.className="hall-bracket-overlay";
