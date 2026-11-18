@@ -2388,3 +2388,8 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 @media(max-width:1000px){.hall-manager-grid .hall-flip-card{height:312px}}
 @media(max-width:720px){.hall-manager-grid .hall-flip-card{height:312px}}
 @media(max-width:440px){.hall-manager-grid .hall-flip-card{height:312px}.hall-card-back{padding:10px 9px 8px}.hall-back-stats small{font-size:6px}.hall-back-honors li strong{font-size:7px}.hall-back-honors li small{font-size:6px}}
+
+
+/* Use the exact 32-bit character sprites supplied for the Hall of Fame. */
+.hall-character-avatar.hall-pixel-sprite{display:block;width:100%;height:100%;border:0;border-radius:0;background-image:url('assets/hall-characters.png');background-repeat:no-repeat;background-size:auto 100%;image-rendering:pixelated;shape-rendering:crispEdges;box-shadow:none;filter:none}
+.hall-avatar-line{background:transparent!important;overflow:visible}
