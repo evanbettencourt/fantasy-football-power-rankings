@@ -221,7 +221,7 @@ html,body{background:#17132b;color:var(--text);font-family:"DM Sans",Arial,sans-
 .dob{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:7px}
 .dob-slot{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:13px 5px 12px;background:#ffffff08;border:1px solid #ffffff13;border-radius:9px}
 .dob-n{font:700 11px var(--mono);color:#a99fbe}
-.dob-dot,.ds-dot{width:8px;height:8px;border-radius:50%;flex:none}
+.dob-dot,.ds-dot{width:8px;height:8px;border-radius:50%;flex:none}.dob-dot{background:#a99fbe}.dob-nm{color:var(--text)}
 .dob-nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:800 10px var(--sans)}
 .ds-cols{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);gap:28px}
 .ds-thd,.ds-row{display:grid;grid-template-columns:38px minmax(0,1fr) 65px 76px;align-items:center;gap:9px}
