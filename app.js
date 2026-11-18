@@ -559,12 +559,22 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const allPlayers = Array.isArray(matchup.players) ? matchup.players.map(String) : [];
     const starters = Array.isArray(matchup.starters) ? matchup.starters.map(String).filter(id => id && id !== "0") : [];
     const starterSet = new Set(starters);
-    const bench = allPlayers.filter(id => !starterSet.has(id));
+    const rosterRecord = state.rosters.find(roster => Number(roster.roster_id) === Number(team.id));
+    const irPlayers = Array.isArray(rosterRecord?.reserve) ? rosterRecord.reserve.map(String) : [];
+    const irSet = new Set(irPlayers);
+    const fullRoster = [...new Set([...allPlayers, ...irPlayers])];
+    const bench = fullRoster.filter(id => !starterSet.has(id));
+    const regularBench = bench.filter(id => !irSet.has(id));
+    const irBench = bench.filter(id => irSet.has(id));
     const slots = Array.isArray(state.league?.roster_positions) ? state.league.roster_positions : [];
-    const rows = (showBench ? bench : starters).map(id => {
+    const renderPlayerRows = ids => ids.map(id => {
       const slotPosition = showBench ? null : slots[starters.indexOf(id)];
       return playerRow(id, matchup, !showBench, slotPosition);
     }).join("");
+    const rows = showBench
+      ? renderPlayerRows(regularBench) +
+        (irBench.length ? '<div class="mu-ir-divider"><span>INJURED RESERVE</span></div>' + renderPlayerRows(irBench) : "")
+      : renderPlayerRows(starters);
     return '<section class="mu-roster-team"><h4 style="color:' + lotteryColor(team.name) + '">' + escapeHtml(team.name) + '</h4>' +
       '<div class="mu-player-head"><span>POS</span><span>PLAYER</span><span>PTS</span><span>PROJ</span></div>' +
       (rows || '<p class="mu-empty">' + (showBench ? "No bench players listed." : "Starter data unavailable.") + '</p>') +
