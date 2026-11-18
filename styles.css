@@ -3234,3 +3234,8 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .award-nominees{align-self:stretch}
 .award-nominees summary{min-height:42px;box-sizing:border-box}
 @media(max-width:760px){.award-card{min-height:280px}.award-winner{padding:13px 14px}}
+
+
+/* Keep the site navigation strictly horizontal on touch and desktop. */
+.site-nav{overflow-x:auto;overflow-y:hidden;overscroll-behavior-y:contain;touch-action:pan-x;}
+@media(max-width:760px){.site-nav{overflow-x:auto!important;overflow-y:hidden!important;touch-action:pan-x;}}
