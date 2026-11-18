@@ -932,9 +932,19 @@ function gradeParlayPick(pick,stats,players,schedule){
  if(!playerEntry)return {status:"REVIEW",detail:"Player not found in Sleeper directory"};
  const stat=stats?.[playerEntry[0]];
  if(!stat)return {status:"PENDING",detail:"Sleeper stats unavailable"};
- if(/\bTD\b/i.test(raw)&&!/(pass|passing)\s*\d/i.test(raw)){
+ if(/\bTD\b/i.test(raw)&&/yards?\s*\+\s*TD/i.test(raw))return {status:"REVIEW",detail:"Combined yards + touchdown prop"};
+ if(/pass(?:ing)?\s*(?:TD|touchdowns?)/i.test(raw)){
+  const line=raw.match(/\b(O|U)\s*(\d+(?:\.\d+)?)/i);
+  if(!line)return {status:"REVIEW",detail:"Passing TD line not clear"};
+  const value=parlayStatNumber(stat,"pass_td");
+  if(value==null)return {status:"PENDING",detail:"Passing TD stat unavailable"};
+  const hit=line[1].toUpperCase()==="U"?value<Number(line[2]):value>Number(line[2]);
+  return {status:value===Number(line[2])?"PUSH":hit?"HIT":"MISS",detail:"PASS TD "+value+" / "+line[1].toUpperCase()+" "+line[2]};
+ }
+ if(/\bTD\b/i.test(raw)){
   const total=["rush_td","rec_td","def_td","st_td","fum_rec_td"].reduce((sum,key)=>sum+(parlayStatNumber(stat,key)||0),0);
-  return {status:total>0?"HIT":"MISS",detail:total+" TD"};
+  const multi=raw.match(/\b(\d+)\s*\+?\s*TD/i),needed=multi?Number(multi[1]):1;
+  return {status:total>=needed?"HIT":"MISS",detail:total+" TD / "+needed+"+"};
  }
  const overUnder=raw.match(/\b(O|U)\s*(\d+(?:\.\d+)?)/i);
  const plus=raw.match(/\b(\d+(?:\.\d+)?)\s*\+/);
@@ -949,6 +959,11 @@ function gradeParlayPick(pick,stats,players,schedule){
  else if(/pass(?:ing)?\s*(?:td|touchdowns?)/i.test(raw)){key="pass_td";label="PASS TD"}
  else if(/\bint(?:erceptions?)?\b/i.test(raw)){key="pass_int";label="INT"}
  else return {status:"REVIEW",detail:"Prop type not recognized"};
+ if(!Object.keys(PARLAY_PLAYER_ALIASES).some(k=>k===alias))return {status:"REVIEW",detail:"Player alias not verified"};
+ const playerTeam=String(playerEntry[1].team||"").toUpperCase();
+ const game=(schedule?.events||[]).find(ev=>(ev.competitions?.[0]?.competitors||[]).some(c=>String(c.team?.abbreviation||"").toUpperCase()===playerTeam));
+ const competition=game?.competitions?.[0],finished=Boolean(competition?.status?.type?.completed??game?.status?.type?.completed??competition?.status?.type?.state==="post");
+ if(!finished)return {status:"PENDING",detail:"Player's NFL game not final"};
  const value=parlayStatNumber(stat,key);
  if(value==null)return {status:"PENDING",detail:"Stat not available"};
  const hit=overUnder?.[1].toUpperCase()==="U"?value<threshold:value>threshold;
