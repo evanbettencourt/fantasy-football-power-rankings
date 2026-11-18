@@ -400,11 +400,15 @@ function renderSchedule() {
   const season = state.league?.season || new Date().getFullYear();
   const seasonLabel = $("schedule-season");
   if (seasonLabel) seasonLabel.textContent = season + " SEASON";
+
+  const teamColor = team => lotteryColor(team.name);
   pickTarget.innerHTML = teams.map(team => {
-    const color = lotteryColor(team.name);
-    return '<button type="button" class="schedule-team-pick '+(selectedScheduleTeam===team.name?'active':'')+'" data-schedule-team="'+escapeHtml(team.name)+'" aria-pressed="'+(selectedScheduleTeam===team.name?'true':'false')+'"><span class="schedule-team-dot" style="background:'+color+'"></span>'+escapeHtml(team.name)+'</button>';
+    const color = teamColor(team);
+    const active = selectedScheduleTeam === team.name;
+    return '<button type="button" class="schedule-team-pick '+(active?'active':'')+'" data-schedule-team="'+escapeHtml(team.name)+'" aria-pressed="'+(active?'true':'false')+'" style="--schedule-team-color:'+color+'"><span class="schedule-team-dot"></span><span class="schedule-team-name">'+escapeHtml(team.name)+'</span><span class="schedule-team-check">'+(active?'✓':'＋')+'</span></button>';
   }).join("");
-  const weeks = [];
+
+  const cards = [];
   for (let week=1; week<=14; week++) {
     const source = state.weeks[week] || [];
     const groups = new Map();
@@ -418,23 +422,34 @@ function renderSchedule() {
       const a=teamFor(group[0].roster_id), b=teamFor(group[1].roster_id);
       return a&&b?{a,b}:null;
     }).filter(Boolean).sort((a,b)=>a.a.name.localeCompare(b.a.name));
-    const phase = week<=11 ? "regular" : "rematch";
-    const tag = week<=11 ? "REGULAR SEASON" : "WEEK "+(week-11)+" REMATCH";
+    const rematch = week>=12;
     const rows = games.map(game=>{
-      const isMatch = !selectedScheduleTeam || game.a.name===selectedScheduleTeam || game.b.name===selectedScheduleTeam;
-      return '<div class="schedule-matchup '+(selectedScheduleTeam?(isMatch?'is-match':'not-match'):'')+'"><span class="schedule-match-team '+(game.a.name===selectedScheduleTeam?'selected':'')+'">'+escapeHtml(game.a.name)+'</span><span class="schedule-vs">VS</span><span class="schedule-match-team '+(game.b.name===selectedScheduleTeam?'selected':'')+'">'+escapeHtml(game.b.name)+'</span></div>';
+      const aSelected = game.a.name===selectedScheduleTeam;
+      const bSelected = game.b.name===selectedScheduleTeam;
+      const isMatch = !selectedScheduleTeam || aSelected || bSelected;
+      return '<div class="schedule-matchup '+(selectedScheduleTeam?(isMatch?'is-match':'not-match'):'')+'">'+
+        '<div class="schedule-match-side '+(aSelected?'selected':'')+'" style="--match-team-color:'+teamColor(game.a)+'"><span class="schedule-match-dot"></span><strong>'+escapeHtml(game.a.name)+'</strong></div>'+
+        '<span class="schedule-vs">VS</span>'+
+        '<div class="schedule-match-side right '+(bSelected?'selected':'')+'" style="--match-team-color:'+teamColor(game.b)+'"><strong>'+escapeHtml(game.b.name)+'</strong><span class="schedule-match-dot"></span></div>'+
+      '</div>';
     }).join("");
-    const empty = state.failedWeeks.includes(week) ? "Schedule data unavailable for this week." : "Matchups have not been posted by Sleeper yet.";
-    weeks.push('<article class="schedule-week-card '+phase+'"><header class="schedule-week-head"><div><span class="schedule-week-number">WEEK '+String(week).padStart(2,"0")+'</span>'+(week>=12?'<small>REMATCH OF WEEK '+(week-11)+'</small>':'')+'</div><span class="schedule-week-tag">'+tag+'</span></header><div class="schedule-matchups">'+(rows||'<p class="schedule-empty">'+empty+'</p>')+'</div></article>');
+    const empty = state.failedWeeks.includes(week) ? "Sleeper schedule data is unavailable for this week." : "Matchups have not been posted by Sleeper yet.";
+    const tag = rematch ? 'REMATCH · WEEK '+(week-11) : 'REGULAR SEASON';
+    cards.push('<article class="schedule-week-card '+(rematch?'rematch':'regular')+'">'+
+      '<header class="schedule-week-head"><div class="schedule-week-title"><span class="schedule-week-word">WEEK</span><strong>'+String(week).padStart(2,"0")+'</strong></div>'+
+      '<div class="schedule-week-meta"><span class="schedule-week-phase">'+tag+'</span>'+(rematch?'<small>REPEATS WEEK '+(week-11)+'</small>':'<small>11-GAME ROUND ROBIN</small>')+'</div></header>'+
+      '<div class="schedule-matchups">'+(rows||'<p class="schedule-empty">'+empty+'</p>')+'</div>'+
+      '<div class="schedule-week-foot"><span>'+games.length+' MATCHUPS</span><span>'+(rematch?'REMATCH ROUND':'REGULAR SEASON')+'</span></div>'+
+    '</article>');
+    if (week===11) cards.push('<div class="schedule-grid-divider"><span>THE REMATCH RUN-IN</span><i></i><small>WEEKS 12–14</small></div>');
   }
   contentTarget.classList.toggle("has-selection",!!selectedScheduleTeam);
-  contentTarget.innerHTML = weeks.join("");
+  contentTarget.innerHTML = cards.join("");
   pickTarget.querySelectorAll("[data-schedule-team]").forEach(button=>button.addEventListener("click",()=>{
     selectedScheduleTeam=selectedScheduleTeam===button.dataset.scheduleTeam?null:button.dataset.scheduleTeam;
     renderSchedule();
   }));
 }
-
 function renderEditorial(week, rankings) {
   const scores=(state.weeks[week]||[]).filter(m=>num(m.points)>0).sort((a,b)=>num(b.points)-num(a.points));
   const chart=$("weekly-chart-bars");
