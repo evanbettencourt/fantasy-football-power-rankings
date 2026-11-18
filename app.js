@@ -1134,8 +1134,8 @@ async function loadSleeperHallHistory(){
     await Promise.all([1,2,3].map(async round=>{
      try{
       const rows=await fetchJson("/league/"+league.league_id+"/matchups/"+(playoffStart+round-1),{attempts:2,timeoutMs:12000});
-      if(Array.isArray(rows))playoffScoreByWeek.set(round,new Map(rows.map(row=>[Number(row.roster_id),Number(row.points)])));
-     }catch(error){}
+      if(Array.isArray(rows))playoffScoreByWeek.set(round,new Map(rows.filter(row=>row.points!=null&&Number.isFinite(Number(row.points))).map(row=>[Number(row.roster_id),Number(row.points)])));
+     }catch(error){errors.push(year+" playoff Week "+(playoffStart+round-1)+" scores unavailable");}
     }));
     const seedByRoster=new Map(rosters.map(roster=>[Number(roster.roster_id),Number(roster.settings?.playoff_seed||roster.settings?.seed)||null]));
     const seasonBracketGames=bracket.map(game=>({
@@ -1182,7 +1182,7 @@ async function loadSleeperHallHistory(){
     if(runnerUp)hallStatFor(stats,runnerUp).runnerUps++;
     if(thirdPlace)hallStatFor(stats,thirdPlace).thirdPlaces++;
     const bracketGames=seasonBracketGames;
-    seasonPoints.forEach((points,manager)=>seasonTotals.push({year,manager,points}));
+    if(completedRegularWeeks>=regularWeeks)seasonPoints.forEach((points,manager)=>seasonTotals.push({year,manager,points}));
     const regularMatchups=recordGames.length-regularGamesBefore;
     const playoffMatchups=seasonBracketGames.filter(game=>game.team1&&game.team2&&game.score1!=null&&game.score2!=null).length;
     seasonDiagnostics.push({year,leagueId:league.league_id,rosters:rosters.length,mappedManagers:managerByRoster.size,regularWeeksLoaded:weekData.length,regularMatchups,playoffMatchups,completedRegularWeeks});
