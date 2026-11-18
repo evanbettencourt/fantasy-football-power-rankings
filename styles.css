@@ -2456,3 +2456,17 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .hall-season-champion small{color:#c3bdcf;font-size:12px}
 .hall-season-section{margin:24px 0}
 .hall-season-section h2{font-size:20px;margin:0 0 14px}
+
+/* Season archive refinements */
+.hall-tree-round-one{justify-content:space-around}
+.hall-tree-bye{border-style:dashed;border-color:#55dff366;background:linear-gradient(145deg,#1c2940,#19182e)}
+.hall-tree-bye .hall-bye-opponent{justify-content:center;color:#55dff3;font:800 9px var(--mono);letter-spacing:.12em}
+.hall-placement-games{display:flex;flex-direction:column;gap:18px;margin-top:44px;padding-top:16px;border-top:1px dashed #ffffff35}
+.hall-placement-game{padding:10px;border:1px solid #ffffff18;border-radius:10px;background:#ffffff05}
+.hall-placement-game .hall-bracket-round-label{color:#c58c64}
+.hall-draft-table td.hall-draft-pick{padding:9px 7px 24px;color:#24202b;border-right:1px solid #00000012;vertical-align:top}
+.hall-draft-table td.hall-draft-pick b{display:block;min-width:0;max-width:100%;color:#211d27;font:800 10px/1.22 var(--sans);white-space:normal;overflow-wrap:anywhere}
+.hall-draft-table td.hall-draft-pick small{display:block;color:#393440;font:700 8px/1.2 var(--mono);overflow-wrap:anywhere}
+.hall-draft-table td.hall-draft-pick em{color:#17131c;font:900 9px var(--mono);font-style:normal}
+.hall-draft-table td.pos-qb{background:#F3A6A6}.hall-draft-table td.pos-rb{background:#A9D8B0}.hall-draft-table td.pos-wr{background:#A9D4F2}.hall-draft-table td.pos-te{background:#F3E2A0}.hall-draft-table td.pos-flex{background:#C9B4F0}.hall-draft-table td.pos-sflx{background:#F2B5D5}.hall-draft-table td.pos-other{background:#D5D0DF}
+.hall-draft-table th b{display:block;max-width:100%;white-space:normal;overflow-wrap:anywhere;font:800 8px/1.2 var(--mono)}
