@@ -3170,3 +3170,53 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   gap:12px;
 }
 [data-panel="rules"] .rules-scoring-card header{grid-column:1/-1}
+
+
+/* Improve legibility and visual balance in the Rules explainer graphics. */
+[data-panel="rules"] .rules-trade-flow{gap:14px;padding:18px}
+[data-panel="rules"] .rules-trade-flow>div{gap:7px}
+[data-panel="rules"] .rules-trade-flow span{font-size:11px}
+[data-panel="rules"] .rules-trade-flow strong{font-size:12px;line-height:1.3}
+[data-panel="rules"] .rules-trade-flow small{font-size:11px;line-height:1.45}
+
+[data-panel="rules"] .rules-faab-bank>span{font-size:11px}
+[data-panel="rules"] .rules-faab-bank strong{font-size:40px}
+[data-panel="rules"] .rules-faab-bank small{font-size:11px}
+[data-panel="rules"] .rules-faab-flow{gap:12px}
+[data-panel="rules"] .rules-faab-flow>div{gap:6px}
+[data-panel="rules"] .rules-faab-flow b{font-size:11px}
+[data-panel="rules"] .rules-faab-flow strong{font-size:12px;line-height:1.3}
+[data-panel="rules"] .rules-faab-flow small{font-size:11px;line-height:1.45}
+[data-panel="rules"] .rules-faab-foot{font-size:10px;line-height:1.4}
+
+[data-panel="rules"] .rules-median-visual{padding:18px;gap:14px}
+[data-panel="rules"] .rules-median-visual span{font-size:10px;letter-spacing:.04em}
+[data-panel="rules"] .rules-median-visual strong{font-size:30px}
+[data-panel="rules"] .rules-median-visual small{font-size:11px}
+
+[data-panel="rules"] .rules-draft-visual{padding:20px}
+[data-panel="rules"] .rules-draft-round{gap:12px;margin:16px 0}
+[data-panel="rules"] .rules-draft-round>b{font-size:11px}
+[data-panel="rules"] .rules-draft-picks{gap:5px}
+[data-panel="rules"] .rules-draft-picks i{font-size:12px;border-radius:6px}
+[data-panel="rules"] .rules-draft-caption{font-size:9px;letter-spacing:.04em}
+
+@media(max-width:620px){
+ [data-panel="rules"] .rules-trade-flow{gap:7px;padding:12px}
+ [data-panel="rules"] .rules-trade-flow span{font-size:10px}
+ [data-panel="rules"] .rules-trade-flow strong{font-size:10px}
+ [data-panel="rules"] .rules-trade-flow small{font-size:9px}
+ [data-panel="rules"] .rules-faab-flow{gap:8px}
+ [data-panel="rules"] .rules-faab-flow strong{font-size:11px}
+ [data-panel="rules"] .rules-faab-flow small{font-size:10px}
+ [data-panel="rules"] .rules-faab-foot{font-size:9px}
+ [data-panel="rules"] .rules-draft-picks{gap:2px}
+ [data-panel="rules"] .rules-draft-picks i{font-size:10px}
+ [data-panel="rules"] .rules-draft-caption{font-size:8px}
+}
+@media(max-width:560px){
+ [data-panel="rules"] .rules-median-visual{gap:7px;padding:13px 9px}
+ [data-panel="rules"] .rules-median-visual span{font-size:9px}
+ [data-panel="rules"] .rules-median-visual strong{font-size:25px}
+ [data-panel="rules"] .rules-median-visual small{font-size:10px}
+}
