@@ -1259,3 +1259,19 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 @media(max-width:520px){
   .mu-roster-grid{grid-template-columns:1fr}
 }
+
+
+/* Matchup seed and power-rank distinction, plus probability labels around the bar. */
+.mu-rank{flex-basis:38px;height:38px;font-size:16px;font-weight:800;color:var(--text)}
+.mu-manager-copy small{letter-spacing:0;font-size:7px}
+.mu-prob-wrap{padding:0 13px 12px}
+.mu-prob-row{display:grid;grid-template-columns:42px minmax(0,1fr) 42px;align-items:center;gap:9px}
+.mu-prob-value{font:700 10px var(--mono);font-variant-numeric:tabular-nums;text-align:center;color:var(--muted)}
+.mu-prob-value.favored{color:#35C878}
+.mu-prob-value.underdog{color:#FF4F91}
+.mu-prob-label{margin-top:6px;text-align:center;color:var(--muted);font:600 8px var(--mono);letter-spacing:.12em}
+.mu-prob-track{width:100%;min-width:0}
+@media(max-width:520px){
+  .mu-rank{flex-basis:30px;height:30px;font-size:13px}
+  .mu-prob-row{grid-template-columns:35px minmax(0,1fr) 35px;gap:6px}
+}
