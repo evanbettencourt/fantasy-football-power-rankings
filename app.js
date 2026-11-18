@@ -1379,12 +1379,12 @@ const HALL_SPRITE_BODY=[
 "..DCCCAACCCCD...",
 "...DCCCCCCCD....",
 ".....DD..DD.....",
-".....DD..DD......",
-".....DD..DD......",
-"....ODD..DDO.....",
-"....DPP..PPD.....",
-"....DDD..DDD.....",
-"....DDD..DDD.....",
+".....DD..DD.....",
+".....DD..DD.....",
+"....ODD..DDO....",
+"....DPP..PPD....",
+"....DDD..DDD....",
+"....DDD..DDD....",
 "....OOOOOOOO...."
 ];
 function hallPixelAvatar(name){
