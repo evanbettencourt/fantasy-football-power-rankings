@@ -633,16 +633,12 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
     const projected = projectionFor(team, matchup);
     const starters = Array.isArray(matchup.starters) ? matchup.starters.map(String).filter(id => id && id !== "0") : [];
     let teamFinished = scheduleGames.length > 0 && starters.length > 0;
-    let originalTotal = 0;
     for (const id of starters) {
       const player = players[id] || {};
       const playerTeam = teamCode(player.team);
       const game = teamSchedules.get(playerTeam);
       const hasBye = Boolean(playerTeam) && !game && scheduleGames.length > 0;
       if (!playerTeam || (!hasBye && !game?.completed)) teamFinished = false;
-      const original = projections.get(id)?.stats?.pts_half_ppr;
-      if (original == null || !Number.isFinite(Number(original))) teamFinished = false;
-      else originalTotal += Number(original);
     }
     const score = num(matchup.points);
     return { record: record?.record || "0-0", seed: seeds.get(team.id), powerRank, projected, score, finished: teamFinished, color: lotteryColor(team.name) };
