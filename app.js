@@ -1160,7 +1160,7 @@ function renderHallOfFame(){
  const retired=[...RETIRED_MANAGERS];
  const statFor=name=>allStats.get(name)||newHallStat(name);
  const makeCard=(name,index,isRetired)=>{
-  const stat=statFor(name),record=stat.regularWins+"-"+stat.regularLosses+(stat.regularTies?"-"+stat.regularTies:"");
+  const stat=statFor(name),record=stat.seasons.size?stat.regularWins+"-"+stat.regularLosses+(stat.regularTies?"-"+stat.regularTies:""):"—";
   const playoffYears=[...stat.playoffAppearances].sort((a,b)=>a-b).join(" · ")||"—";
   const seasons=[...stat.seasons].sort((a,b)=>a-b).join(" · ");
   return '<article class="hall-manager-card '+(isRetired?'retired':'active')+'"><div class="hall-card-top"><span class="hall-card-number">'+String(index+1).padStart(2,"0")+'</span><span class="hall-status">'+(isRetired?'RETIRED':'ACTIVE')+'</span></div><div class="hall-manager-identity"><span class="hall-avatar">'+escapeHtml(initials(name))+'</span><div><h3>'+escapeHtml(name)+'</h3><span class="hall-manager-years">'+(MANAGER_TENURES[name]||(isRetired?'FORMER MANAGER':'CURRENT MANAGER'))+'</span></div></div><div class="hall-card-stats hall-career-stats"><div><b>'+stat.championships+'</b><span>TITLES</span></div><div><b>'+record+'</b><span>REGULAR W-L</span></div><div><b>'+stat.playoffWins+'</b><span>PLAYOFF WINS</span></div><div><b>'+stat.playoffAppearances.size+'</b><span>PLAYOFF YEARS</span></div></div><div class="hall-card-foot">'+(seasons?'Sleeper seasons: '+seasons+' · ':'')+'Playoff seasons: '+playoffYears+'</div></article>';
