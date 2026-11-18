@@ -373,10 +373,6 @@ html,body{background:#17132b;color:var(--text);font-family:"DM Sans",Arial,sans-
   border-radius:8px;
   background:rgba(255,255,255,.03);
 }
-.lottery-page .dob-slot:first-child{
-  border-color:rgba(213,148,59,.55);
-  background:rgba(213,148,59,.08);
-}
 .lottery-page .dob-n{
   width:30px;
   color:rgba(245,244,235,.5);
