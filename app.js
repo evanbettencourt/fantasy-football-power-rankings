@@ -1445,7 +1445,7 @@ function hallPlayoffTemplateMarkup(){
   {matchId:7,round:3,placement:5,team1:null,team2:null,source1:{l:1},source2:{l:2}}
  ];
  const row={bracket,byeTeams:[{seed:1,manager:"Seed 1"},{seed:2,manager:"Seed 2"}]};
- return hallBracketMarkup(Number(state.league?.season)||new Date().getFullYear(),row);
+ return '<div class="hall-bracket-scroll">' + hallBracketMarkup(Number(state.league?.season)||new Date().getFullYear(),row) + '</div>';
 }
 function hallBracketMarkup(year,championRow){
  const games=championRow?.bracket?.length?championRow.bracket:hallPreSleeperBracket(year);
