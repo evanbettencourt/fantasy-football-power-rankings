@@ -1045,7 +1045,7 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .pr-controls select option{background:var(--pr-jfl-deep)}
 .pr-controls button{border-color:rgba(123,51,245,.7);color:var(--pr-jfl-light)}
 .pr-controls button:hover{background:rgba(123,51,245,.2)}
-.pr-chart-img{background:#fff;border-color:rgba(255,255,255,.12)}
+.pr-chart-img{background:var(--panel);border-color:var(--line)}
 .pr-chart-bar-item span{font-family:var(--mono);color:var(--pr-jfl-cream)}
 .pr-chart-bar-item b{font-family:var(--sans);color:var(--pr-jfl-light)}
 .pr-chart-median-divider{border-left-color:rgba(245,244,235,.45)}
