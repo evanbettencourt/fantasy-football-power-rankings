@@ -1038,7 +1038,7 @@ function hallManagerFromSleeperUser(user,managerByUserId=state.managerBySleeperU
  return null;
 }
 function newHallStat(name){
- return {name,regularWins:0,regularLosses:0,regularTies:0,regularGames:0,pf:0,pa:0,playoffWins:0,playoffAppearances:new Set(),championships:0,runnerUps:0,thirdPlaces:0,regularSeasonChampionships:new Set(),seasons:new Set()};
+ return {name,regularWins:0,regularLosses:0,regularTies:0,regularGames:0,weeksPlayed:0,pf:0,pa:0,playoffWins:0,playoffAppearances:new Set(),championships:0,runnerUps:0,thirdPlaces:0,regularSeasonChampionships:new Set(),seasons:new Set()};
 }
 function hallStatFor(stats,name){
  if(!stats.has(name))stats.set(name,newHallStat(name));
@@ -1201,7 +1201,7 @@ async function loadSleeperHallHistory(){
      const groups=new Map();
      for(const row of scoreRows){
       const id=Number(row.roster_id),manager=managerByRoster.get(id),stat=hallStatFor(stats,manager),points=Number(row.points);
-      stat.pf+=points;stat.regularGames++;
+      stat.pf+=points;stat.regularGames++;stat.weeksPlayed++;
       seasonPoints.set(manager,(seasonPoints.get(manager)||0)+points);
       if(!groups.has(row.matchup_id))groups.set(row.matchup_id,[]);
       groups.get(row.matchup_id).push(row);
@@ -1504,10 +1504,10 @@ function renderHallOfFame(){
   const stat=statFor(name),games=stat.regularWins+stat.regularLosses+stat.regularTies;
   const record=stat.seasons.size?stat.regularWins+"-"+stat.regularLosses+(stat.regularTies?"-"+stat.regularTies:""):"—";
   const winPct=games?(100*stat.regularWins/games).toFixed(1)+"%":"—";
-  const avg=stat.regularGames?fmt(stat.pf/stat.regularGames):"—";
+  const avg=stat.weeksPlayed?fmt(stat.pf/stat.weeksPlayed):"—";
   const honors=hallManagerHonors(name,stat);
   const honorIcons=honors.map(honor=>Array.from({length:(honor.detail||"").split(",").filter(Boolean).length||1},()=>'<span class="hall-honor-icon '+(honor.tone||"")+'" title="'+escapeHtml(honor.label)+'" aria-label="'+escapeHtml(honor.label)+'">'+honor.icon+'</span>').join("")).join("");
-  const honorList=honors.length?honors.map(honor=>'<li><span>'+honor.icon+'</span><div><strong>'+escapeHtml(honor.label)+'</strong><small>'+escapeHtml(honor.detail||"")+'</small></div></li>').join(""):'<li class="hall-no-honors">NO RECORDED HONORS YET</li>';
+  const honorList=honors.length?honors.map(honor=>'<li><span class="hall-honor-icon '+(honor.tone||"")+'">'+honor.icon+'</span><div><strong>'+escapeHtml(honor.label)+'</strong><small>'+escapeHtml(honor.detail||"")+'</small></div></li>').join(""):'<li class="hall-no-honors">NO RECORDED HONORS YET</li>';
   const years=isRetired?(MANAGER_TENURES[name]||"FORMER MANAGER"):"YEAR "+Math.max(1,stat.seasons.size);
   const palette=["#67D9F2","#FF8A7A","#C3A0FF","#F4D06F","#7FE0B5","#FF9BCB","#83B5FF","#FFB36B","#C2DF72","#D4B4F0","#63D6C8","#F28FA3"];
   const activeOrder=[...state.teams.values()].map(team=>team.name);
