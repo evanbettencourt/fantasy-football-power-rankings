@@ -1774,3 +1774,21 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .parlay-result.pending,.parlay-week-result.pending,.parlay-result.na{color:var(--muted)}
 .parlay-result small{display:block;margin-top:3px;font:500 7px var(--mono);letter-spacing:0;color:var(--muted);line-height:1.25}
 .parlay-week-result{font-weight:800}
+
+
+/* Matchups: bring the left team's manager and seed details toward the center,
+   mirroring the established right-side arrangement without changing it. */
+.mu-side.side-a{
+  grid-template-columns:auto auto minmax(0,1fr);
+  grid-template-areas:"score meta manager";
+}
+.mu-side.side-a .mu-manager-copy{
+  align-items:flex-end;
+  text-align:right;
+}
+.mu-side.side-a .mu-manager-meta{
+  align-items:flex-end;
+}
+@media(max-width:600px){
+  .mu-side.side-a{grid-template-columns:auto auto minmax(0,1fr)}
+}
