@@ -2514,3 +2514,27 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .hall-bracket-playoff .hall-tree-finals .hall-placement-game .hall-tree-team{font-size:9px;padding:6px 3px;gap:3px}
 .hall-bracket-playoff .hall-tree-finals .hall-placement-game .hall-bracket-seed{font-size:7px}
 @media(max-width:720px){.hall-bracket-playoff .hall-tree-finals .hall-placement-games{width:calc(100% + 20px);gap:6px}.hall-bracket-playoff .hall-tree-finals .hall-placement-game{padding:6px 3px}}
+
+
+/* Put final standings and positional leaders side by side in the season archive. */
+.hall-season-summary-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(220px,.75fr);gap:24px;align-items:start;margin:26px 0 8px}
+.hall-season-summary-grid>.hall-season-standings,.hall-season-summary-grid>.hall-season-leaders{min-width:0;margin:0;padding-top:18px}
+.hall-season-summary-grid .hall-season-standings h3,.hall-season-summary-grid .hall-season-leaders h3{font-size:15px;line-height:1.25}
+.hall-season-summary-grid .hall-season-table{min-width:0;table-layout:fixed}
+.hall-season-summary-grid .hall-season-table th,.hall-season-summary-grid .hall-season-table td{padding:8px 7px;white-space:nowrap}
+.hall-season-summary-grid .hall-season-table th{font-size:7px;letter-spacing:.06em}
+.hall-season-summary-grid .hall-season-table td{font-size:10px}
+.hall-season-summary-grid .hall-season-table th:nth-child(1),.hall-season-summary-grid .hall-season-table td:nth-child(1){width:7%}
+.hall-season-summary-grid .hall-season-table th:nth-child(2),.hall-season-summary-grid .hall-season-table td:nth-child(2){width:27%;overflow:hidden;text-overflow:ellipsis}
+.hall-season-summary-grid .hall-season-table th:nth-child(3),.hall-season-summary-grid .hall-season-table td:nth-child(3){width:14%}
+.hall-season-summary-grid .hall-season-table th:nth-child(4),.hall-season-summary-grid .hall-season-table td:nth-child(4),.hall-season-summary-grid .hall-season-table th:nth-child(5),.hall-season-summary-grid .hall-season-table td:nth-child(5){width:15%}
+.hall-season-summary-grid .hall-season-table th:nth-child(6),.hall-season-summary-grid .hall-season-table td:nth-child(6){width:22%}
+.hall-season-summary-grid .hall-leader-grid{grid-template-columns:1fr;gap:8px}
+.hall-season-summary-grid .hall-leader-card{display:grid;grid-template-columns:36px minmax(0,1fr);grid-template-areas:"pos player" "pos points" "meta meta";gap:4px 10px;padding:10px 12px}
+.hall-season-summary-grid .hall-leader-card>span{grid-area:pos;align-self:center}
+.hall-season-summary-grid .hall-leader-card strong{grid-area:player;font-size:12px}
+.hall-season-summary-grid .hall-leader-card>b{grid-area:points;font-size:11px}
+.hall-season-summary-grid .hall-leader-card small{grid-area:meta}
+.hall-season-summary-grid .hall-archive-note{font-size:7px}
+@media(max-width:900px){.hall-season-summary-grid{grid-template-columns:1fr;gap:0}.hall-season-summary-grid .hall-leader-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hall-season-summary-grid .hall-season-table{min-width:420px}}
+@media(max-width:520px){.hall-season-summary-grid .hall-leader-grid{grid-template-columns:1fr}}
