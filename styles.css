@@ -1137,12 +1137,12 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
   background: linear-gradient(145deg, #239FC2, #A8D8EA);
 }
 .sch-seg.regular {
-  background: rgba(35, 159, 194, .14);
-  border-color: rgba(35, 159, 194, .52);
+  background: rgba(123, 51, 245, .14);
+  border-color: rgba(123, 51, 245, .5);
 }
 .sch-wk-tag.regular {
-  color: #A8D8EA;
-  border-color: rgba(35, 159, 194, .55);
+  color: #EAB4F9;
+  border-color: rgba(123, 51, 245, .5);
 }
 .sch-nm.selected {
   color: #A8D8EA;
