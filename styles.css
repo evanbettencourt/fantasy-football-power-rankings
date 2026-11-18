@@ -2974,23 +2974,23 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 
 
 /* Rules page typography matches the site's DM Sans visual system. */
-.rules-page,.rules-page *,
+.extra-panel[data-panel="rules"],.extra-panel[data-panel="rules"] *,
 .rules-content,.rules-content *{
   font-family:var(--sans);
 }
-.rules-page .rule-group summary{
+.extra-panel[data-panel="rules"] .rule-group summary{
   font-family:var(--sans);
   font-weight:800;
 }
-.rules-page .rule-group summary:after{
+.extra-panel[data-panel="rules"] .rule-group summary:after{
   font-family:var(--sans);
 }
-.rules-page .rule-body{
+.extra-panel[data-panel="rules"] .rule-body{
   font-family:var(--sans);
   font-size:14px;
   line-height:1.7;
 }
-.rules-page .rule-body h3{
+.extra-panel[data-panel="rules"] .rule-body h3{
   font-family:var(--sans);
   font-style:normal;
   font-weight:800;
