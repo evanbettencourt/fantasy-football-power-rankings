@@ -2917,3 +2917,57 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
     font-size:7px;
   }
 }
+
+
+/* Placement games are a second grid row, so their columns line up exactly
+   with the semifinal and championship columns and their height is reserved. */
+.hall-bracket-playoff{
+  width:max-content;
+  max-width:none;
+  min-width:0;
+  grid-template-columns:repeat(3,205px);
+  column-gap:12px;
+  row-gap:14px;
+  align-items:start;
+}
+.hall-bracket-playoff>.hall-placement-games{
+  grid-column:2 / span 2;
+  display:grid;
+  grid-template-columns:205px 205px;
+  column-gap:12px;
+  width:422px;
+  margin:0;
+  padding:0;
+  border:0;
+  position:static;
+  transform:none;
+  align-items:start;
+}
+.hall-bracket-playoff>.hall-placement-games>.hall-placement-game{
+  width:205px;
+  min-width:205px;
+  max-width:205px;
+  margin:0;
+  padding:0;
+  border:0;
+  background:transparent;
+}
+.hall-bracket-playoff>.hall-placement-games>.hall-placement-game:first-child{grid-column:2}
+.hall-bracket-playoff>.hall-placement-games>.hall-placement-game:nth-child(2){grid-column:1}
+.hall-bracket-playoff>.hall-placement-games .hall-tree-game{
+  width:205px;
+  min-width:205px;
+  max-width:205px;
+  margin:0;
+}
+.hall-bracket-playoff>.hall-placement-games .hall-tree-team{font-size:10px}
+@media(max-width:900px){
+  .hall-bracket-playoff{width:max-content;min-width:0;max-width:none;column-gap:12px;row-gap:14px}
+}
+@media(max-width:720px){
+  .hall-bracket-playoff>.hall-placement-games{grid-template-columns:205px 205px;column-gap:12px;width:422px}
+  .hall-bracket-playoff>.hall-placement-games .hall-tree-team{font-size:8px}
+}
+@media(max-width:480px){
+  .hall-bracket-playoff>.hall-placement-games .hall-tree-team{font-size:7px}
+}
