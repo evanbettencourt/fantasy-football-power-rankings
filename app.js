@@ -840,10 +840,11 @@ function playoffActual(teams,completed){
 async function refreshPlayoffPredictor(){
  const target=$("playoff-predictor-content"),button=$("playoff-refresh");if(!target||playoffPredictorBusy)return;
  playoffPredictorBusy=true;if(button){button.disabled=true;button.textContent="UPDATING…";}
- target.innerHTML='<div class="pp-loading">REFRESHING CURRENT ROSTERS, PROJECTIONS AND SCHEDULE…</div>';
+ target.innerHTML='<div class="pp-loading">CONNECTING TO SLEEPER LEAGUE DATA…</div>';
  try{
   const coreReady=await sleeperCoreReady;if(!coreReady||!state.teams?.size)throw new Error("League data is still loading or unavailable. Please refresh in a moment.");
   const regular=Math.max(1,(num(state.league?.settings?.playoff_week_start)||15)-1),season=state.league?.season||new Date().getFullYear();
+  target.innerHTML='<div class="pp-loading">LOADING CURRENT ROSTERS AND PLAYER DATA…</div>';
   const [rosters,players]=await Promise.all([fetchJson("/league/"+LEAGUE_ID+"/rosters",{attempts:2,timeoutMs:15000}),state.players?Promise.resolve(state.players):(state.playersPromise||=fetchJson("/players/nfl?active=true",{attempts:1,timeoutMs:25000}).then(v=>{state.players=v||{};return state.players;}))]);
   if(!Array.isArray(rosters)||rosters.length!==state.teams.size)throw new Error("Could not retrieve all current Sleeper rosters.");
   state.rosters=rosters;
@@ -851,6 +852,7 @@ async function refreshPlayoffPredictor(){
   for(let w=1;w<=regular;w++){const rows=state.weeks[w]||[];if(rows.length>=state.teams.size&&rows.filter(m=>num(m.points)>0).length===state.teams.size)completed=w;}
   const teams=[...state.teams.values()].sort((a,b)=>a.id-b.id),actual=playoffActual(teams,completed),actualMap=new Map(actual.map(x=>[x.id,x]));
   const future=Array.from({length:regular-completed},(_,i)=>completed+i+1);
+  target.innerHTML='<div class="pp-loading">FETCHING WEEKLY PROJECTIONS AND NFL BYE WEEKS…</div>';
   const slots=(Array.isArray(state.league?.roster_positions)?state.league.roster_positions:[]).filter(s=>!["BN","IR"].includes(String(s).toUpperCase()));
   const weekly=await Promise.all(future.map(async week=>{
    const [raw,schedule]=await Promise.all([
@@ -868,7 +870,9 @@ async function refreshPlayoffPredictor(){
   for(const w of future){const groups=new Map();for(const m of state.weeks[w]||[]){if(m.matchup_id==null)continue;const k=String(m.matchup_id);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(Number(m.roster_id));}const valid=[...groups.values()].filter(g=>g.length===2);if(valid.length!==teams.length/2)throw new Error("Week "+w+" head-to-head schedule is not fully loaded yet.");const map=new Map();valid.forEach(([x,y])=>{map.set(x,y);map.set(y,x);});opponents.set(w,map);}
   const wins=new Map(),losses=new Map(),pf=new Map(),seeds=new Map(),playoffs=new Map();
   for(const t of teams){wins.set(t.id,0);losses.set(t.id,0);pf.set(t.id,0);seeds.set(t.id,Array(teams.length).fill(0));playoffs.set(t.id,0);}
+  target.innerHTML='<div class="pp-loading">RUNNING 10,000 SEASON SIMULATIONS…</div>';
   for(let sim=0;sim<PLAYOFF_SIMULATIONS;sim++){
+   if(sim%250===0){target.innerHTML='<div class="pp-loading">RUNNING SIMULATIONS · '+sim.toLocaleString()+' / '+PLAYOFF_SIMULATIONS.toLocaleString()+'</div>';await new Promise(resolve=>setTimeout(resolve,0));}
    const sw=new Map(teams.map(t=>[t.id,model.get(t.id).h.w])),sl=new Map(teams.map(t=>[t.id,model.get(t.id).h.l])),st=new Map(teams.map(t=>[t.id,model.get(t.id).h.t])),sp=new Map(teams.map(t=>[t.id,model.get(t.id).h.pf]));
    for(const w of future){
     const scores=new Map();for(const t of teams){const m=model.get(t.id),projection=weekMeans.get(w).get(t.id),mean=.70*projection+.20*m.avg+.10*m.recentAvg;scores.set(t.id,Math.max(0,playoffSample(mean,m.sd)));}
