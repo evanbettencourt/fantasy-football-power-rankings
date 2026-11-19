@@ -873,7 +873,11 @@ function renderScheduleComparison(){
  for(const week of completedWeeks)for(const rowTeam of teams){
   const score=week.scoreById.get(rowTeam.id),medianResult=week.medianWinners.has(rowTeam.id)?1:-1;
   for(const scheduleTeam of teams){
-   const opponentScore=week.scoreById.get(week.opponentById.get(scheduleTeam.id)),r=records.get(rowTeam.id).get(scheduleTeam.id);
+   // If the row manager and schedule owner actually played each other,
+   // preserve that real matchup instead of assigning the row manager as their own opponent.
+   const scheduleOpponentId=week.opponentById.get(scheduleTeam.id);
+   const opponentId=scheduleOpponentId===rowTeam.id?scheduleTeam.id:scheduleOpponentId;
+   const opponentScore=week.scoreById.get(opponentId),r=records.get(rowTeam.id).get(scheduleTeam.id);
    if(!Number.isFinite(score)||!Number.isFinite(opponentScore))continue;
    if(score>opponentScore)r.w++;else if(score<opponentScore)r.l++;else if(score===opponentScore)r.t++;
    if(includeMedian){if(medianResult>0)r.w++;else r.l++;}
