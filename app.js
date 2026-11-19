@@ -865,7 +865,7 @@ async function refreshPlayoffPredictor(){
    return {week,mean,missing:missing.size};
   }));
   const weekMeans=new Map(weekly.map(item=>[item.week,item.mean]));
-  const model=new Map(teams.map(team=>{const h=actualMap.get(team.id),scores=h.scores||[],avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:130,recent=scores.slice(-3),recentAvg=recent.length?recent.reduce((a,b)=>a+b,0)/recent.length:avg,sd=scores.length>1?Math.sqrt(scores.reduce((s,x)=>s+(x-avg)**2,0)/scores.length):18;return [team.id,{h,avg,recentAvg,sd:Math.max(12,Math.min(28,sd))}];}));
+  const model=new Map(teams.map(team=>{const h=actualMap.get(team.id);return [team.id,{h,sd:18}];}));
   const opponents=new Map();
   for(const w of future){const groups=new Map();for(const m of state.weeks[w]||[]){if(m.matchup_id==null)continue;const k=String(m.matchup_id);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(Number(m.roster_id));}const valid=[...groups.values()].filter(g=>g.length===2);if(valid.length!==teams.length/2)throw new Error("Week "+w+" head-to-head schedule is not fully loaded yet.");const map=new Map();valid.forEach(([x,y])=>{map.set(x,y);map.set(y,x);});opponents.set(w,map);}
   const wins=new Map(),losses=new Map(),pf=new Map(),seeds=new Map(),playoffs=new Map();
@@ -875,7 +875,7 @@ async function refreshPlayoffPredictor(){
    if(sim%250===0){target.innerHTML='<div class="pp-loading">RUNNING SIMULATIONS · '+sim.toLocaleString()+' / '+PLAYOFF_SIMULATIONS.toLocaleString()+'</div>';await new Promise(resolve=>setTimeout(resolve,0));}
    const sw=new Map(teams.map(t=>[t.id,model.get(t.id).h.w])),sl=new Map(teams.map(t=>[t.id,model.get(t.id).h.l])),st=new Map(teams.map(t=>[t.id,model.get(t.id).h.t])),sp=new Map(teams.map(t=>[t.id,model.get(t.id).h.pf]));
    for(const w of future){
-    const scores=new Map();for(const t of teams){const m=model.get(t.id),projection=weekMeans.get(w).get(t.id),mean=.70*projection+.20*m.avg+.10*m.recentAvg;scores.set(t.id,Math.max(0,playoffSample(mean,m.sd)));}
+    const scores=new Map();for(const t of teams){const m=model.get(t.id),projection=weekMeans.get(w).get(t.id),mean=projection;scores.set(t.id,Math.max(0,playoffSample(mean,m.sd)));}
     const vals=[...scores.values()].sort((a,b)=>a-b),median=(vals[5]+vals[6])/2;
     for(const t of teams){const x=scores.get(t.id),y=scores.get(opponents.get(w).get(t.id));sp.set(t.id,sp.get(t.id)+x);if(x>median)sw.set(t.id,sw.get(t.id)+1);else if(x<median)sl.set(t.id,sl.get(t.id)+1);else st.set(t.id,st.get(t.id)+1);if(x>y)sw.set(t.id,sw.get(t.id)+1);else if(x<y)sl.set(t.id,sl.get(t.id)+1);else st.set(t.id,st.get(t.id)+1);}
    }
