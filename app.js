@@ -862,11 +862,12 @@ function renderScheduleComparison(){
   const opponentById=new Map();
   for(const group of groups.values()){if(group.length!==2)continue;opponentById.set(group[0],group[1]);opponentById.set(group[1],group[0]);}
   if(opponentById.size!==teams.length)continue;
-  const sorted=[...scoreById.values()].sort((a,b)=>a-b);
-  completedWeeks.push({scoreById,opponentById,median:(sorted[5]+sorted[6])/2});
+  const rankedScores=[...scoreById.entries()].sort((a,b)=>b[1]-a[1]||a[0]-b[0]);
+  const medianWinners=new Set(rankedScores.slice(0,Math.floor(teams.length/2)).map(([id])=>id));
+  completedWeeks.push({scoreById,opponentById,medianWinners});
  }
  for(const week of completedWeeks)for(const rowTeam of teams){
-  const score=week.scoreById.get(rowTeam.id),medianResult=score>week.median?1:score<week.median?-1:0;
+  const score=week.scoreById.get(rowTeam.id),medianResult=week.medianWinners.has(rowTeam.id)?1:-1;
   for(const scheduleTeam of teams){
    const opponentScore=week.scoreById.get(week.opponentById.get(scheduleTeam.id)),r=records.get(rowTeam.id).get(scheduleTeam.id);
    if(score>opponentScore)r.w++;else if(score<opponentScore)r.l++;else r.t++;
@@ -875,7 +876,7 @@ function renderScheduleComparison(){
  }
  const fmtRecord=r=>r.w+"–"+r.l+(r.t?"–"+r.t:""),totalGames=completedWeeks.length*(includeMedian?2:1);
  const table='<div class="pp-table-wrap pp-schedule-matrix-wrap"><table class="pp-table pp-schedule-matrix"><thead><tr><th class="pp-matrix-corner">TEAM<br>↓ / SCHEDULE →</th>'+teams.map(t=>'<th title="'+escapeHtml(t.name)+'">'+escapeHtml(t.name)+'</th>').join("")+'</tr></thead><tbody>'+
- teams.map(row=>{const actual=records.get(row.id).get(row.id),actualPoints=actual.w+.5*actual.t;return '<tr><th scope="row">'+escapeHtml(row.name)+'</th>'+teams.map(col=>{const r=records.get(row.id).get(col.id),points=r.w+.5*r.t,cls=points>actualPoints?"pp-matrix-better":points<actualPoints?"pp-matrix-worse":"";return '<td class="'+cls+'" title="'+escapeHtml(row.name)+' with '+escapeHtml(col.name)+' schedule: '+fmtRecord(r)+'; actual: '+fmtRecord(actual)+'">'+fmtRecord(r)+'</td>';}).join("")+'</tr>';}).join("")+
+ teams.map(row=>{const actual=records.get(row.id).get(row.id),actualPoints=actual.w+.5*actual.t;return '<tr><th scope="row">'+escapeHtml(row.name)+'</th>'+teams.map(col=>{const r=records.get(row.id).get(col.id),points=r.w+.5*r.t,cls=row.id===col.id?"pp-matrix-diagonal":points>actualPoints?"pp-matrix-better":points<actualPoints?"pp-matrix-worse":"";return '<td class="'+cls+'" title="'+escapeHtml(row.name)+' with '+escapeHtml(col.name)+' schedule: '+fmtRecord(r)+'; actual: '+fmtRecord(actual)+'">'+fmtRecord(r)+'</td>';}).join("")+'</tr>';}).join("")+
  '</tbody></table></div>';
  target.innerHTML='<div class="pp-meta"><span>'+completedWeeks.length+' COMPLETED WEEKS</span><span>'+(includeMedian?'HEAD-TO-HEAD + MEDIAN':'HEAD-TO-HEAD ONLY')+'</span><span>'+totalGames+' RESULTS PER CELL</span></div>'+
  (completedWeeks.length?table:'<div class="pp-loading">No completed regular-season weeks are available yet.</div>')+
