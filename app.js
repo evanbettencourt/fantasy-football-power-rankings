@@ -812,14 +812,15 @@ function playoffLineup(ids,players,projections,slots,byes){
   return {id,positions,points:bye?0:(raw!=null&&Number.isFinite(Number(raw))?Number(raw):0)};
  }).filter(p=>p.positions.size);
  const ordered=slots.map((slot,i)=>({slot,i})).sort((a,b)=>pool.filter(p=>playoffSlotAccepts(a.slot,p.positions)).length-pool.filter(p=>playoffSlotAccepts(b.slot,p.positions)).length);
- let best=0;const used=new Set();
- function visit(i,total){
-  if(i===ordered.length){best=Math.max(best,total);return;}
-  const slot=ordered[i];
-  for(const p of pool){if(used.has(p.id)||!playoffSlotAccepts(slot.slot,p.positions))continue;used.add(p.id);visit(i+1,total+p.points);used.delete(p.id);}
-  visit(i+1,total);
+ const memo=new Map();
+ function best(i,mask){
+  if(i===ordered.length)return 0;
+  const key=i+":"+mask;if(memo.has(key))return memo.get(key);
+  let value=best(i+1,mask);
+  for(let p=0;p<pool.length;p++){const bit=1<<p;if((mask&bit)||!playoffSlotAccepts(ordered[i].slot,pool[p].positions))continue;value=Math.max(value,pool[p].points+best(i+1,mask|bit));}
+  memo.set(key,value);return value;
  }
- visit(0,0);return best;
+ return best(0,0);
 }
 function playoffByes(schedule){
  const nfl=["ARI","ATL","BAL","BUF","CAR","CHI","CIN","CLE","DAL","DEN","DET","GB","HOU","IND","JAX","KC","LV","LAC","LAR","MIA","MIN","NE","NO","NYG","NYJ","PHI","PIT","SF","SEA","TB","TEN","WAS"],playing=new Set();
@@ -849,6 +850,7 @@ async function refreshPlayoffPredictor(){
   for(let w=1;w<=regular;w++){const rows=state.weeks[w]||[];if(rows.length>=state.teams.size&&rows.filter(m=>num(m.points)>0).length===state.teams.size)completed=w;}
   const teams=[...state.teams.values()].sort((a,b)=>a.id-b.id),actual=playoffActual(teams,completed),actualMap=new Map(actual.map(x=>[x.id,x]));
   const future=Array.from({length:regular-completed},(_,i)=>completed+i+1);
+  const slots=(Array.isArray(state.league?.roster_positions)?state.league.roster_positions:[]).filter(s=>!["BN","IR"].includes(String(s).toUpperCase()));
   const weekly=await Promise.all(future.map(async week=>{
    const [raw,schedule]=await Promise.all([
     fetchJson("/api/sleeper-projections/"+season+"/"+week+"?season_type=regular&position[]=QB&position[]=RB&position[]=WR&position[]=TE&position[]=K&position[]=DEF&order_by=pts_half_ppr",{attempts:2,timeoutMs:22000}),
@@ -859,16 +861,7 @@ async function refreshPlayoffPredictor(){
    for(const roster of rosters){const ids=[...(roster.players||[]),...(roster.reserve||[])];mean.set(Number(roster.roster_id),playoffLineup(ids,players,map,slots,byes));for(const id of ids.map(String)){if(!map.has(id)&&!byes.has(String(players[id]?.team||"").toUpperCase()))missing.add(id);}}
    return {week,mean,missing:missing.size};
   }));
-  const slots=(Array.isArray(state.league?.roster_positions)?state.league.roster_positions:[]).filter(s=>!["BN","IR"].includes(String(s).toUpperCase()));
-  // Rebuild lineup projections now that the configured legal roster slots are known.
-  const weekMeans=new Map();
-  for(const item of weekly){
-   const raw=await fetchJson("/api/sleeper-projections/"+season+"/"+item.week+"?season_type=regular&position[]=QB&position[]=RB&position[]=WR&position[]=TE&position[]=K&position[]=DEF&order_by=pts_half_ppr",{attempts:1,timeoutMs:22000});
-   const map=new Map(normalizeSleeperRows(raw).map(r=>[String(r.player_id??r.player?.player_id??""),r]).filter(([id])=>id));
-   const sched=await fetchJson("/api/nfl-schedule?seasontype=2&week="+item.week+"&year="+encodeURIComponent(season),{attempts:1,timeoutMs:18000}),byes=playoffByes(sched),mean=new Map();
-   for(const roster of rosters)mean.set(Number(roster.roster_id),playoffLineup([...(roster.players||[]),...(roster.reserve||[])],players,map,slots,byes));
-   weekMeans.set(item.week,mean);
-  }
+  const weekMeans=new Map(weekly.map(item=>[item.week,item.mean]));
   const model=new Map(teams.map(team=>{const h=actualMap.get(team.id),scores=h.scores||[],avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:130,recent=scores.slice(-3),recentAvg=recent.length?recent.reduce((a,b)=>a+b,0)/recent.length:avg,sd=scores.length>1?Math.sqrt(scores.reduce((s,x)=>s+(x-avg)**2,0)/scores.length):18;return [team.id,{h,avg,recentAvg,sd:Math.max(12,Math.min(28,sd))}];}));
   const opponents=new Map();
   for(const w of future){const groups=new Map();for(const m of state.weeks[w]||[]){if(m.matchup_id==null)continue;const k=String(m.matchup_id);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(Number(m.roster_id));}const valid=[...groups.values()].filter(g=>g.length===2);if(valid.length!==teams.length/2)throw new Error("Week "+w+" head-to-head schedule is not fully loaded yet.");const map=new Map();valid.forEach(([x,y])=>{map.set(x,y);map.set(y,x);});opponents.set(w,map);}
