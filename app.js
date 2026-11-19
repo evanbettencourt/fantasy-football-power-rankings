@@ -824,7 +824,7 @@ function playoffLineup(ids,players,projections,slots,byes){
 }
 function playoffByes(schedule){
  const nfl=["ARI","ATL","BAL","BUF","CAR","CHI","CIN","CLE","DAL","DEN","DET","GB","HOU","IND","JAX","KC","LV","LAC","LAR","MIA","MIN","NE","NO","NYG","NYJ","PHI","PIT","SF","SEA","TB","TEN","WAS"],playing=new Set();
- for(const e of schedule?.events||[])for(const c of e.competitions?.[0]?.competitors||[]){let t=String(c.team?.abbreviation||"").toUpperCase();if(t==="JAC")t="JAX";if(t==="LA")t="LAR";if(t)playing.add(t);}
+ for(const e of schedule?.events||[])for(const c of e.competitions?.[0]?.competitors||[]){let t=String(c.team?.abbreviation||"").toUpperCase();if(t==="JAC")t="JAX";if(t==="LA")t="LAR";if(t==="WSH")t="WAS";if(t)playing.add(t);}
  return new Set(nfl.filter(t=>!playing.has(t)));
 }
 function playoffActual(teams,completed){
