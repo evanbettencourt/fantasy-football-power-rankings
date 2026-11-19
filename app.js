@@ -805,12 +805,17 @@ function playoffSlotAccepts(slot,eligible){
  if(["SUPER_FLEX","SUPERFLEX","SFLX"].includes(s))return ["QB","RB","WR","TE"].some(p=>eligible.has(p));
  return false;
 }
-function playoffLineup(ids,players,projections,slots,byes){
- const pool=[...new Set(ids.map(String))].map(id=>{
+function playoffLineup(ids,players,projections,slots,byes,waiverPool=[]){
+ const rosterPool=[...new Set(ids.map(String))].map(id=>{
   const p=players[id]||{},positions=new Set((p.fantasy_positions?.length?p.fantasy_positions:[p.position]).filter(Boolean).map(x=>String(x).toUpperCase()));
   const raw=projections.get(id)?.stats?.pts_half_ppr,bye=byes.has(String(p.team||"").toUpperCase());
-  return {id,positions,points:bye?0:(raw!=null&&Number.isFinite(Number(raw))?Number(raw):0)};
- }).filter(p=>p.positions.size);
+  return {id,positions,points:raw!=null&&Number.isFinite(Number(raw))?Number(raw):0,bye};
+ }).filter(p=>p.positions.size&&!p.bye);
+ const gaps=slots.map((slot,i)=>({slot,i})).filter(x=>!rosterPool.some(p=>playoffSlotAccepts(x.slot,p.positions)));
+ const orderedGaps=gaps.sort((a,b)=>waiverPool.filter(p=>playoffSlotAccepts(a.slot,p.positions)).length-waiverPool.filter(p=>playoffSlotAccepts(b.slot,p.positions)).length);
+ const additions=[],used=new Set();
+ for(const gap of orderedGaps){const candidate=waiverPool.find(p=>!used.has(p.id)&&playoffSlotAccepts(gap.slot,p.positions));if(candidate){additions.push(candidate);used.add(candidate.id);}}
+ const pool=[...rosterPool,...additions];
  const ordered=slots.map((slot,i)=>({slot,i})).sort((a,b)=>pool.filter(p=>playoffSlotAccepts(a.slot,p.positions)).length-pool.filter(p=>playoffSlotAccepts(b.slot,p.positions)).length);
  const memo=new Map();
  function best(i,mask){
@@ -852,6 +857,7 @@ async function refreshPlayoffPredictor(){
   for(let w=1;w<=regular;w++){const rows=state.weeks[w]||[];if(rows.length>=state.teams.size&&rows.filter(m=>num(m.points)>0).length===state.teams.size)completed=w;}
   const teams=[...state.teams.values()].sort((a,b)=>a.id-b.id),actual=playoffActual(teams,completed),actualMap=new Map(actual.map(x=>[x.id,x]));
   const future=Array.from({length:regular-completed},(_,i)=>completed+i+1);
+  const rosteredIds=new Set(rosters.flatMap(roster=>[...(roster.players||[]),...(roster.reserve||[])].map(String)));
   target.innerHTML='<div class="pp-loading">FETCHING WEEKLY PROJECTIONS AND NFL BYE WEEKS…</div>';
   const slots=(Array.isArray(state.league?.roster_positions)?state.league.roster_positions:[]).filter(s=>!["BN","IR"].includes(String(s).toUpperCase()));
   const weekly=await Promise.all(future.map(async week=>{
@@ -861,7 +867,12 @@ async function refreshPlayoffPredictor(){
    ]);
    const rows=normalizeSleeperRows(raw);if(!rows.length)throw new Error("Sleeper projections unavailable for Week "+week+".");if(!schedule?.events?.length)throw new Error("NFL schedule unavailable for Week "+week+".");
    const map=new Map(rows.map(r=>[String(r.player_id??r.player?.player_id??""),r]).filter(([id])=>id)),byes=playoffByes(schedule),mean=new Map(),missing=new Set();
-   for(const roster of rosters){const ids=[...(roster.players||[]),...(roster.reserve||[])];mean.set(Number(roster.roster_id),playoffLineup(ids,players,map,slots,byes));for(const id of ids.map(String)){if(!map.has(id)&&!byes.has(String(players[id]?.team||"").toUpperCase()))missing.add(id);}}
+   const waiverPool=[...map.entries()].filter(([id])=>!rosteredIds.has(id)).map(([id,row])=>{
+    const p=players[id]||{},positions=new Set((p.fantasy_positions?.length?p.fantasy_positions:[p.position]).filter(Boolean).map(x=>String(x).toUpperCase()));
+    const raw=row?.stats?.pts_half_ppr,points=raw!=null&&Number.isFinite(Number(raw))?Number(raw):0;
+    return {id,positions,points,bye:byes.has(String(p.team||"").toUpperCase())};
+   }).filter(p=>p.positions.size&&!p.bye&&p.points>0).sort((a,b)=>b.points-a.points);
+   for(const roster of rosters){const ids=[...(roster.players||[]),...(roster.reserve||[])];mean.set(Number(roster.roster_id),playoffLineup(ids,players,map,slots,byes,waiverPool));for(const id of ids.map(String)){if(!map.has(id)&&!byes.has(String(players[id]?.team||"").toUpperCase()))missing.add(id);}}
    return {week,mean,missing:missing.size};
   }));
   const weekMeans=new Map(weekly.map(item=>[item.week,item.mean]));
@@ -890,7 +901,7 @@ async function refreshPlayoffPredictor(){
    results.map((r,i)=>'<tr class="'+(i===5?'pp-cutoff':'')+'"><td><span class="pp-manager-rank">'+String(i+1).padStart(2,"0")+'</span><strong>'+escapeHtml(r.t.name)+'</strong></td><td><div class="pp-odds-cell"><strong>'+(r.odds>0&&r.odds<0.1?'<0.1%':r.odds.toFixed(1)+'%')+'</strong><span class="pp-odds-track"><i style="width:'+r.odds+'%"></i></span></div></td><td class="pp-number">'+r.record+'</td><td class="pp-number">'+r.pf.toFixed(1)+'</td><td><strong>#'+r.seed+'</strong><small class="pp-seed-note">'+r.seedPct.toFixed(1)+'% of sims</small></td></tr>').join("")+
    '</tbody></table></div><p class="pp-explainer">Each simulation plays out every remaining week with a head-to-head result and a league-median result. Final standings are ordered by wins, then Points For. The top six qualify; the top two seeds receive a first-round bye.</p>'+
    (warnings.length?'<p class="pp-warning">Some rostered players lacked a Sleeper projection and were assigned 0: '+warnings.join(", ")+'.</p>':'')+
-   '<p class="pp-footnote">Future lineups use the highest-projected legal lineup from each current roster, including IR. Bye-week players score 0. Future scoring is based on Sleeper projections only, with the current record as the starting point. Roster changes are picked up on refresh.</p>';
+   '<p class="pp-footnote">Future lineups use the highest-projected legal lineup from each current roster, including IR. If a bye or roster shortage leaves a starting position with no eligible rostered player, the model fills that gap with the highest-projected unrostered player in the weekly projection feed. Waiver additions are evaluated independently for each team, so the same free agent can appear as a replacement for multiple teams. Future scoring is based on Sleeper projections only, with the current record as the starting point. Roster changes are picked up on refresh.</p>';
  }catch(error){console.error("Playoff predictor failed",error);target.dataset.ready="no";target.innerHTML='<div class="pp-error">The predictor could not finish: '+escapeHtml(error?.message||"Unknown error")+'. Please refresh and try again.</div>';}
  finally{playoffPredictorBusy=false;if(button){button.disabled=false;button.textContent="REFRESH PREDICTIONS";}}
 }
