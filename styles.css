@@ -3331,3 +3331,32 @@ body:has(.pr-page:not([hidden])) footer{width:min(100%,1180px);margin:0 auto;pad
 .pp-warning,.pp-error{margin:14px 0 0;padding:12px;border-left:3px solid var(--pink);background:#ffffff08;color:var(--text);font-size:11px;line-height:1.5}
 .pp-loading{padding:35px 15px;text-align:center;color:var(--muted);font:700 10px var(--mono);letter-spacing:.08em}
 @media(max-width:640px){.playoff-picture-page{padding:24px 14px 55px}.pp-section{padding:16px 12px}.pp-crest{width:60px;height:60px;font-size:20px}.pp-section-heading{align-items:flex-start;flex-direction:column}.pp-refresh{width:100%}.pp-hero h1{font-size:44px}}
+
+
+/* Shared top-of-page title treatment: match the Rules and Parlays headings. */
+.league-hero h1,
+.lottery-page .lot-lock h1,
+.pr-mast .wk,
+.playoff-picture-page .pp-hero h1,
+.schedule-page .sch-lock h1,
+.hall-page .hall-hero h1,
+.extra-panel>h2{
+ font-family:var(--sans)!important;
+ font-size:clamp(40px,5vw,48px)!important;
+ font-weight:900!important;
+ line-height:1!important;
+ letter-spacing:-.045em!important;
+ text-transform:uppercase!important;
+}
+.league-hero h1 em,
+.playoff-picture-page .pp-hero h1 em,
+.hall-page .hall-hero h1 em{font-style:normal}
+@media(max-width:760px){
+ .league-hero h1,
+ .lottery-page .lot-lock h1,
+ .pr-mast .wk,
+ .playoff-picture-page .pp-hero h1,
+ .schedule-page .sch-lock h1,
+ .hall-page .hall-hero h1,
+ .extra-panel>h2{font-size:40px!important}
+}
