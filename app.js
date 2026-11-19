@@ -855,14 +855,17 @@ function renderScheduleComparison(){
  const records=new Map(teams.map(t=>[t.id,new Map(teams.map(s=>[s.id,{w:0,l:0,t:0}]))]));
  const regular=Math.max(1,(num(state.league?.settings?.playoff_week_start)||15)-1),completedWeeks=[];
  for(let week=1;week<=regular;week++){
-  const games=state.weeks[week]||[],valid=games.filter(m=>num(m.points)>0);
-  if(valid.length!==teams.length||new Set(valid.map(m=>Number(m.roster_id))).size!==teams.length)continue;
-  const scoreById=new Map(valid.map(m=>[Number(m.roster_id),num(m.points)])),groups=new Map();
-  for(const m of valid){if(m.matchup_id==null)continue;const key=String(m.matchup_id);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(Number(m.roster_id));}
-  const opponentById=new Map();
-  for(const group of groups.values()){if(group.length!==2)continue;opponentById.set(group[0],group[1]);opponentById.set(group[1],group[0]);}
-  if(opponentById.size!==teams.length||teams.some(t=>!scoreById.has(t.id)||!opponentById.has(t.id)))continue;
-  if(teams.some(t=>!scoreById.has(opponentById.get(t.id))))continue;
+  // Reuse the exact matchup pairing and winner logic used by the Power Rankings bars.
+  const matchupResults=calculateWeek(week).results;
+  if(matchupResults.length!==teams.length/2)continue;
+  const scoreById=new Map(),opponentById=new Map();
+  for(const matchup of matchupResults){
+   const aId=Number(matchup.a.id),bId=Number(matchup.b.id);
+   if(scoreById.has(aId)||scoreById.has(bId)||opponentById.has(aId)||opponentById.has(bId))continue;
+   scoreById.set(aId,matchup.scoreA);scoreById.set(bId,matchup.scoreB);
+   opponentById.set(aId,bId);opponentById.set(bId,aId);
+  }
+  if(scoreById.size!==teams.length||opponentById.size!==teams.length||teams.some(t=>!scoreById.has(t.id)||!opponentById.has(t.id)))continue;
   const rankedScores=[...scoreById.entries()].sort((a,b)=>b[1]-a[1]||a[0]-b[0]);
   const medianWinners=new Set(rankedScores.slice(0,Math.floor(teams.length/2)).map(([id])=>id));
   completedWeeks.push({scoreById,opponentById,medianWinners});
