@@ -794,6 +794,109 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
   if (!data.loaded && !data.loading) loadMatchupWeekData(week);
 }
 
+
+const PLAYOFF_SIMULATIONS=10000;
+let playoffPredictorBusy=false;
+function playoffSample(mean,sd){const u=Math.max(1e-9,Math.random()),v=Math.random();return mean+sd*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function playoffSlotAccepts(slot,eligible){
+ const s=String(slot||"").toUpperCase();
+ if(["QB","RB","WR","TE"].includes(s))return eligible.has(s);
+ if(["FLEX","WRRB_FLEX","REC_FLEX"].includes(s))return ["RB","WR","TE"].some(p=>eligible.has(p));
+ if(["SUPER_FLEX","SUPERFLEX","SFLX"].includes(s))return ["QB","RB","WR","TE"].some(p=>eligible.has(p));
+ return false;
+}
+function playoffLineup(ids,players,projections,slots,byes){
+ const pool=[...new Set(ids.map(String))].map(id=>{
+  const p=players[id]||{},positions=new Set((p.fantasy_positions?.length?p.fantasy_positions:[p.position]).filter(Boolean).map(x=>String(x).toUpperCase()));
+  const raw=projections.get(id)?.stats?.pts_half_ppr,bye=byes.has(String(p.team||"").toUpperCase());
+  return {id,positions,points:bye?0:(raw!=null&&Number.isFinite(Number(raw))?Number(raw):0)};
+ }).filter(p=>p.positions.size);
+ const ordered=slots.map((slot,i)=>({slot,i})).sort((a,b)=>pool.filter(p=>playoffSlotAccepts(a.slot,p.positions)).length-pool.filter(p=>playoffSlotAccepts(b.slot,p.positions)).length);
+ let best=0;const used=new Set();
+ function visit(i,total){
+  if(i===ordered.length){best=Math.max(best,total);return;}
+  const slot=ordered[i];
+  for(const p of pool){if(used.has(p.id)||!playoffSlotAccepts(slot.slot,p.positions))continue;used.add(p.id);visit(i+1,total+p.points);used.delete(p.id);}
+  visit(i+1,total);
+ }
+ visit(0,0);return best;
+}
+function playoffByes(schedule){
+ const nfl=["ARI","ATL","BAL","BUF","CAR","CHI","CIN","CLE","DAL","DEN","DET","GB","HOU","IND","JAX","KC","LV","LAC","LAR","MIA","MIN","NE","NO","NYG","NYJ","PHI","PIT","SF","SEA","TB","TEN","WAS"],playing=new Set();
+ for(const e of schedule?.events||[])for(const c of e.competitions?.[0]?.competitors||[]){let t=String(c.team?.abbreviation||"").toUpperCase();if(t==="JAC")t="JAX";if(t==="LA")t="LAR";if(t)playing.add(t);}
+ return new Set(nfl.filter(t=>!playing.has(t)));
+}
+function playoffActual(teams,completed){
+ const rows=teams.map(t=>({id:t.id,name:t.name,w:0,l:0,t:0,pf:0,scores:[]})),byId=new Map(rows.map(t=>[t.id,t]));
+ for(let w=1;w<=completed;w++){
+  const games=state.weeks[w]||[],valid=games.filter(m=>num(m.points)>0);if(valid.length!==teams.length)continue;
+  const ordered=valid.map(m=>num(m.points)).sort((a,b)=>a-b),median=(ordered[5]+ordered[6])/2,groups=new Map();
+  for(const m of valid){const t=byId.get(Number(m.roster_id));if(!t)continue;const p=num(m.points);t.pf+=p;t.scores.push(p);if(p>median)t.w++;else if(p<median)t.l++;else t.t++;if(m.matchup_id!=null){const k=String(m.matchup_id);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(m);}}
+  for(const g of groups.values()){if(g.length!==2)continue;const x=byId.get(Number(g[0].roster_id)),y=byId.get(Number(g[1].roster_id));if(!x||!y)continue;if(num(g[0].points)>num(g[1].points))x.w++,y.l++;else if(num(g[0].points)<num(g[1].points))y.w++,x.l++;else x.t++,y.t++;}
+ }
+ return rows;
+}
+async function refreshPlayoffPredictor(){
+ const target=$("playoff-predictor-content"),button=$("playoff-refresh");if(!target||playoffPredictorBusy)return;
+ playoffPredictorBusy=true;if(button){button.disabled=true;button.textContent="UPDATING…";}
+ target.innerHTML='<div class="pp-loading">REFRESHING CURRENT ROSTERS, PROJECTIONS AND SCHEDULE…</div>';
+ try{
+  const regular=Math.max(1,(num(state.league?.settings?.playoff_week_start)||15)-1),season=state.league?.season||new Date().getFullYear();
+  const [rosters,players]=await Promise.all([fetchJson("/league/"+LEAGUE_ID+"/rosters",{attempts:2,timeoutMs:15000}),state.players?Promise.resolve(state.players):(state.playersPromise||=fetchJson("/players/nfl?active=true",{attempts:1,timeoutMs:25000}).then(v=>{state.players=v||{};return state.players;}))]);
+  if(!Array.isArray(rosters)||rosters.length!==state.teams.size)throw new Error("Could not retrieve all current Sleeper rosters.");
+  state.rosters=rosters;
+  let completed=0;
+  for(let w=1;w<=regular;w++){const rows=state.weeks[w]||[];if(rows.length>=state.teams.size&&rows.filter(m=>num(m.points)>0).length===state.teams.size)completed=w;}
+  const teams=[...state.teams.values()].sort((a,b)=>a.id-b.id),actual=playoffActual(teams,completed),actualMap=new Map(actual.map(x=>[x.id,x]));
+  const future=Array.from({length:regular-completed},(_,i)=>completed+i+1);
+  const weekly=await Promise.all(future.map(async week=>{
+   const [raw,schedule]=await Promise.all([
+    fetchJson("/api/sleeper-projections/"+season+"/"+week+"?season_type=regular&position[]=QB&position[]=RB&position[]=WR&position[]=TE&position[]=K&position[]=DEF&order_by=pts_half_ppr",{attempts:2,timeoutMs:22000}),
+    fetchJson("/api/nfl-schedule?seasontype=2&week="+week+"&year="+encodeURIComponent(season),{attempts:2,timeoutMs:18000})
+   ]);
+   const rows=normalizeSleeperRows(raw);if(!rows.length)throw new Error("Sleeper projections unavailable for Week "+week+".");if(!schedule?.events?.length)throw new Error("NFL schedule unavailable for Week "+week+".");
+   const map=new Map(rows.map(r=>[String(r.player_id??r.player?.player_id??""),r]).filter(([id])=>id)),byes=playoffByes(schedule),mean=new Map(),missing=new Set();
+   for(const roster of rosters){const ids=[...(roster.players||[]),...(roster.reserve||[])];mean.set(Number(roster.roster_id),playoffLineup(ids,players,map,slots,byes));for(const id of ids.map(String)){if(!map.has(id)&&!byes.has(String(players[id]?.team||"").toUpperCase()))missing.add(id);}}
+   return {week,mean,missing:missing.size};
+  }));
+  const slots=(Array.isArray(state.league?.roster_positions)?state.league.roster_positions:[]).filter(s=>!["BN","IR"].includes(String(s).toUpperCase()));
+  // Rebuild lineup projections now that the configured legal roster slots are known.
+  const weekMeans=new Map();
+  for(const item of weekly){
+   const raw=await fetchJson("/api/sleeper-projections/"+season+"/"+item.week+"?season_type=regular&position[]=QB&position[]=RB&position[]=WR&position[]=TE&position[]=K&position[]=DEF&order_by=pts_half_ppr",{attempts:1,timeoutMs:22000});
+   const map=new Map(normalizeSleeperRows(raw).map(r=>[String(r.player_id??r.player?.player_id??""),r]).filter(([id])=>id));
+   const sched=await fetchJson("/api/nfl-schedule?seasontype=2&week="+item.week+"&year="+encodeURIComponent(season),{attempts:1,timeoutMs:18000}),byes=playoffByes(sched),mean=new Map();
+   for(const roster of rosters)mean.set(Number(roster.roster_id),playoffLineup([...(roster.players||[]),...(roster.reserve||[])],players,map,slots,byes));
+   weekMeans.set(item.week,mean);
+  }
+  const model=new Map(teams.map(team=>{const h=actualMap.get(team.id),scores=h.scores||[],avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:130,recent=scores.slice(-3),recentAvg=recent.length?recent.reduce((a,b)=>a+b,0)/recent.length:avg,sd=scores.length>1?Math.sqrt(scores.reduce((s,x)=>s+(x-avg)**2,0)/scores.length):18;return [team.id,{h,avg,recentAvg,sd:Math.max(12,Math.min(28,sd))}];}));
+  const opponents=new Map();
+  for(const w of future){const groups=new Map();for(const m of state.weeks[w]||[]){if(m.matchup_id==null)continue;const k=String(m.matchup_id);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(Number(m.roster_id));}const valid=[...groups.values()].filter(g=>g.length===2);if(valid.length!==teams.length/2)throw new Error("Week "+w+" head-to-head schedule is not fully loaded yet.");const map=new Map();valid.forEach(([x,y])=>{map.set(x,y);map.set(y,x);});opponents.set(w,map);}
+  const wins=new Map(),losses=new Map(),pf=new Map(),seeds=new Map(),playoffs=new Map();
+  for(const t of teams){wins.set(t.id,0);losses.set(t.id,0);pf.set(t.id,0);seeds.set(t.id,Array(teams.length).fill(0));playoffs.set(t.id,0);}
+  for(let sim=0;sim<PLAYOFF_SIMULATIONS;sim++){
+   const sw=new Map(teams.map(t=>[t.id,model.get(t.id).h.w])),sl=new Map(teams.map(t=>[t.id,model.get(t.id).h.l])),st=new Map(teams.map(t=>[t.id,model.get(t.id).h.t])),sp=new Map(teams.map(t=>[t.id,model.get(t.id).h.pf]));
+   for(const w of future){
+    const scores=new Map();for(const t of teams){const m=model.get(t.id),projection=weekMeans.get(w).get(t.id),mean=.70*projection+.20*m.avg+.10*m.recentAvg;scores.set(t.id,Math.max(0,playoffSample(mean,m.sd)));}
+    const vals=[...scores.values()].sort((a,b)=>a-b),median=(vals[5]+vals[6])/2;
+    for(const t of teams){const x=scores.get(t.id),y=scores.get(opponents.get(w).get(t.id));sp.set(t.id,sp.get(t.id)+x);if(x>median)sw.set(t.id,sw.get(t.id)+1);else if(x<median)sl.set(t.id,sl.get(t.id)+1);else st.set(t.id,st.get(t.id)+1);if(x>y)sw.set(t.id,sw.get(t.id)+1);else if(x<y)sl.set(t.id,sl.get(t.id)+1);else st.set(t.id,st.get(t.id)+1);}
+   }
+   const sorted=teams.map(t=>({id:t.id,w:sw.get(t.id),pf:sp.get(t.id)})).sort((a,b)=>b.w-a.w||b.pf-a.pf);
+   sorted.forEach((r,i)=>seeds.get(r.id)[i]++);sorted.slice(0,6).forEach(r=>playoffs.set(r.id,playoffs.get(r.id)+1));
+   for(const t of teams){wins.set(t.id,wins.get(t.id)+sw.get(t.id));losses.set(t.id,losses.get(t.id)+sl.get(t.id));pf.set(t.id,pf.get(t.id)+(sp.get(t.id)-(model.get(t.id).h.pf||0)));}
+  }
+  const results=teams.map(t=>{const a=seeds.get(t.id),seed=a.indexOf(Math.max(...a))+1;return {t,odds:playoffs.get(t.id)/100,record:(wins.get(t.id)/10000).toFixed(1)+"–"+(losses.get(t.id)/10000).toFixed(1),pf:(model.get(t.id).h.pf+pf.get(t.id)/10000),seed,seedPct:a[seed-1]/100};}).sort((a,b)=>b.odds-a.odds||b.pf-a.pf);
+  const warnings=weekly.filter(x=>x.missing).map(x=>"Week "+x.week+" ("+x.missing+" players)");
+  target.dataset.ready="yes";
+  target.innerHTML='<div class="pp-meta"><span>10,000 SIMULATIONS</span><span>DATA THROUGH WEEK '+completed+'</span><span>'+(regular-completed)+' WEEKS REMAINING</span></div><div class="pp-table-wrap"><table class="pp-table"><thead><tr><th>MANAGER</th><th>PLAYOFF ODDS</th><th>PROJECTED RECORD</th><th>PROJECTED PF</th><th>MOST LIKELY SEED</th></tr></thead><tbody>'+
+   results.map((r,i)=>'<tr class="'+(i===5?'pp-cutoff':'')+'"><td><span class="pp-manager-rank">'+String(i+1).padStart(2,"0")+'</span><strong>'+escapeHtml(r.t.name)+'</strong></td><td><div class="pp-odds-cell"><strong>'+r.odds.toFixed(1)+'%</strong><span class="pp-odds-track"><i style="width:'+r.odds+'%"></i></span></div></td><td class="pp-number">'+r.record+'</td><td class="pp-number">'+r.pf.toFixed(1)+'</td><td><strong>#'+r.seed+'</strong><small class="pp-seed-note">'+r.seedPct.toFixed(1)+'% of sims</small></td></tr>').join("")+
+   '</tbody></table></div><p class="pp-explainer">Each simulation plays out every remaining week with a head-to-head result and a league-median result. Final standings are ordered by wins, then Points For. The top six qualify; the top two seeds receive a first-round bye.</p>'+
+   (warnings.length?'<p class="pp-warning">Some rostered players lacked a Sleeper projection and were assigned 0: '+warnings.join(", ")+'.</p>':'')+
+   '<p class="pp-footnote">Future lineups use the highest-projected legal lineup from each current roster, including IR. Bye-week players score 0. Projections are blended with season-long and recent scoring. Roster changes are picked up on refresh.</p>';
+ }catch(error){console.error("Playoff predictor failed",error);target.dataset.ready="no";target.innerHTML='<div class="pp-error">The predictor could not finish: '+escapeHtml(error?.message||"Unknown error")+'. Please refresh and try again.</div>';}
+ finally{playoffPredictorBusy=false;if(button){button.disabled=false;button.textContent="REFRESH PREDICTIONS";}}
+}
+
 let selectedScheduleTeam = null;
 function renderSchedule() {
   const pickTarget = $("schedule-team-picks");
@@ -1972,6 +2075,7 @@ function setupNavigation() {
     if (seasonPage) seasonPage.hidden = true;
     if (target === "rules") renderRules();
     if (target === "schedule") renderSchedule();
+    if (target === "playoffs" && !$("playoff-predictor-content")?.dataset.ready) refreshPlayoffPredictor();
     if (target === "matchups") renderMatchups(state.matchupWeek);
     if (target === "hall") renderHallOfFame();
     if (target === "parlays") renderParlays();
@@ -1993,5 +2097,7 @@ function setupNavigation() {
   window.addEventListener("popstate",()=>{const route=window.location.hash.replace(/^#/, "").match(/^season-(\d{4})$/);if(route)openHallSeasonPage(Number(route[1]),false);else if(window.location.hash==="#hall")activateTab("hall");});
 }
 setupNavigation();
+const playoffRefreshButton=$('playoff-refresh');
+if(playoffRefreshButton)playoffRefreshButton.addEventListener('click',refreshPlayoffPredictor);
 
 init();
