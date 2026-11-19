@@ -861,7 +861,8 @@ function renderScheduleComparison(){
   for(const m of valid){if(m.matchup_id==null)continue;const key=String(m.matchup_id);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(Number(m.roster_id));}
   const opponentById=new Map();
   for(const group of groups.values()){if(group.length!==2)continue;opponentById.set(group[0],group[1]);opponentById.set(group[1],group[0]);}
-  if(opponentById.size!==teams.length)continue;
+  if(opponentById.size!==teams.length||teams.some(t=>!scoreById.has(t.id)||!opponentById.has(t.id)))continue;
+  if(teams.some(t=>!scoreById.has(opponentById.get(t.id))))continue;
   const rankedScores=[...scoreById.entries()].sort((a,b)=>b[1]-a[1]||a[0]-b[0]);
   const medianWinners=new Set(rankedScores.slice(0,Math.floor(teams.length/2)).map(([id])=>id));
   completedWeeks.push({scoreById,opponentById,medianWinners});
@@ -870,8 +871,9 @@ function renderScheduleComparison(){
   const score=week.scoreById.get(rowTeam.id),medianResult=week.medianWinners.has(rowTeam.id)?1:-1;
   for(const scheduleTeam of teams){
    const opponentScore=week.scoreById.get(week.opponentById.get(scheduleTeam.id)),r=records.get(rowTeam.id).get(scheduleTeam.id);
-   if(score>opponentScore)r.w++;else if(score<opponentScore)r.l++;else r.t++;
-   if(includeMedian){if(medianResult>0)r.w++;else if(medianResult<0)r.l++;else r.t++;}
+   if(!Number.isFinite(score)||!Number.isFinite(opponentScore))continue;
+   if(score>opponentScore)r.w++;else if(score<opponentScore)r.l++;else if(score===opponentScore)r.t++;
+   if(includeMedian){if(medianResult>0)r.w++;else r.l++;}
   }
  }
  const fmtRecord=r=>r.w+"–"+r.l+(r.t?"–"+r.t:""),totalGames=completedWeeks.length*(includeMedian?2:1);
