@@ -845,7 +845,13 @@ function playoffActual(teams,completed){
 function renderScheduleComparison(){
  const target=$("pp-schedule-comparison");if(!target||!state.teams?.size)return;
  const includeMedian=$("pp-include-median")?.checked!==false;
- const teams=[...state.teams.values()].sort((a,b)=>a.name.localeCompare(b.name));
+ const baseTeams=[...state.teams.values()];
+ let standingsWeeks=0;
+ const regularWeeks=Math.max(1,(num(state.league?.settings?.playoff_week_start)||15)-1);
+ for(let w=1;w<=regularWeeks;w++){const rows=state.weeks[w]||[];if(rows.length>=baseTeams.length&&rows.filter(m=>num(m.points)>0).length===baseTeams.length)standingsWeeks=w;}
+ const standings=playoffActual(baseTeams,standingsWeeks);
+ const standingsById=new Map(standings.map(t=>[t.id,t]));
+ const teams=baseTeams.sort((a,b)=>{const x=standingsById.get(a.id)||{},y=standingsById.get(b.id)||{};return (y.w-x.w)||(y.pf-x.pf)||a.name.localeCompare(b.name);});
  const records=new Map(teams.map(t=>[t.id,new Map(teams.map(s=>[s.id,{w:0,l:0,t:0}]))]));
  const regular=Math.max(1,(num(state.league?.settings?.playoff_week_start)||15)-1),completedWeeks=[];
  for(let week=1;week<=regular;week++){
