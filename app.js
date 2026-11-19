@@ -842,6 +842,39 @@ function playoffActual(teams,completed){
  }
  return rows;
 }
+function renderScheduleComparison(){
+ const target=$("pp-schedule-comparison");if(!target||!state.teams?.size)return;
+ const includeMedian=$("pp-include-median")?.checked!==false;
+ const teams=[...state.teams.values()].sort((a,b)=>a.name.localeCompare(b.name));
+ const records=new Map(teams.map(t=>[t.id,new Map(teams.map(s=>[s.id,{w:0,l:0,t:0}]))]));
+ const regular=Math.max(1,(num(state.league?.settings?.playoff_week_start)||15)-1),completedWeeks=[];
+ for(let week=1;week<=regular;week++){
+  const games=state.weeks[week]||[],valid=games.filter(m=>num(m.points)>0);
+  if(valid.length!==teams.length||new Set(valid.map(m=>Number(m.roster_id))).size!==teams.length)continue;
+  const scoreById=new Map(valid.map(m=>[Number(m.roster_id),num(m.points)])),groups=new Map();
+  for(const m of valid){if(m.matchup_id==null)continue;const key=String(m.matchup_id);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(Number(m.roster_id));}
+  const opponentById=new Map();
+  for(const group of groups.values()){if(group.length!==2)continue;opponentById.set(group[0],group[1]);opponentById.set(group[1],group[0]);}
+  if(opponentById.size!==teams.length)continue;
+  const sorted=[...scoreById.values()].sort((a,b)=>a-b);
+  completedWeeks.push({scoreById,opponentById,median:(sorted[5]+sorted[6])/2});
+ }
+ for(const week of completedWeeks)for(const rowTeam of teams){
+  const score=week.scoreById.get(rowTeam.id),medianResult=score>week.median?1:score<week.median?-1:0;
+  for(const scheduleTeam of teams){
+   const opponentScore=week.scoreById.get(week.opponentById.get(scheduleTeam.id)),r=records.get(rowTeam.id).get(scheduleTeam.id);
+   if(score>opponentScore)r.w++;else if(score<opponentScore)r.l++;else r.t++;
+   if(includeMedian){if(medianResult>0)r.w++;else if(medianResult<0)r.l++;else r.t++;}
+  }
+ }
+ const fmtRecord=r=>r.w+"–"+r.l+(r.t?"–"+r.t:""),totalGames=completedWeeks.length*(includeMedian?2:1);
+ const table='<div class="pp-table-wrap pp-schedule-matrix-wrap"><table class="pp-table pp-schedule-matrix"><thead><tr><th class="pp-matrix-corner">TEAM<br>↓ / SCHEDULE →</th>'+teams.map(t=>'<th title="'+escapeHtml(t.name)+'">'+escapeHtml(t.name)+'</th>').join("")+'</tr></thead><tbody>'+
+ teams.map(row=>'<tr><th scope="row">'+escapeHtml(row.name)+'</th>'+teams.map(col=>{const r=records.get(row.id).get(col.id),rate=totalGames?(r.w+.5*r.t)/totalGames:0,cls=row.id===col.id?"pp-matrix-diagonal":rate>=.65?"pp-matrix-strong":rate>=.5?"pp-matrix-positive":rate<.35?"pp-matrix-weak":"";return '<td class="'+cls+'" title="'+escapeHtml(row.name)+' with '+escapeHtml(col.name)+' schedule: '+fmtRecord(r)+'">'+fmtRecord(r)+'</td>';}).join("")+'</tr>').join("")+
+ '</tbody></table></div>';
+ target.innerHTML='<div class="pp-meta"><span>'+completedWeeks.length+' COMPLETED WEEKS</span><span>'+(includeMedian?'HEAD-TO-HEAD + MEDIAN':'HEAD-TO-HEAD ONLY')+'</span><span>'+totalGames+' RESULTS PER CELL</span></div>'+
+ (completedWeeks.length?table:'<div class="pp-loading">No completed regular-season weeks are available yet.</div>')+
+ '<p class="pp-explainer">Rows keep that manager’s actual weekly scores; columns apply that manager’s actual head-to-head opponents. Each cell shows the row manager’s recalculated record against the column manager’s schedule. The diagonal is each manager’s actual record. League-median results are based on the row manager’s own weekly scores and do not change with the head-to-head schedule.</p>';
+}
 async function refreshPlayoffPredictor(){
  const target=$("playoff-predictor-content"),button=$("playoff-refresh");if(!target||playoffPredictorBusy)return;
  playoffPredictorBusy=true;if(button){button.disabled=true;button.textContent="UPDATING…";}
@@ -895,6 +928,7 @@ async function refreshPlayoffPredictor(){
    for(const t of teams){wins.set(t.id,wins.get(t.id)+sw.get(t.id));losses.set(t.id,losses.get(t.id)+sl.get(t.id));pf.set(t.id,pf.get(t.id)+(sp.get(t.id)-(model.get(t.id).h.pf||0)));}
   }
   const results=teams.map(t=>{const a=seeds.get(t.id),seed=a.indexOf(Math.max(...a))+1;return {t,odds:playoffs.get(t.id)/100,record:(wins.get(t.id)/10000).toFixed(1)+"–"+(losses.get(t.id)/10000).toFixed(1),pf:(model.get(t.id).h.pf+pf.get(t.id)/10000),seed,seedPct:a[seed-1]/100};}).sort((a,b)=>b.odds-a.odds||b.pf-a.pf);
+  renderScheduleComparison();
   const warnings=weekly.filter(x=>x.missing).map(x=>"Week "+x.week+" ("+x.missing+" players)");
   target.dataset.ready="yes";
   target.innerHTML='<div class="pp-meta"><span>10,000 SIMULATIONS</span><span>DATA THROUGH WEEK '+completed+'</span><span>'+(regular-completed)+' WEEKS REMAINING</span></div><div class="pp-table-wrap"><table class="pp-table"><thead><tr><th>MANAGER</th><th>PLAYOFF ODDS</th><th>PROJECTED RECORD</th><th>PROJECTED PF</th><th>MOST LIKELY SEED</th></tr></thead><tbody>'+
@@ -2084,7 +2118,7 @@ function setupNavigation() {
     if (seasonPage) seasonPage.hidden = true;
     if (target === "rules") renderRules();
     if (target === "schedule") renderSchedule();
-    if (target === "playoffs" && !$("playoff-predictor-content")?.dataset.ready) refreshPlayoffPredictor();
+    if (target === "playoffs") { if (!$("playoff-predictor-content")?.dataset.ready) refreshPlayoffPredictor(); else renderScheduleComparison(); }
     if (target === "matchups") renderMatchups(state.matchupWeek);
     if (target === "hall") renderHallOfFame();
     if (target === "parlays") renderParlays();
@@ -2108,5 +2142,7 @@ function setupNavigation() {
 setupNavigation();
 const playoffRefreshButton=$('playoff-refresh');
 if(playoffRefreshButton)playoffRefreshButton.addEventListener('click',refreshPlayoffPredictor);
+const ppMedianToggle=$("pp-include-median");
+if(ppMedianToggle)ppMedianToggle.addEventListener("change",renderScheduleComparison);
 
 init();
