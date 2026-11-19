@@ -842,6 +842,7 @@ async function refreshPlayoffPredictor(){
  playoffPredictorBusy=true;if(button){button.disabled=true;button.textContent="UPDATING…";}
  target.innerHTML='<div class="pp-loading">REFRESHING CURRENT ROSTERS, PROJECTIONS AND SCHEDULE…</div>';
  try{
+  const coreReady=await sleeperCoreReady;if(!coreReady||!state.teams?.size)throw new Error("League data is still loading or unavailable. Please refresh in a moment.");
   const regular=Math.max(1,(num(state.league?.settings?.playoff_week_start)||15)-1),season=state.league?.season||new Date().getFullYear();
   const [rosters,players]=await Promise.all([fetchJson("/league/"+LEAGUE_ID+"/rosters",{attempts:2,timeoutMs:15000}),state.players?Promise.resolve(state.players):(state.playersPromise||=fetchJson("/players/nfl?active=true",{attempts:1,timeoutMs:25000}).then(v=>{state.players=v||{};return state.players;}))]);
   if(!Array.isArray(rosters)||rosters.length!==state.teams.size)throw new Error("Could not retrieve all current Sleeper rosters.");
