@@ -432,10 +432,16 @@ async function init() {
     $("updated-at").textContent = state.usingCachedCore ? "SLEEPER API · SAVED LEAGUE DETAILS IN USE" : "SLEEPER API · REFRESHING WEEKLY DATA";
     updateStartupStatus();
 
-    // Keep the expensive historical refresh off the critical rendering path and cap
-    // concurrency so Sleeper/network bursts cannot overwhelm the browser.
-    for (let startWeek = 1; startWeek <= maxWeek; startWeek += 4) {
-      const batch = Array.from({ length: Math.min(4, maxWeek - startWeek + 1) }, (_, index) => startWeek + index);
+    // Reuse saved historical matchups instead of requesting every week on
+    // every page load. Refresh the latest completed week and the active week;
+    // fetch any weeks that are missing from the local cache (first visit/recovery).
+    const weeksToRefresh = Array.from({ length: maxWeek }, (_, index) => index + 1)
+      .filter(week => !Array.isArray(savedWeeks[String(week)]) ||
+        week === cachedLatest ||
+        week === Math.min(maxWeek, Math.max(cachedLatest + 1, state.currentWeek)));
+    // Keep requests in small batches so a refresh remains gentle on Sleeper.
+    for (let start = 0; start < weeksToRefresh.length; start += 4) {
+      const batch = weeksToRefresh.slice(start, start + 4);
       const results = await Promise.all(batch.map(async week => {
         try {
           const data = await fetchJson("/league/" + LEAGUE_ID + "/matchups/" + week, { attempts: 2, timeoutMs: 9000 });
