@@ -897,47 +897,6 @@ function renderScheduleComparison(){
  (completedWeeks.length?table:'<div class="pp-loading">No completed regular-season weeks are available yet.</div>')+
  '<p class="pp-explainer">Rows keep that manager’s actual weekly scores; columns apply that manager’s actual head-to-head opponents. Each cell shows the row manager’s recalculated record against the column manager’s schedule. The diagonal is each manager’s actual record. League-median results are based on the row manager’s own weekly scores and do not change with the head-to-head schedule.</p>';
 }
-
-async function calculateHistoricalProjectionError() {
- const button=$("pp-calibration-run"),target=$("pp-calibration-results");
- if(!target||button?.disabled)return;
- if(button){button.disabled=true;button.textContent="CALCULATING…";}
- target.innerHTML='<div class="pp-loading">CHECKING HISTORICAL SLEEPER PROJECTIONS…</div>';
- try{
-  const ready=await sleeperCoreReady;
-  if(!ready||!state.teams?.size)throw new Error("League data is not ready yet.");
-  const regular=Math.max(1,(num(state.league?.settings?.playoff_week_start)||15)-1),season=state.league?.season||new Date().getFullYear(),completed=[];
-  for(let week=1;week<=regular;week++){const rows=state.weeks[week]||[];if(rows.length>=state.teams.size&&rows.filter(row=>num(row.points)>0).length===state.teams.size)completed.push(week);}
-  if(!completed.length)throw new Error("No fully completed weeks were found.");
-  const observations=[],weekResults=[];
-  for(let start=0;start<completed.length;start+=3){
-   const batch=completed.slice(start,start+3);
-   const results=await Promise.all(batch.map(async week=>{
-    const raw=await fetchJson("/api/sleeper-projections/"+season+"/"+week+"?season_type=regular&position[]=QB&position[]=RB&position[]=WR&position[]=TE&position[]=K&position[]=DEF&order_by=pts_half_ppr",{attempts:1,timeoutMs:22000});
-    const rows=normalizeSleeperRows(raw);if(!rows.length)throw new Error("Sleeper returned no projection rows for Week "+week+".");
-    const byPlayer=new Map(rows.map(row=>[String(row.player_id??row.player?.player_id??""),row]).filter(([id])=>id)),weekObs=[],excluded=[];
-    for(const matchup of state.weeks[week]||[]){
-     const rosterId=Number(matchup.roster_id),team=teamFor(rosterId),starters=Array.isArray(matchup.starters)?matchup.starters.map(String).filter(id=>id&&id!=="0"):[];
-     if(!team||!starters.length||!Number.isFinite(Number(matchup.points))){excluded.push(team?.name||("Roster "+rosterId));continue;}
-     let projected=0,missing=0;
-     for(const id of starters){const value=byPlayer.get(id)?.stats?.pts_half_ppr;if(value==null||!Number.isFinite(Number(value)))missing++;else projected+=Number(value);}
-     if(missing){excluded.push(team.name+" ("+missing+" missing starter projections)");continue;}
-     const actual=Number(matchup.points);weekObs.push({week,manager:team.name,actual,projected,error:actual-projected});
-    }
-    return {week,observations:weekObs,excluded};
-   }));
-   results.forEach(result=>observations.push(...result.observations));weekResults.push(...results);
-   target.innerHTML='<div class="pp-loading">PROCESSED '+Math.min(start+3,completed.length)+' / '+completed.length+' COMPLETED WEEKS…</div>';
-  }
-  if(observations.length<2)throw new Error("Only "+observations.length+" usable team-week comparisons were found. Historical projections may not be available from Sleeper.");
-  const mean=observations.reduce((sum,row)=>sum+row.error,0)/observations.length,sumSquares=observations.reduce((sum,row)=>sum+Math.pow(row.error-mean,2),0),sampleSd=Math.sqrt(sumSquares/(observations.length-1)),populationSd=Math.sqrt(sumSquares/observations.length);
-  const weekRows=weekResults.map(result=>{const rows=result.observations,avg=rows.length?rows.reduce((sum,row)=>sum+row.error,0)/rows.length:null,sd=rows.length>1?Math.sqrt(rows.reduce((sum,row)=>sum+Math.pow(row.error-avg,2),0)/(rows.length-1)):null;return {week:result.week,count:rows.length,mean:avg,sd,excluded:result.excluded.length};});
-  const excludedTotal=weekResults.reduce((sum,row)=>sum+row.excluded.length,0);
-  target.innerHTML='<div class="pp-calibration-stats"><article><span>TEAM-WEEK SAMPLES</span><strong>'+observations.length+'</strong></article><article><span>MEAN ERROR</span><strong>'+(mean>0?"+":"")+mean.toFixed(2)+'</strong><small>ACTUAL − PROJECTED</small></article><article><span>SAMPLE SD</span><strong>'+sampleSd.toFixed(2)+'</strong><small>POINTS</small></article><article><span>POPULATION SD</span><strong>'+populationSd.toFixed(2)+'</strong><small>POINTS</small></article></div><p class="pp-explainer">Errors are actual starting-lineup points minus Sleeper’s player projections (half-PPR). The sample standard deviation is the main calibration figure; positive mean error means Sleeper underprojected on average.</p><div class="pp-table-wrap"><table class="pp-table pp-calibration-table"><thead><tr><th>WEEK</th><th>SAMPLES</th><th>MEAN ERROR</th><th>ERROR SD</th><th>EXCLUDED</th></tr></thead><tbody>'+weekRows.map(row=>'<tr><td>WEEK '+row.week+'</td><td class="pp-number">'+row.count+'</td><td class="pp-number">'+(row.mean==null?"—":(row.mean>0?"+":"")+row.mean.toFixed(2))+'</td><td class="pp-number">'+(row.sd==null?"—":row.sd.toFixed(2))+'</td><td class="pp-number">'+row.excluded+'</td></tr>').join("")+'</tbody></table></div>'+(excludedTotal?'<p class="pp-warning">'+excludedTotal+' team-week records were excluded because starters or one or more player projections were missing. The overall SD uses only complete comparisons.</p>':'')+'<p class="pp-footnote">Weeks checked: '+completed.join(", ")+'. This uses historical Sleeper projection responses, not current projections or player actual stats.</p>';
-  target.dataset.ready="yes";
- }catch(error){console.error("Historical projection calibration failed",error);target.innerHTML='<div class="pp-error">Could not calculate historical accuracy: '+escapeHtml(error?.message||"Unknown error")+'. If Sleeper does not expose archived projections for completed weeks, this endpoint cannot provide a valid historical SD.</div>';target.dataset.ready="no";}
- finally{if(button){button.disabled=false;button.textContent="RECALCULATE ACTUAL SD";}}
-}
 async function refreshPlayoffPredictor(){
  const target=$("playoff-predictor-content"),button=$("playoff-refresh");if(!target||playoffPredictorBusy)return;
  playoffPredictorBusy=true;if(button){button.disabled=true;button.textContent="UPDATING…";}
@@ -2206,8 +2165,6 @@ function setupNavigation() {
   window.addEventListener("popstate",()=>{const route=window.location.hash.replace(/^#/, "").match(/^season-(\d{4})$/);if(route)openHallSeasonPage(Number(route[1]),false);else if(window.location.hash==="#hall")activateTab("hall");});
 }
 setupNavigation();
-const calibrationButton=$("pp-calibration-run");
-if(calibrationButton)calibrationButton.addEventListener("click",calculateHistoricalProjectionError);
 const playoffRefreshButton=$('playoff-refresh');
 if(playoffRefreshButton)playoffRefreshButton.addEventListener('click',refreshPlayoffPredictor);
 const ppMedianToggle=$("pp-include-median");
