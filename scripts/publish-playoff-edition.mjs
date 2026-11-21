@@ -109,7 +109,7 @@ async function main() {
   const indexPath=path.join(outDir,"index.json");
   const index=fs.existsSync(indexPath)?JSON.parse(fs.readFileSync(indexPath,"utf8")):{season:SEASON,editions:[]};
   const latest=Math.max(0,...index.editions.map(e=>Number(e.week)||0));
-  if(completed<=latest && process.env.REBUILD_CURRENT_EDITION!=="true"){console.log(`Week ${completed} is already published (latest ${latest}); no new edition.`);return;}
+  if(completed<=latest){console.log(`Week ${completed} is already published (latest ${latest}); no new edition.`);return;}
   const actual=standings(teams,matchups,completed),actualById=new Map(actual.map(t=>[t.id,t]));
   const future=Array.from({length:regular-completed},(_,i)=>completed+i+1);
   const maxWins=new Map(teams.map(t=>[t.id,actualById.get(t.id).w+future.length*2]));
