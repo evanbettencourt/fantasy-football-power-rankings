@@ -1,4 +1,10 @@
 {
   "season": "2026",
-  "editions": []
+  "editions": [
+    {
+      "week": 10,
+      "publishedAt": "2026-11-21T12:31:34.626Z",
+      "file": "week-10.json"
+    }
+  ]
 }

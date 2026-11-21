@@ -1,0 +1,142 @@
+{
+  "season": "2026",
+  "week": 10,
+  "publishedAt": "2026-11-21T12:31:34.626Z",
+  "simulations": 100000,
+  "standardDeviation": 20,
+  "regularSeasonWeeks": 14,
+  "results": [
+    {
+      "rosterId": 3,
+      "manager": "Ben",
+      "odds": 98.802,
+      "byeOdds": 58.426,
+      "record": "18.8–9.2",
+      "pf": 1636.4423629055143,
+      "seed": 1,
+      "seedPct": 32.632,
+      "eliminated": false
+    },
+    {
+      "rosterId": 5,
+      "manager": "Marc",
+      "odds": 98.54899999999999,
+      "byeOdds": 48.679,
+      "record": "19.0–9.0",
+      "pf": 1560.9375409038619,
+      "seed": 1,
+      "seedPct": 25.918000000000003,
+      "eliminated": false
+    },
+    {
+      "rosterId": 10,
+      "manager": "Kevin",
+      "odds": 97.783,
+      "byeOdds": 39.223,
+      "record": "18.5–9.5",
+      "pf": 1580.2816654674157,
+      "seed": 3,
+      "seedPct": 20.235,
+      "eliminated": false
+    },
+    {
+      "rosterId": 4,
+      "manager": "Colby",
+      "odds": 97.696,
+      "byeOdds": 38.499,
+      "record": "18.6–9.4",
+      "pf": 1557.8914308414865,
+      "seed": 3,
+      "seedPct": 21.318,
+      "eliminated": false
+    },
+    {
+      "rosterId": 1,
+      "manager": "Evan",
+      "odds": 80.903,
+      "byeOdds": 6.306000000000001,
+      "record": "16.2–11.8",
+      "pf": 1575.2611873740025,
+      "seed": 5,
+      "seedPct": 24.576999999999998,
+      "eliminated": false
+    },
+    {
+      "rosterId": 12,
+      "manager": "Brandon",
+      "odds": 80.373,
+      "byeOdds": 7.931000000000001,
+      "record": "16.0–12.0",
+      "pf": 1595.606832671113,
+      "seed": 6,
+      "seedPct": 26.714,
+      "eliminated": false
+    },
+    {
+      "rosterId": 8,
+      "manager": "Pat",
+      "odds": 33.349000000000004,
+      "byeOdds": 0.9259999999999999,
+      "record": "14.8–13.2",
+      "pf": 1457.1357042925167,
+      "seed": 7,
+      "seedPct": 31.537,
+      "eliminated": false
+    },
+    {
+      "rosterId": 6,
+      "manager": "Joey",
+      "odds": 6.798,
+      "byeOdds": 0.006999999999999999,
+      "record": "12.7–15.3",
+      "pf": 1477.8164752595956,
+      "seed": 8,
+      "seedPct": 29.213,
+      "eliminated": false
+    },
+    {
+      "rosterId": 7,
+      "manager": "Lee",
+      "odds": 2.942,
+      "byeOdds": 0,
+      "record": "12.0–16.0",
+      "pf": 1464.5212199263894,
+      "seed": 10,
+      "seedPct": 29.604000000000003,
+      "eliminated": false
+    },
+    {
+      "rosterId": 9,
+      "manager": "Butta",
+      "odds": 2.8049999999999997,
+      "byeOdds": 0.003,
+      "record": "11.8–16.2",
+      "pf": 1444.828024774914,
+      "seed": 10,
+      "seedPct": 42.172,
+      "eliminated": false
+    },
+    {
+      "rosterId": 11,
+      "manager": "Ders",
+      "odds": 0,
+      "byeOdds": 0,
+      "record": "7.1–20.9",
+      "pf": 1394.5899316935406,
+      "seed": 11,
+      "seedPct": 92.107,
+      "eliminated": false
+    },
+    {
+      "rosterId": 2,
+      "manager": "Tanz",
+      "odds": 0,
+      "byeOdds": 0,
+      "record": "2.5–25.5",
+      "pf": 1178.971560553033,
+      "seed": 12,
+      "seedPct": 98.778,
+      "eliminated": true
+    }
+  ]
+}
