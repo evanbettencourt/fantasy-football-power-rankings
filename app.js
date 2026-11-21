@@ -858,9 +858,9 @@ async function loadPlayoffEditions(){
   const response=await fetch("data/playoff-editions/index.json",{cache:"no-store"});
   if(!response.ok)throw new Error("Published edition index is not available yet.");
   const index=await response.json(),editions=(index.editions||[]).slice().sort((a,b)=>Number(b.week)-Number(a.week));
-  if(!editions.length){target.innerHTML='<div class="pp-loading">THE FIRST SHARED EDITION WILL APPEAR AFTER A FULL FANTASY WEEK IS COMPLETE.</div>';target.dataset.ready="yes";return;}
+  if(!editions.length){target.innerHTML='<div class="pp-loading">THE FIRST SHARED EDITION WILL APPEAR AFTER A FULL FANTASY WEEK IS COMPLETE.</div>';target.dataset.ready="no";return;}
   if(select){select.innerHTML=editions.map(e=>'<option value="'+Number(e.week)+'">Week '+String(e.week).padStart(2,"0")+'</option>').join("");select.value=String(editions[0].week);if(!select.dataset.bound){select.addEventListener("change",()=>showPlayoffEdition(Number(select.value),editions));select.dataset.bound="yes";}}
-  await showPlayoffEdition(Number(editions[0].week),editions);
+  await showPlayoffEdition(Number(editions[0].week),editions);\n  sleeperCoreReady.then(()=>renderScheduleComparison());
  }catch(error){target.innerHTML='<div class="pp-error">Shared playoff predictions are not available yet: '+escapeHtml(error?.message||"Unknown error")+'</div>';target.dataset.ready="no";}
  finally{target.dataset.loading="no";}
 }
