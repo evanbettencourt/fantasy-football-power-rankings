@@ -1,5 +1,7 @@
 name: Publish playoff editions
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: write
@@ -15,6 +17,8 @@ jobs:
         with:
           node-version: 22
       - name: Generate latest completed edition
+        env:
+          REBUILD_CURRENT_EDITION: 'true'
         run: node scripts/publish-playoff-edition.mjs
       - name: Commit new edition
         run: |
