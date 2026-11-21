@@ -132,7 +132,7 @@ async function main() {
     opponents.set(week,matchupMap(matchups[week]||[],week,teams.length));
   }
   const random=makeRandom(20260000+completed*7919);
-  const accum=new Map(teams.map(t=>[t.id,{playoffs:0,bye:0,seeds:Array(12).fill(0),wins:0,losses:0,pf:0}]));
+  const accum=new Map(teams.map(t=>[t.id,{playoffs:0,bye:0,lastPlace:0,seeds:Array(12).fill(0),wins:0,losses:0,pf:0}]));
   for(let sim=0;sim<SIMULATIONS;sim++){
     const w=new Map(teams.map(t=>[t.id,actualById.get(t.id).w]));
     const l=new Map(teams.map(t=>[t.id,actualById.get(t.id).l]));
@@ -148,11 +148,12 @@ async function main() {
     sorted.forEach((r,i)=>accum.get(r.id).seeds[i]++);
     sorted.slice(0,6).forEach(r=>accum.get(r.id).playoffs++);
     sorted.slice(0,2).forEach(r=>accum.get(r.id).bye++);
+     accum.get(sorted[11].id).lastPlace++;
     for(const team of teams){const a=accum.get(team.id);a.wins+=w.get(team.id);a.losses+=l.get(team.id);a.pf+=pf.get(team.id)-actualById.get(team.id).pf;}
   }
   const results=teams.map(team=>{
     const a=accum.get(team.id),seedIndex=a.seeds.indexOf(Math.max(...a.seeds)),actualRow=actualById.get(team.id);
-    return {rosterId:team.id,manager:team.name,odds:eliminated.get(team.id)?0:a.playoffs/SIMULATIONS*100,byeOdds:a.bye/SIMULATIONS*100,record:(a.wins/SIMULATIONS).toFixed(1)+"–"+(a.losses/SIMULATIONS).toFixed(1),pf:actualRow.pf+a.pf/SIMULATIONS,seed:seedIndex+1,seedPct:a.seeds[seedIndex]/SIMULATIONS*100,eliminated:eliminated.get(team.id)};
+    return {rosterId:team.id,manager:team.name,odds:eliminated.get(team.id)?0:a.playoffs/SIMULATIONS*100,byeOdds:a.bye/SIMULATIONS*100,lastPlaceOdds:a.lastPlace/SIMULATIONS*100,record:(a.wins/SIMULATIONS).toFixed(1)+"–"+(a.losses/SIMULATIONS).toFixed(1),pf:actualRow.pf+a.pf/SIMULATIONS,seed:seedIndex+1,seedPct:a.seeds[seedIndex]/SIMULATIONS*100,eliminated:eliminated.get(team.id)};
   }).sort((a,b)=>b.odds-a.odds||b.pf-a.pf);
   const edition={season:SEASON,week:completed,publishedAt:new Date().toISOString(),simulations:SIMULATIONS,standardDeviation:SD,regularSeasonWeeks:regular,results};
   const filename=`week-${String(completed).padStart(2,"0")}.json`;
