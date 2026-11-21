@@ -90,7 +90,7 @@ async function main() {
     get("https://api.sleeper.app/v1/state/nfl")
   ]);
   const userById=new Map(users.map(u=>[String(u.user_id),u]));
-  const teams=rosters.map(r=>{const owner=userById.get(String(r.owner_id));const key=String(owner?.username||owner?.display_name||"").toLowerCase();return {id:Number(r.roster_id),name:MANAGERS[key]||("Manager "+r.roster_id),roster:r};}).sort((a,b)=>a.id-b.id);
+  const teams=rosters.map(r=>{const owner=userById.get(String(r.owner_id));const username=String(owner?.username||"").toLowerCase(),display=String(owner?.display_name||"").toLowerCase();return {id:Number(r.roster_id),name:MANAGERS[username]||MANAGERS[display]||("Manager "+r.roster_id),roster:r};}).sort((a,b)=>a.id-b.id);
   if(teams.length!==12)throw new Error("Expected 12 league teams; found "+teams.length);
   const matchups={};
   for(let w=1;w<=regular;w++)matchups[w]=await get(`https://api.sleeper.app/v1/league/${LEAGUE_ID}/matchups/${w}`);
