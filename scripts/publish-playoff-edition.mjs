@@ -1,7 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
-// Shared, deterministic weekly edition publisher.\nconst LEAGUE_ID = "1313563024161787904";
+// Shared, deterministic weekly edition publisher.
+const LEAGUE_ID = "1313563024161787904";
 const SEASON = "2026";
 const SIMULATIONS = 100000;
 const SD = 20;
