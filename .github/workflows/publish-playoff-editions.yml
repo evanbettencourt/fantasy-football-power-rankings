@@ -1,12 +1,6 @@
 name: Publish playoff editions
 on:
-  schedule:
-    - cron: "17 * * * *"
   workflow_dispatch:
-  push:
-    paths:
-      - "scripts/publish-playoff-edition.mjs"
-      - ".github/workflows/publish-playoff-editions.yml"
 permissions:
   contents: write
 jobs:
