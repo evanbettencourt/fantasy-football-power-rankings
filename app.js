@@ -934,7 +934,7 @@ async function refreshPlayoffPredictor(){
    return {week,mean,missing:missing.size};
   }));
   const weekMeans=new Map(weekly.map(item=>[item.week,item.mean]));
-  const model=new Map(teams.map(team=>{const h=actualMap.get(team.id);return [team.id,{h,sd:18}];}));
+  const model=new Map(teams.map(team=>{const h=actualMap.get(team.id);return [team.id,{h,sd:20}];}));
   const opponents=new Map();
   for(const w of future){const groups=new Map();for(const m of state.weeks[w]||[]){if(m.matchup_id==null)continue;const k=String(m.matchup_id);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(Number(m.roster_id));}const valid=[...groups.values()].filter(g=>g.length===2);if(valid.length!==teams.length/2)throw new Error("Week "+w+" head-to-head schedule is not fully loaded yet.");const map=new Map();valid.forEach(([x,y])=>{map.set(x,y);map.set(y,x);});opponents.set(w,map);}
   const wins=new Map(),losses=new Map(),pf=new Map(),seeds=new Map(),playoffs=new Map();
