@@ -801,53 +801,6 @@ function renderMatchups(week = state.matchupWeek, dataReady = false) {
 }
 
 
-const PLAYOFF_SIMULATIONS=10000;
-let playoffPredictorBusy=false;
-function playoffSample(mean,sd){const u=Math.max(1e-9,Math.random()),v=Math.random();return mean+sd*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
-function playoffSlotAccepts(slot,eligible){
- const s=String(slot||"").toUpperCase();
- if(["QB","RB","WR","TE"].includes(s))return eligible.has(s);
- if(["FLEX","WRRB_FLEX","REC_FLEX"].includes(s))return ["RB","WR","TE"].some(p=>eligible.has(p));
- if(["SUPER_FLEX","SUPERFLEX","SFLX"].includes(s))return ["QB","RB","WR","TE"].some(p=>eligible.has(p));
- return false;
-}
-function playoffLineup(ids,players,projections,slots,byes,waiverPool=[]){
- const rosterPool=[...new Set(ids.map(String))].map(id=>{
-  const p=players[id]||{},positions=new Set((p.fantasy_positions?.length?p.fantasy_positions:[p.position]).filter(Boolean).map(x=>String(x).toUpperCase()));
-  const raw=projections.get(id)?.stats?.pts_half_ppr,bye=byes.has(String(p.team||"").toUpperCase());
-  return {id,positions,points:raw!=null&&Number.isFinite(Number(raw))?Number(raw):0,bye};
- }).filter(p=>p.positions.size&&!p.bye);
- const gaps=slots.map((slot,i)=>({slot,i})).filter(x=>!rosterPool.some(p=>playoffSlotAccepts(x.slot,p.positions)));
- const orderedGaps=gaps.sort((a,b)=>waiverPool.filter(p=>playoffSlotAccepts(a.slot,p.positions)).length-waiverPool.filter(p=>playoffSlotAccepts(b.slot,p.positions)).length);
- const additions=[],used=new Set();
- for(const gap of orderedGaps){const candidate=waiverPool.find(p=>!used.has(p.id)&&playoffSlotAccepts(gap.slot,p.positions));if(candidate){additions.push(candidate);used.add(candidate.id);}}
- const pool=[...rosterPool,...additions];
- const ordered=slots.map((slot,i)=>({slot,i})).sort((a,b)=>pool.filter(p=>playoffSlotAccepts(a.slot,p.positions)).length-pool.filter(p=>playoffSlotAccepts(b.slot,p.positions)).length);
- const memo=new Map();
- function best(i,mask){
-  if(i===ordered.length)return 0;
-  const key=i+":"+mask;if(memo.has(key))return memo.get(key);
-  let value=best(i+1,mask);
-  for(let p=0;p<pool.length;p++){const bit=1<<p;if((mask&bit)||!playoffSlotAccepts(ordered[i].slot,pool[p].positions))continue;value=Math.max(value,pool[p].points+best(i+1,mask|bit));}
-  memo.set(key,value);return value;
- }
- return best(0,0);
-}
-function playoffByes(schedule){
- const nfl=["ARI","ATL","BAL","BUF","CAR","CHI","CIN","CLE","DAL","DEN","DET","GB","HOU","IND","JAX","KC","LV","LAC","LAR","MIA","MIN","NE","NO","NYG","NYJ","PHI","PIT","SF","SEA","TB","TEN","WAS"],playing=new Set();
- for(const e of schedule?.events||[])for(const c of e.competitions?.[0]?.competitors||[]){let t=String(c.team?.abbreviation||"").toUpperCase();if(t==="JAC")t="JAX";if(t==="LA")t="LAR";if(t==="WSH")t="WAS";if(t)playing.add(t);}
- return new Set(nfl.filter(t=>!playing.has(t)));
-}
-function playoffActual(teams,completed){
- const rows=teams.map(t=>({id:t.id,name:t.name,w:0,l:0,t:0,pf:0,scores:[]})),byId=new Map(rows.map(t=>[t.id,t]));
- for(let w=1;w<=completed;w++){
-  const games=state.weeks[w]||[],valid=games.filter(m=>num(m.points)>0);if(valid.length!==teams.length)continue;
-  const ordered=valid.map(m=>num(m.points)).sort((a,b)=>a-b),median=(ordered[5]+ordered[6])/2,groups=new Map();
-  for(const m of valid){const t=byId.get(Number(m.roster_id));if(!t)continue;const p=num(m.points);t.pf+=p;t.scores.push(p);if(p>median)t.w++;else if(p<median)t.l++;else t.t++;if(m.matchup_id!=null){const k=String(m.matchup_id);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(m);}}
-  for(const g of groups.values()){if(g.length!==2)continue;const x=byId.get(Number(g[0].roster_id)),y=byId.get(Number(g[1].roster_id));if(!x||!y)continue;if(num(g[0].points)>num(g[1].points))x.w++,y.l++;else if(num(g[0].points)<num(g[1].points))y.w++,x.l++;else x.t++,y.t++;}
- }
- return rows;
-}
 function renderScheduleComparison(){
  const target=$("pp-schedule-comparison");if(!target||!state.teams?.size)return;
  const includeMedian=$("pp-include-median")?.checked!==false;
@@ -897,74 +850,35 @@ function renderScheduleComparison(){
  (completedWeeks.length?table:'<div class="pp-loading">No completed regular-season weeks are available yet.</div>')+
  '<p class="pp-explainer">Rows keep that manager’s actual weekly scores; columns apply that manager’s actual head-to-head opponents. Each cell shows the row manager’s recalculated record against the column manager’s schedule. The diagonal is each manager’s actual record. League-median results are based on the row manager’s own weekly scores and do not change with the head-to-head schedule.</p>';
 }
-async function refreshPlayoffPredictor(){
- const target=$("playoff-predictor-content"),button=$("playoff-refresh");if(!target||playoffPredictorBusy)return;
- playoffPredictorBusy=true;if(button){button.disabled=true;button.textContent="UPDATING…";}
- target.innerHTML='<div class="pp-loading">CONNECTING TO SLEEPER LEAGUE DATA…</div>';
+async function loadPlayoffEditions(){
+ const target=$("playoff-predictor-content"),select=$("playoff-edition-select");
+ if(!target||target.dataset.loading==="yes")return;
+ target.dataset.loading="yes";target.innerHTML='<div class="pp-loading">LOADING PUBLISHED PLAYOFF EDITIONS…</div>';
  try{
-  const coreReady=await sleeperCoreReady;if(!coreReady||!state.teams?.size)throw new Error("League data is still loading or unavailable. Please refresh in a moment.");
-  const regular=Math.max(1,(num(state.league?.settings?.playoff_week_start)||15)-1),season=state.league?.season||new Date().getFullYear();
-  target.innerHTML='<div class="pp-loading">LOADING CURRENT ROSTERS AND PLAYER DATA…</div>';
-  const [rosters,players]=await Promise.all([fetchJson("/league/"+LEAGUE_ID+"/rosters",{attempts:2,timeoutMs:15000}),state.players?Promise.resolve(state.players):(state.playersPromise||=fetchJson("/players/nfl?active=true",{attempts:1,timeoutMs:25000}).then(v=>{state.players=v||{};return state.players;}))]);
-  if(!Array.isArray(rosters)||rosters.length!==state.teams.size)throw new Error("Could not retrieve all current Sleeper rosters.");
-  state.rosters=rosters;
-  let completed=0;
-  for(let w=1;w<=regular;w++){const rows=state.weeks[w]||[];if(rows.length>=state.teams.size&&rows.filter(m=>num(m.points)>0).length===state.teams.size)completed=w;}
-  const teams=[...state.teams.values()].sort((a,b)=>a.id-b.id),actual=playoffActual(teams,completed),actualMap=new Map(actual.map(x=>[x.id,x]));
-  const future=Array.from({length:regular-completed},(_,i)=>completed+i+1);
-  // A team is eliminated only when six other teams have already banked more wins than its best possible finish. A tie remains alive because Points For breaks ties.
-  const maximumWins=new Map(teams.map(team=>[team.id,actualMap.get(team.id).w+future.length*2]));
-  const mathematicallyEliminated=new Map(teams.map(team=>[team.id,teams.filter(other=>other.id!==team.id&&actualMap.get(other.id).w>maximumWins.get(team.id)).length>=6]));
-  const rosteredIds=new Set(rosters.flatMap(roster=>[...(roster.players||[]),...(roster.reserve||[])].map(String)));
-  target.innerHTML='<div class="pp-loading">FETCHING WEEKLY PROJECTIONS AND NFL BYE WEEKS…</div>';
-  const slots=(Array.isArray(state.league?.roster_positions)?state.league.roster_positions:[]).filter(s=>!["BN","IR"].includes(String(s).toUpperCase()));
-  const weekly=await Promise.all(future.map(async week=>{
-   const [raw,schedule]=await Promise.all([
-    fetchJson("/api/sleeper-projections/"+season+"/"+week+"?season_type=regular&position[]=QB&position[]=RB&position[]=WR&position[]=TE&position[]=K&position[]=DEF&order_by=pts_half_ppr",{attempts:2,timeoutMs:22000}),
-    fetchJson("/api/nfl-schedule?seasontype=2&week="+week+"&year="+encodeURIComponent(season),{attempts:2,timeoutMs:18000})
-   ]);
-   const rows=normalizeSleeperRows(raw);if(!rows.length)throw new Error("Sleeper projections unavailable for Week "+week+".");if(!schedule?.events?.length)throw new Error("NFL schedule unavailable for Week "+week+".");
-   const map=new Map(rows.map(r=>[String(r.player_id??r.player?.player_id??""),r]).filter(([id])=>id)),byes=playoffByes(schedule),mean=new Map(),missing=new Set();
-   const waiverPool=[...map.entries()].filter(([id])=>!rosteredIds.has(id)).map(([id,row])=>{
-    const p=players[id]||{},positions=new Set((p.fantasy_positions?.length?p.fantasy_positions:[p.position]).filter(Boolean).map(x=>String(x).toUpperCase()));
-    const raw=row?.stats?.pts_half_ppr,points=raw!=null&&Number.isFinite(Number(raw))?Number(raw):0;
-    return {id,positions,points,bye:byes.has(String(p.team||"").toUpperCase())};
-   }).filter(p=>p.positions.size&&!p.bye&&p.points>0).sort((a,b)=>b.points-a.points);
-   for(const roster of rosters){const ids=[...(roster.players||[]),...(roster.reserve||[])];mean.set(Number(roster.roster_id),playoffLineup(ids,players,map,slots,byes,waiverPool));for(const id of ids.map(String)){if(!map.has(id)&&!byes.has(String(players[id]?.team||"").toUpperCase()))missing.add(id);}}
-   return {week,mean,missing:missing.size};
-  }));
-  const weekMeans=new Map(weekly.map(item=>[item.week,item.mean]));
-  const model=new Map(teams.map(team=>{const h=actualMap.get(team.id);return [team.id,{h,sd:20}];}));
-  const opponents=new Map();
-  for(const w of future){const groups=new Map();for(const m of state.weeks[w]||[]){if(m.matchup_id==null)continue;const k=String(m.matchup_id);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(Number(m.roster_id));}const valid=[...groups.values()].filter(g=>g.length===2);if(valid.length!==teams.length/2)throw new Error("Week "+w+" head-to-head schedule is not fully loaded yet.");const map=new Map();valid.forEach(([x,y])=>{map.set(x,y);map.set(y,x);});opponents.set(w,map);}
-  const wins=new Map(),losses=new Map(),pf=new Map(),seeds=new Map(),playoffs=new Map();
-  for(const t of teams){wins.set(t.id,0);losses.set(t.id,0);pf.set(t.id,0);seeds.set(t.id,Array(teams.length).fill(0));playoffs.set(t.id,0);}
-  target.innerHTML='<div class="pp-loading">RUNNING 10,000 SEASON SIMULATIONS…</div>';
-  for(let sim=0;sim<PLAYOFF_SIMULATIONS;sim++){
-   if(sim%250===0){target.innerHTML='<div class="pp-loading">RUNNING SIMULATIONS · '+sim.toLocaleString()+' / '+PLAYOFF_SIMULATIONS.toLocaleString()+'</div>';await new Promise(resolve=>setTimeout(resolve,0));}
-   const sw=new Map(teams.map(t=>[t.id,model.get(t.id).h.w])),sl=new Map(teams.map(t=>[t.id,model.get(t.id).h.l])),st=new Map(teams.map(t=>[t.id,model.get(t.id).h.t])),sp=new Map(teams.map(t=>[t.id,model.get(t.id).h.pf]));
-   for(const w of future){
-    const scores=new Map();for(const t of teams){const m=model.get(t.id),projection=weekMeans.get(w).get(t.id),mean=projection;scores.set(t.id,Math.max(0,playoffSample(mean,m.sd)));}
-    const vals=[...scores.values()].sort((a,b)=>a-b),median=(vals[5]+vals[6])/2;
-    for(const t of teams){const x=scores.get(t.id),y=scores.get(opponents.get(w).get(t.id));sp.set(t.id,sp.get(t.id)+x);if(x>median)sw.set(t.id,sw.get(t.id)+1);else if(x<median)sl.set(t.id,sl.get(t.id)+1);else st.set(t.id,st.get(t.id)+1);if(x>y)sw.set(t.id,sw.get(t.id)+1);else if(x<y)sl.set(t.id,sl.get(t.id)+1);else st.set(t.id,st.get(t.id)+1);}
-   }
-   const sorted=teams.map(t=>({id:t.id,w:sw.get(t.id),pf:sp.get(t.id)})).sort((a,b)=>b.w-a.w||b.pf-a.pf);
-   sorted.forEach((r,i)=>seeds.get(r.id)[i]++);sorted.slice(0,6).forEach(r=>playoffs.set(r.id,playoffs.get(r.id)+1));
-   for(const t of teams){wins.set(t.id,wins.get(t.id)+sw.get(t.id));losses.set(t.id,losses.get(t.id)+sl.get(t.id));pf.set(t.id,pf.get(t.id)+(sp.get(t.id)-(model.get(t.id).h.pf||0)));}
-  }
-  const results=teams.map(t=>{const a=seeds.get(t.id),seed=a.indexOf(Math.max(...a))+1;return {t,odds:playoffs.get(t.id)/100,byeOdds:(a[0]+a[1])/100,eliminated:mathematicallyEliminated.get(t.id),record:(wins.get(t.id)/10000).toFixed(1)+"–"+(losses.get(t.id)/10000).toFixed(1),pf:(model.get(t.id).h.pf+pf.get(t.id)/10000),seed,seedPct:a[seed-1]/100};}).sort((a,b)=>b.odds-a.odds||b.pf-a.pf);
-  renderScheduleComparison();
-  const warnings=weekly.filter(x=>x.missing).map(x=>"Week "+x.week+" ("+x.missing+" players)");
-  target.dataset.ready="yes";
-  target.innerHTML='<div class="pp-meta"><span>10,000 SIMULATIONS</span><span>DATA THROUGH WEEK '+completed+'</span><span>'+(regular-completed)+' WEEKS REMAINING</span></div><div class="pp-table-wrap"><table class="pp-table"><thead><tr><th>MANAGER</th><th>PLAYOFF ODDS</th><th>BYE WEEK ODDS</th><th>PROJECTED RECORD</th><th>PROJECTED PF</th><th>MOST LIKELY SEED</th></tr></thead><tbody>'+
-   results.map((r,i)=>'<tr class="'+(i===5?'pp-cutoff':'')+'"><td><span class="pp-manager-rank">'+String(i+1).padStart(2,"0")+'</span><strong>'+escapeHtml(r.t.name)+'</strong></td><td><div class="pp-odds-cell"><strong>'+(r.eliminated?'0.0%':r.odds<0.1?'<0.1%':r.odds.toFixed(1)+'%')+'</strong><span class="pp-odds-track"><i style="width:'+r.odds+'%"></i></span></div></td><td><div class="pp-odds-cell"><strong>'+(r.byeOdds>0&&r.byeOdds<0.1?'<0.1%':r.byeOdds.toFixed(1)+'%')+'</strong><span class="pp-odds-track"><i style="width:'+r.byeOdds+'%"></i></span></div></td><td class="pp-number">'+r.record+'</td><td class="pp-number">'+r.pf.toFixed(1)+'</td><td><strong>#'+r.seed+'</strong><small class="pp-seed-note">'+r.seedPct.toFixed(1)+'% of sims</small></td></tr>').join("")+
-   '</tbody></table></div><p class="pp-explainer">Each simulation plays out every remaining week with a head-to-head result and a league-median result. Final standings are ordered by wins, then Points For. The top six qualify; the top two seeds receive a first-round bye. A team with zero playoff finishes in the simulations is shown as &lt;0.1% if it is still mathematically alive. A team is eliminated only when at least six other teams have already earned more wins than it can possibly finish with; ties on wins remain alive because Points For is the tiebreaker.</p>'+
-   (warnings.length?'<p class="pp-warning">Some rostered players lacked a Sleeper projection and were assigned 0: '+warnings.join(", ")+'.</p>':'')+
-   '<p class="pp-footnote">Future lineups use the highest-projected legal lineup from each current roster, including IR. If a bye or roster shortage leaves a starting position with no eligible rostered player, the model fills that gap with the highest-projected unrostered player in the weekly projection feed. Waiver additions are evaluated independently for each team, so the same free agent can appear as a replacement for multiple teams. Future scoring is based on Sleeper projections only, with the current record as the starting point. Roster changes are picked up on refresh.</p>';
- }catch(error){console.error("Playoff predictor failed",error);target.dataset.ready="no";target.innerHTML='<div class="pp-error">The predictor could not finish: '+escapeHtml(error?.message||"Unknown error")+'. Please refresh and try again.</div>';}
- finally{playoffPredictorBusy=false;if(button){button.disabled=false;button.textContent="REFRESH PREDICTIONS";}}
+  const response=await fetch("data/playoff-editions/index.json",{cache:"no-store"});
+  if(!response.ok)throw new Error("Published edition index is not available yet.");
+  const index=await response.json(),editions=(index.editions||[]).slice().sort((a,b)=>Number(b.week)-Number(a.week));
+  if(!editions.length){target.innerHTML='<div class="pp-loading">THE FIRST SHARED EDITION WILL APPEAR AFTER A FULL FANTASY WEEK IS COMPLETE.</div>';target.dataset.ready="yes";return;}
+  if(select){select.innerHTML=editions.map(e=>'<option value="'+Number(e.week)+'">Week '+String(e.week).padStart(2,"0")+'</option>').join("");select.value=String(editions[0].week);if(!select.dataset.bound){select.addEventListener("change",()=>showPlayoffEdition(Number(select.value),editions));select.dataset.bound="yes";}}
+  await showPlayoffEdition(Number(editions[0].week),editions);
+ }catch(error){target.innerHTML='<div class="pp-error">Shared playoff predictions are not available yet: '+escapeHtml(error?.message||"Unknown error")+'</div>';target.dataset.ready="no";}
+ finally{target.dataset.loading="no";}
 }
-
+async function showPlayoffEdition(week,editions){
+ const target=$("playoff-predictor-content");if(!target)return;
+ try{
+  const editionInfo=editions.find(e=>Number(e.week)===week);if(!editionInfo)throw new Error("That edition could not be found.");
+  target.innerHTML='<div class="pp-loading">LOADING WEEK '+week+' EDITION…</div>';
+  const response=await fetch("data/playoff-editions/"+encodeURIComponent(editionInfo.file),{cache:"no-store"});if(!response.ok)throw new Error("The saved Week "+week+" edition could not be loaded.");
+  const edition=await response.json(),results=edition.results||[];if(results.length!==12)throw new Error("The saved edition is incomplete.");
+  const published=new Date(edition.publishedAt),dateLabel=Number.isNaN(published.getTime())?"":published.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
+  target.innerHTML='<div class="pp-meta"><span>'+Number(edition.simulations).toLocaleString()+' SIMULATIONS</span><span>DATA THROUGH WEEK '+edition.week+'</span><span>SD '+edition.standardDeviation+' POINTS</span><span>'+dateLabel.toUpperCase()+'</span></div>'+
+   '<div class="pp-table-wrap"><table class="pp-table"><thead><tr><th>MANAGER</th><th>PLAYOFF ODDS</th><th>BYE WEEK ODDS</th><th>PROJECTED RECORD</th><th>PROJECTED PF</th><th>MOST LIKELY SEED</th></tr></thead><tbody>'+
+   results.map((r,i)=>'<tr class="'+(i===5?"pp-cutoff":"")+'"><td><span class="pp-manager-rank">'+String(i+1).padStart(2,"0")+'</span><strong>'+escapeHtml(r.manager)+'</strong></td><td><div class="pp-odds-cell"><strong>'+(r.eliminated?"0.0%":r.odds<0.1?"<0.1%":r.odds.toFixed(1)+"%")+'</strong><span class="pp-odds-track"><i style="width:'+Math.max(0,Math.min(100,r.odds))+'%"></i></span></div></td><td><div class="pp-odds-cell"><strong>'+(r.byeOdds>0&&r.byeOdds<0.1?"<0.1%":r.byeOdds.toFixed(1)+"%")+'</strong><span class="pp-odds-track"><i style="width:'+Math.max(0,Math.min(100,r.byeOdds))+'%"></i></span></div></td><td class="pp-number">'+escapeHtml(r.record)+'</td><td class="pp-number">'+Number(r.pf).toFixed(1)+'</td><td><strong>#'+r.seed+'</strong><small class="pp-seed-note">'+Number(r.seedPct).toFixed(1)+'% of sims</small></td></tr>').join("")+
+   '</tbody></table></div><p class="pp-explainer">Each saved edition runs 100,000 simulations of every remaining regular-season week, including a head-to-head result and a league-median result. Final standings are ordered by wins, then Points For. The top six qualify; the top two seeds receive a first-round bye. Future scoring is based on Sleeper projections with a 20-point standard deviation. Everyone sees the same published results until the next complete fantasy week is published.</p><p class="pp-footnote">This is an archived snapshot. It does not recalculate when you visit the page or when rosters and projections change. Earlier editions remain available in the edition selector.</p>';
+  target.dataset.ready="yes";
+ }catch(error){target.innerHTML='<div class="pp-error">The saved prediction edition could not be displayed: '+escapeHtml(error?.message||"Unknown error")+'</div>';target.dataset.ready="no";}
+}
 let selectedScheduleTeam = null;
 function renderSchedule() {
   const pickTarget = $("schedule-team-picks");
@@ -2143,7 +2057,7 @@ function setupNavigation() {
     if (seasonPage) seasonPage.hidden = true;
     if (target === "rules") renderRules();
     if (target === "schedule") renderSchedule();
-    if (target === "playoffs") { if (!$("playoff-predictor-content")?.dataset.ready) refreshPlayoffPredictor(); else renderScheduleComparison(); }
+    if (target === "playoffs") { if (!$("playoff-predictor-content")?.dataset.ready) loadPlayoffEditions(); renderScheduleComparison(); }
     if (target === "matchups") renderMatchups(state.matchupWeek);
     if (target === "hall") renderHallOfFame();
     if (target === "parlays") renderParlays();
@@ -2165,8 +2079,6 @@ function setupNavigation() {
   window.addEventListener("popstate",()=>{const route=window.location.hash.replace(/^#/, "").match(/^season-(\d{4})$/);if(route)openHallSeasonPage(Number(route[1]),false);else if(window.location.hash==="#hall")activateTab("hall");});
 }
 setupNavigation();
-const playoffRefreshButton=$('playoff-refresh');
-if(playoffRefreshButton)playoffRefreshButton.addEventListener('click',refreshPlayoffPredictor);
 const ppMedianToggle=$("pp-include-median");
 if(ppMedianToggle)ppMedianToggle.addEventListener("change",renderScheduleComparison);
 
